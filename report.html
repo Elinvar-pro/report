@@ -12,59 +12,253 @@
         h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 4px 0; color: #1a5d2a; }
         .sub { color: #475569; font-size: 0.85rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
         
+        /* Карточка фильтров */
         .filters-card { background: white; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
-        .filters-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 16px; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 1; }
-        .filter-group label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5b6e8c; letter-spacing: 0.5px; }
-        select, input { padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; font-family: inherit; background: white; }
-        select:focus, input:focus { outline: none; border-color: #2e7d32; box-shadow: 0 0 0 2px rgba(46,125,50,0.1); }
         
-        .compare-section { background: #f8f9fa; border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid #dee2e6; }
-        .compare-title { font-weight: 600; margin-bottom: 16px; color: #1a5d2a; display: flex; align-items: center; gap: 8px; }
-        .compare-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
-        .compare-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 200px; }
-        .compare-group label { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; }
-        .compare-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #dee2e6; }
-        .compare-stat-card { background: white; border-radius: 12px; padding: 12px 16px; text-align: center; }
-        .compare-stat-card h4 { margin: 0 0 8px 0; font-size: 0.8rem; color: #5b6e8c; }
-        .compare-stat-card .value { font-size: 1.4rem; font-weight: 700; color: #1a5d2a; }
+        /* Ряд фильтров — Flexbox с выравниванием */
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        
+        /* Группа полей — одинаковый размер */
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 150px;
+            flex: 1 1 150px;
+        }
+        
+        /* Умный поиск — шире остальных */
+        .filter-group.search-group {
+            flex: 2 1 250px;
+        }
+        
+        .filter-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #5b6e8c;
+            letter-spacing: 0.5px;
+        }
+        
+        select, input {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: white;
+            width: 100%;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 2px rgba(46,125,50,0.1);
+        }
+        
+        /* Блок сравнения поставщиков */
+        .compare-section {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .compare-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a5d2a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .compare-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        
+        .compare-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1 1 200px;
+            min-width: 180px;
+        }
+        
+        .compare-group label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #5b6e8c;
+            text-transform: uppercase;
+        }
+        
+        /* Кнопки */
+        button {
+            background: #2e7d32;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        button:hover { background: #1b5e20; }
+        .btn-outline {
+            background: white;
+            border: 1px solid #2e7d32;
+            color: #2e7d32;
+        }
+        .btn-outline:hover { background: #e8f5e9; }
+        
+        /* Ряд с кнопкой сброса */
+        .reset-row {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        /* Статистика */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #e9edf2;
+        }
+        .stat-card h3 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #5b6e8c;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a5d2a;
+        }
+        
+        /* Графики */
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e9edf2;
+        }
+        .chart-card h3 {
+            margin: 0 0 16px 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        canvas { max-height: 280px; width: 100%; }
+        
+        /* Таблица */
+        .table-wrapper {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e9edf2;
+            overflow: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 800px;
+        }
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+        th:hover { background: #e9ecef; }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .price-cell {
+            font-weight: 500;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .badge-missing {
+            background: #ffebee;
+            color: #c62828;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .total-row td {
+            background: #fef6e0;
+            font-weight: 700;
+        }
+        .loading, .error-message {
+            text-align: center;
+            padding: 48px;
+        }
+        .error-message {
+            background: #fff5f5;
+            color: #b91c1c;
+            border-radius: 20px;
+        }
+        a {
+            color: #2e7d32;
+            text-decoration: none;
+        }
+        .compare-table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .compare-table th, .compare-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .search-hint {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
         .diff-positive { color: #c62828; }
         .diff-negative { color: #2e7d32; }
         
-        button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
-        button:hover { background: #1b5e20; }
-        .btn-outline { background: white; border: 1px solid #2e7d32; color: #2e7d32; }
-        .btn-outline:hover { background: #e8f5e9; }
-        
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-        .stat-card { background: white; border-radius: 20px; padding: 16px 20px; border: 1px solid #e9edf2; }
-        .stat-card h3 { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-value { font-size: 1.8rem; font-weight: 700; color: #1a5d2a; }
-        
-        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; margin-bottom: 28px; }
-        .chart-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e9edf2; }
-        .chart-card h3 { margin: 0 0 16px 0; font-size: 0.9rem; font-weight: 600; color: #1e293b; }
-        canvas { max-height: 280px; width: 100%; }
-        
-        .table-wrapper { background: white; border-radius: 20px; border: 1px solid #e9edf2; overflow: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
-        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; }
-        th:hover { background: #e9ecef; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; }
-        .price-cell { font-weight: 500; text-align: right; white-space: nowrap; }
-        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
-        .total-row td { background: #fef6e0; font-weight: 700; }
-        .loading, .error-message { text-align: center; padding: 48px; }
-        .error-message { background: #fff5f5; color: #b91c1c; border-radius: 20px; }
-        a { color: #2e7d32; text-decoration: none; }
-        .compare-table { margin-top: 20px; width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .compare-table th, .compare-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #dee2e6; }
-        .search-hint { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
         @media (max-width: 768px) {
             body { padding: 16px; }
             .filters-row { flex-direction: column; }
-            .compare-row { flex-direction: column; }
             .filter-group { width: 100%; }
+            .compare-row { flex-direction: column; }
+            .compare-group { width: 100%; }
+            .reset-row { justify-content: flex-start; }
             .charts-row { grid-template-columns: 1fr; }
         }
     </style>
@@ -77,7 +271,7 @@
     <!-- Основные фильтры -->
     <div class="filters-card">
         <div class="filters-row">
-            <div class="filter-group" style="flex: 2;">
+            <div class="filter-group search-group">
                 <label>🔎 Умный поиск</label>
                 <input type="text" id="searchText" placeholder="Поиск по наименованию, группе, поставщику, размеру...">
                 <div class="search-hint">📌 Ищет одновременно в 4 полях: наименование, группа, поставщик, размер</div>
@@ -99,12 +293,17 @@
                 <input type="number" id="priceMax" placeholder="Любая" step="1000">
             </div>
         </div>
-        <div style="margin-top: 16px; display: flex; gap: 10px;">
+        <div class="reset-row">
             <button id="resetAllBtn">⟳ Сбросить всё</button>
         </div>
     </div>
 
-    <!-- Блок сравнения поставщиков -->
+    <!-- Кнопка включения сравнения -->
+    <div style="margin-bottom: 16px;">
+        <button id="enableCompareBtn" class="btn-outline">📊 Сравнить поставщиков</button>
+    </div>
+
+    <!-- Блок сравнения поставщиков (изначально скрыт) -->
     <div class="compare-section" id="compareSection" style="display: none;">
         <div class="compare-title">
             <span>📊 Режим сравнения поставщиков</span>
@@ -125,11 +324,6 @@
             </div>
         </div>
         <div id="compareResults"></div>
-    </div>
-
-    <!-- Кнопка включения сравнения -->
-    <div style="margin-bottom: 24px;">
-        <button id="enableCompareBtn" class="btn-outline">📊 Сравнить поставщиков</button>
     </div>
 
     <!-- Статистика -->
@@ -317,13 +511,11 @@
                 }
             }
             
-            // Фильтры
             if (filterGroup && filterGroup !== "📁 Все группы" && group !== filterGroup) continue;
             if (!forCompare && filterSupplier && filterSupplier !== "🏭 Все поставщики" && supplier !== filterSupplier) continue;
             if (!isNaN(priceMin) && totalNum < priceMin) continue;
             if (!isNaN(priceMax) && totalNum > priceMax) continue;
             
-            // Умный поиск — ищет в 4 полях
             if (searchText) {
                 const searchable = `${name} ${group} ${supplier} ${size}`.toLowerCase();
                 if (!searchable.includes(searchText)) continue;
@@ -453,7 +645,7 @@
             return;
         }
         
-        let html = `<table><thead><tr><th onclick="sortTable('name')">📦 Наименование</th><th onclick="sortTable('group')">📁 Группа</th><th onclick="sortTable('supplier')">🏭 Поставщик</th><th>📏 Размер</th><th>📐 Ед.изм</th><th>💵 Цена/ед</th><th onclick="sortTable('price')">💰 Цена общая</th><th>🔗 Сайт</th></tr></thead><tbody>`;
+        let html = `<td><thead><tr><th onclick="sortTable('name')">📦 Наименование</th><th onclick="sortTable('group')">📁 Группа</th><th onclick="sortTable('supplier')">🏭 Поставщик</th><th>📏 Размер</th><th>📐 Ед.изм</th><th>💵 Цена/ед</th><th onclick="sortTable('price')">💰 Цена общая</th><th>🔗 Сайт</th></tr></thead><tbody>`;
         
         for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">⚠️ нет цены</span>`;
@@ -471,7 +663,7 @@
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
-        html += `</tbody>`;
+        html += `</tbody>~`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
@@ -514,8 +706,8 @@
     }
     
     function resetAllFilters() {
-        document.getElementById('filterGroup').value = '📁 Все группы';
-        document.getElementById('filterSupplier').value = '🏭 Все поставщики';
+        document.getElementById('filterGroup').value = "📁 Все группы";
+        document.getElementById('filterSupplier').value = "🏭 Все поставщики";
         document.getElementById('priceMin').value = '';
         document.getElementById('priceMax').value = '';
         document.getElementById('searchText').value = '';
