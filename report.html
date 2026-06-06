@@ -220,7 +220,7 @@
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ (между /d/ и /edit в URL) ⚠️
+    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ ⚠️
     const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
     const SHEET_NAME = "Лист1";
     
@@ -235,7 +235,6 @@
         container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
         
         try {
-            // Используем Google Sheets API напрямую (публичный доступ)
             const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
             const response = await fetch(url);
             const text = await response.text();
@@ -245,17 +244,31 @@
             const json = JSON.parse(jsonStr);
             
             const rows = json.table.rows;
+            const cols = json.table.cols;
             
-            // Преобразуем в массив массивов
+            // Очищаем старые данные
             allData = [];
+            
+            // Проходим по всем строкам
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i].c;
                 const rowData = [];
                 for (let j = 0; j < row.length; j++) {
-                    rowData.push(row[j] ? row[j].v : '');
+                    // Получаем значение, если оно есть
+                    let value = '';
+                    if (row[j] && row[j].v !== null && row[j].v !== undefined) {
+                        value = row[j].v;
+                    }
+                    rowData.push(value);
                 }
-                allData.push(rowData);
+                // Добавляем только если есть хоть какие-то данные
+                if (rowData.length > 0 && rowData.some(cell => cell !== '' && cell !== null && cell !== undefined)) {
+                    allData.push(rowData);
+                }
             }
+            
+            console.log("Загружено строк (сырых):", allData.length);
+            console.log("Первые 3 строки:", allData.slice(0, 3));
             
             if (!allData.length) {
                 container.innerHTML = '<div class="loading">📭 Нет данных в таблице</div>';
@@ -268,11 +281,14 @@
             for (let row of allData) {
                 const group = row[0] ? String(row[0]).trim() : '';
                 const supplier = row[2] ? String(row[2]).trim() : '';
-                if (group) groupsSet.add(group);
-                if (supplier) suppliersSet.add(supplier);
+                if (group && group !== '') groupsSet.add(group);
+                if (supplier && supplier !== '') suppliersSet.add(supplier);
             }
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
+            
+            console.log("Найдено групп:", allGroups.length);
+            console.log("Найдено поставщиков:", allSuppliers.length);
             
             const groupSelect = document.getElementById('filterGroup');
             groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
@@ -307,8 +323,8 @@
             
         } catch (error) {
             console.error('Ошибка:', error);
-            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки данных. Проверьте:<br>
-                1. Таблица опубликована (Файл → Предоставить доступ → "Все, у кого есть ссылка" → "Просматривать")<br>
+            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки данных: ${error.message}<br><br>
+                1. Таблица опубликована (Файл → Предоставить доступ → "Все, у кого есть ссылка")<br>
                 2. ID таблицы правильный<br>
                 3. Название листа "${SHEET_NAME}"</div>`;
         }
@@ -323,8 +339,8 @@
         if (selectedGroup && selectedGroup !== "📁 Все группы") {
             const suppliersInGroup = new Set();
             for (let row of allData) {
-                const group = row[0] ? row[0].toString().trim() : '';
-                const supplier = row[2] ? row[2].toString().trim() : '';
+                const group = row[0] ? String(row[0]).trim() : '';
+                const supplier = row[2] ? String(row[2]).trim() : '';
                 if (group === selectedGroup && supplier) suppliersInGroup.add(supplier);
             }
             availableSuppliers = Array.from(suppliersInGroup).sort();
@@ -347,6 +363,15 @@
         }
     }
     
+    function parsePrice(value) {
+        if (!value || value === '') return 0;
+        if (typeof value === 'number') return value;
+        const str = String(value).trim();
+        if (str === '') return 0;
+        const num = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        return isNaN(num) ? 0 : num;
+    }
+    
     function getFilteredData() {
         const filterGroup = document.getElementById('filterGroup').value;
         const filterSupplier = document.getElementById('filterSupplier').value;
@@ -366,43 +391,39 @@
             const size = row[6] ? String(row[6]).trim() : '';
             const site = row[7] || '';
             
+            // Форматирование цены за единицу
             let pricePerUnitFormatted = '';
-            if (pricePerUnitRaw && String(pricePerUnitRaw).trim() !== '') {
-                let priceStr = String(pricePerUnitRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
-                let priceNum = parseFloat(priceStr);
-                if (!isNaN(priceNum)) {
-                    pricePerUnitFormatted = priceNum.toFixed(2).replace('.', ',') + ' ₽';
-                } else {
-                    pricePerUnitFormatted = pricePerUnitRaw;
-                }
+            const pricePerUnitNum = parsePrice(pricePerUnitRaw);
+            if (pricePerUnitNum > 0) {
+                pricePerUnitFormatted = pricePerUnitNum.toFixed(2).replace('.', ',') + ' ₽';
             } else {
-                pricePerUnitFormatted = '—';
+                pricePerUnitFormatted = pricePerUnitRaw ? String(pricePerUnitRaw) : '—';
             }
             
-            let totalNum = 0;
-            let hasPrice = false;
-            if (totalRaw && String(totalRaw).trim() !== '') {
-                let priceStr = String(totalRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
-                let parsed = parseFloat(priceStr);
-                if (!isNaN(parsed)) {
-                    totalNum = parsed;
-                    hasPrice = true;
-                }
-            }
+            // Парсим общую цену
+            let totalNum = parsePrice(totalRaw);
+            let hasPrice = totalNum > 0;
             
+            // Пропускаем пустые строки
+            if (!group || group === '') continue;
+            
+            // Фильтры
             if (filterGroup && filterGroup !== "📁 Все группы" && group !== filterGroup) continue;
             if (filterSupplier && filterSupplier !== "🏭 Все поставщики" && supplier !== filterSupplier) continue;
             if (!isNaN(priceMin) && totalNum < priceMin) continue;
             if (!isNaN(priceMax) && totalNum > priceMax) continue;
             
+            // Умный поиск
             if (searchText) {
                 const searchable = `${name} ${group} ${supplier} ${size}`.toLowerCase();
                 if (!searchable.includes(searchText)) continue;
             }
             
-            if (!group) continue;
-            
-            filtered.push({ group, name, supplier, unit, pricePerUnit: pricePerUnitFormatted, totalNum, hasPrice, size, site });
+            filtered.push({ 
+                group, name, supplier, unit, 
+                pricePerUnit: pricePerUnitFormatted, 
+                totalNum, hasPrice, size, site 
+            });
         }
         
         return filtered;
@@ -411,6 +432,7 @@
     function renderTable() {
         let filtered = getFilteredData();
         
+        // Сортировка
         filtered.sort((a, b) => {
             if (currentSort.column === 'name') return currentSort.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
             if (currentSort.column === 'group') return currentSort.direction === 'asc' ? a.group.localeCompare(b.group) : b.group.localeCompare(a.group);
@@ -463,7 +485,7 @@
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td class="price-cell">—</td></tr>`;
-        html += `</tbody></table>`;
+        html += `</tbody>树`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
@@ -481,18 +503,19 @@
         const countData = labels.map(l => groupMap.get(l).count);
         
         if (sumChart) sumChart.destroy();
-        sumChart = new Chart(document.getElementById('sumChart'), {
-            type: 'bar',
-            data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#2e7d32', borderRadius: 6 }] },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
-        
-        if (countChart) countChart.destroy();
-        countChart = new Chart(document.getElementById('countChart'), {
-            type: 'pie',
-            data: { labels, datasets: [{ data: countData, backgroundColor: ['#2e7d32','#1565c0','#e65100','#6a1b9a','#c62828','#00838f','#5d4037'] }] },
-            options: { responsive: true, maintainAspectRatio: true }
-        });
+        if (labels.length > 0) {
+            sumChart = new Chart(document.getElementById('sumChart'), {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#2e7d32', borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+            
+            countChart = new Chart(document.getElementById('countChart'), {
+                type: 'pie',
+                data: { labels, datasets: [{ data: countData, backgroundColor: ['#2e7d32','#1565c0','#e65100','#6a1b9a','#c62828','#00838f','#5d4037'] }] },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+        }
     }
     
     function sortTable(col) {
