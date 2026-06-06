@@ -59,6 +59,7 @@
         a { color: #2e7d32; text-decoration: none; }
         .compare-table { margin-top: 20px; width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         .compare-table th, .compare-table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        .search-hint { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
         @media (max-width: 768px) {
             body { padding: 16px; }
             .filters-row { flex-direction: column; }
@@ -70,35 +71,36 @@
 </head>
 <body>
 <div class="container">
-    <h1>Сводка по материалам</h1>
-    <div class="sub">Актуальные данные из Google Таблицы</div>
+    <h1>📋 Сводка по материалам</h1>
+    <div class="sub">📅 Актуальные данные из Google Таблицы | 🔄 Обновляется автоматически</div>
 
     <!-- Основные фильтры -->
     <div class="filters-card">
         <div class="filters-row">
+            <div class="filter-group" style="flex: 2;">
+                <label>🔎 Умный поиск</label>
+                <input type="text" id="searchText" placeholder="Поиск по наименованию, группе, поставщику, размеру...">
+                <div class="search-hint">📌 Ищет одновременно в 4 полях: наименование, группа, поставщик, размер</div>
+            </div>
             <div class="filter-group">
-                <label>Группа</label>
+                <label>📁 Группа</label>
                 <select id="filterGroup"><option value="">Все группы</option></select>
             </div>
             <div class="filter-group">
-                <label>Поставщик</label>
+                <label>🏭 Поставщик</label>
                 <select id="filterSupplier"><option value="">Все поставщики</option></select>
             </div>
             <div class="filter-group">
-                <label>Цена от (руб)</label>
+                <label>💰 Цена от</label>
                 <input type="number" id="priceMin" placeholder="0" step="1000">
             </div>
             <div class="filter-group">
-                <label>Цена до (руб)</label>
+                <label>💰 Цена до</label>
                 <input type="number" id="priceMax" placeholder="Любая" step="1000">
-            </div>
-            <div class="filter-group">
-                <label>Поиск</label>
-                <input type="text" id="searchText" placeholder="Наименование...">
             </div>
         </div>
         <div style="margin-top: 16px; display: flex; gap: 10px;">
-            <button id="resetAllBtn">Сбросить всё</button>
+            <button id="resetAllBtn">⟳ Сбросить всё</button>
         </div>
     </div>
 
@@ -106,20 +108,20 @@
     <div class="compare-section" id="compareSection" style="display: none;">
         <div class="compare-title">
             <span>📊 Режим сравнения поставщиков</span>
-            <button id="closeCompareBtn" class="btn-outline" style="padding: 4px 12px; font-size: 0.7rem;">Закрыть</button>
+            <button id="closeCompareBtn" class="btn-outline" style="padding: 4px 12px; font-size: 0.7rem;">✕ Закрыть</button>
         </div>
         <div class="compare-row">
             <div class="compare-group">
-                <label>Поставщик №1</label>
+                <label>🏭 Поставщик №1</label>
                 <select id="compareSupplier1"><option value="">Выберите поставщика</option></select>
             </div>
             <div class="compare-group">
-                <label>Поставщик №2</label>
+                <label>🏭 Поставщик №2</label>
                 <select id="compareSupplier2"><option value="">Выберите поставщика</option></select>
             </div>
             <div class="compare-group">
                 <label>&nbsp;</label>
-                <button id="compareBtn">Сравнить</button>
+                <button id="compareBtn">🔍 Сравнить</button>
             </div>
         </div>
         <div id="compareResults"></div>
@@ -127,26 +129,26 @@
 
     <!-- Кнопка включения сравнения -->
     <div style="margin-bottom: 24px;">
-        <button id="enableCompareBtn" class="btn-outline">🔍 Сравнить поставщиков</button>
+        <button id="enableCompareBtn" class="btn-outline">📊 Сравнить поставщиков</button>
     </div>
 
     <!-- Статистика -->
     <div class="stats-grid" id="statsContainer">
-        <div class="stat-card"><h3>Общая сумма</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>Всего позиций</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>Групп</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>Без цены</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>📦 Всего позиций</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">—</div></div>
     </div>
 
     <!-- Графики -->
     <div class="charts-row">
-        <div class="chart-card"><h3>Сумма по группам</h3><canvas id="sumChart"></canvas></div>
-        <div class="chart-card"><h3>Количество по группам</h3><canvas id="countChart"></canvas></div>
+        <div class="chart-card"><h3>📊 Сумма по группам</h3><canvas id="sumChart"></canvas></div>
+        <div class="chart-card"><h3>🥧 Количество по группам</h3><canvas id="countChart"></canvas></div>
     </div>
 
     <!-- Таблица -->
     <div class="table-wrapper">
-        <div id="tableContainer" class="loading">Загрузка данных...</div>
+        <div id="tableContainer" class="loading">📡 Загрузка данных...</div>
     </div>
 </div>
 
@@ -158,11 +160,10 @@
     let allSuppliers = [];
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
-    let compareMode = false;
     
     function loadData() {
         const container = document.getElementById('tableContainer');
-        container.innerHTML = '<div class="loading">Загрузка данных...</div>';
+        container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
         
         const callbackName = 'jsonp_callback_' + Math.random().toString(36).substr(2);
         window[callbackName] = function(data) {
@@ -171,7 +172,7 @@
             allData = data.data || [];
             
             if (!allData.length) {
-                container.innerHTML = '<div class="loading">Нет данных в таблице</div>';
+                container.innerHTML = '<div class="loading">📭 Нет данных в таблице</div>';
                 return;
             }
             
@@ -187,7 +188,7 @@
             allSuppliers = Array.from(suppliersSet).sort();
             
             const groupSelect = document.getElementById('filterGroup');
-            groupSelect.innerHTML = '<option value="">Все группы</option>';
+            groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
             allGroups.forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g;
@@ -195,11 +196,10 @@
                 groupSelect.appendChild(opt);
             });
             
-            // Заполняем списки поставщиков для сравнения
             const comp1 = document.getElementById('compareSupplier1');
             const comp2 = document.getElementById('compareSupplier2');
             [comp1, comp2].forEach(sel => {
-                sel.innerHTML = '<option value="">Выберите поставщика</option>';
+                sel.innerHTML = '<option value="">🏭 Выберите поставщика</option>';
                 allSuppliers.forEach(s => {
                     const opt = document.createElement('option');
                     opt.value = s;
@@ -236,7 +236,7 @@
         script.onerror = () => {
             delete window[callbackName];
             document.body.removeChild(script);
-            container.innerHTML = `<div class="error-message">Ошибка загрузки данных. Проверьте настройки доступа к таблице.</div>`;
+            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки данных. Проверьте настройки доступа к таблице.</div>`;
         };
         document.body.appendChild(script);
     }
@@ -247,7 +247,7 @@
         const currentSupplier = supplierSelect.value;
         
         let availableSuppliers;
-        if (selectedGroup) {
+        if (selectedGroup && selectedGroup !== "📁 Все группы") {
             const suppliersInGroup = new Set();
             for (let row of allData) {
                 const group = row[0] ? row[0].toString().trim() : '';
@@ -259,7 +259,7 @@
             availableSuppliers = [...allSuppliers];
         }
         
-        supplierSelect.innerHTML = '<option value="">Все поставщики</option>';
+        supplierSelect.innerHTML = '<option value="">🏭 Все поставщики</option>';
         availableSuppliers.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
@@ -279,7 +279,7 @@
         const filterSupplier = document.getElementById('filterSupplier').value;
         const priceMin = parseFloat(document.getElementById('priceMin').value);
         const priceMax = parseFloat(document.getElementById('priceMax').value);
-        const searchText = document.getElementById('searchText').value.toLowerCase();
+        const searchText = document.getElementById('searchText').value.toLowerCase().trim();
         
         let filtered = [];
         
@@ -317,11 +317,18 @@
                 }
             }
             
-            if (filterGroup && group !== filterGroup) continue;
-            if (!forCompare && filterSupplier && supplier !== filterSupplier) continue;
+            // Фильтры
+            if (filterGroup && filterGroup !== "📁 Все группы" && group !== filterGroup) continue;
+            if (!forCompare && filterSupplier && filterSupplier !== "🏭 Все поставщики" && supplier !== filterSupplier) continue;
             if (!isNaN(priceMin) && totalNum < priceMin) continue;
             if (!isNaN(priceMax) && totalNum > priceMax) continue;
-            if (searchText && !name.toLowerCase().includes(searchText)) continue;
+            
+            // Умный поиск — ищет в 4 полях
+            if (searchText) {
+                const searchable = `${name} ${group} ${supplier} ${size}`.toLowerCase();
+                if (!searchable.includes(searchText)) continue;
+            }
+            
             if (!group) continue;
             
             filtered.push({ group, name, supplier, unit, pricePerUnit: pricePerUnitFormatted, totalRaw, totalNum, hasPrice, size, site });
@@ -331,20 +338,22 @@
     }
     
     function compareSuppliers() {
-        const supplier1 = document.getElementById('compareSupplier1').value;
-        const supplier2 = document.getElementById('compareSupplier2').value;
+        let supplier1 = document.getElementById('compareSupplier1').value;
+        let supplier2 = document.getElementById('compareSupplier2').value;
+        
+        if (supplier1 === "🏭 Выберите поставщика") supplier1 = "";
+        if (supplier2 === "🏭 Выберите поставщика") supplier2 = "";
         
         if (!supplier1 || !supplier2) {
-            alert('Выберите обоих поставщиков для сравнения');
+            alert('⚠️ Выберите обоих поставщиков для сравнения');
             return;
         }
         
         if (supplier1 === supplier2) {
-            alert('Выберите разных поставщиков');
+            alert('⚠️ Выберите разных поставщиков');
             return;
         }
         
-        // Получаем данные без фильтра по поставщику
         const allItems = getFilteredData(true);
         
         const items1 = allItems.filter(item => item.supplier === supplier1);
@@ -361,33 +370,29 @@
         const diffCount = count2 - count1;
         const diffAvg = avg2 - avg1;
         
-        const resultsHtml = `
+        let resultsHtml = `
             <div class="compare-stats">
                 <div class="compare-stat-card">
-                    <h4>${escapeHtml(supplier1)}</h4>
+                    <h4>🏭 ${escapeHtml(supplier1)}</h4>
                     <div class="value">${sum1.toLocaleString('ru-RU')} ₽</div>
-                    <div style="font-size:0.7rem;">${count1} позиций</div>
-                    <div style="font-size:0.7rem;">средняя: ${avg1.toFixed(2).replace('.', ',')} ₽</div>
+                    <div style="font-size:0.7rem;">📦 ${count1} позиций</div>
+                    <div style="font-size:0.7rem;">📊 средняя: ${avg1.toFixed(2).replace('.', ',')} ₽</div>
                 </div>
                 <div class="compare-stat-card">
-                    <h4>${escapeHtml(supplier2)}</h4>
+                    <h4>🏭 ${escapeHtml(supplier2)}</h4>
                     <div class="value">${sum2.toLocaleString('ru-RU')} ₽</div>
-                    <div style="font-size:0.7rem;">${count2} позиций</div>
-                    <div style="font-size:0.7rem;">средняя: ${avg2.toFixed(2).replace('.', ',')} ₽</div>
+                    <div style="font-size:0.7rem;">📦 ${count2} позиций</div>
+                    <div style="font-size:0.7rem;">📊 средняя: ${avg2.toFixed(2).replace('.', ',')} ₽</div>
                 </div>
                 <div class="compare-stat-card">
-                    <h4>Разница</h4>
+                    <h4>📉 Разница</h4>
                     <div class="value ${diffSum > 0 ? 'diff-positive' : 'diff-negative'}">${diffSum > 0 ? '+' : ''}${diffSum.toLocaleString('ru-RU')} ₽</div>
                     <div style="font-size:0.7rem;">позиций: ${diffCount > 0 ? '+' : ''}${diffCount}</div>
                     <div style="font-size:0.7rem;">средняя: ${diffAvg > 0 ? '+' : ''}${diffAvg.toFixed(2).replace('.', ',')} ₽</div>
                 </div>
             </div>
-            <table class="compare-table">
-                <thead><tr><th>Наименование</th><th>${escapeHtml(supplier1)}</th><th>${escapeHtml(supplier2)}</th><th>Разница</th></tr></thead>
-                <tbody>
         `;
         
-        // Находим общие позиции по наименованию
         const map1 = new Map();
         items1.forEach(item => map1.set(item.name.toLowerCase(), item.totalNum));
         
@@ -407,14 +412,17 @@
         });
         
         if (compareRows) {
-            resultsHtml + compareRows;
+            resultsHtml += `
+                <table class="compare-table">
+                    <thead><tr><th>📦 Наименование</th><th>🏭 ${escapeHtml(supplier1)}</th><th>🏭 ${escapeHtml(supplier2)}</th><th>📉 Разница</th></tr></thead>
+                    <tbody>${compareRows}</tbody>
+                </table>
+            `;
         } else {
-            compareRows = '<tr><td colspan="4">Нет общих позиций для сравнения</td></tr>';
+            resultsHtml += `<div style="margin-top:16px; padding:12px; background:#fff3cd; border-radius:8px;">⚠️ Нет общих позиций для сравнения</div>`;
         }
         
-        resultsHtml + compareRows + `</tbody></table>`;
-        
-        document.getElementById('compareResults').innerHTML = resultsHtml + compareRows;
+        document.getElementById('compareResults').innerHTML = resultsHtml;
     }
     
     function renderTable() {
@@ -432,24 +440,24 @@
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
         
         document.getElementById('statsContainer').innerHTML = `
-            <div class="stat-card"><h3>Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
-            <div class="stat-card"><h3>Всего позиций</h3><div class="stat-value">${filtered.length}</div></div>
-            <div class="stat-card"><h3>Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
-            <div class="stat-card"><h3>Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
+            <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
+            <div class="stat-card"><h3>📦 Всего позиций</h3><div class="stat-value">${filtered.length}</div></div>
+            <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
+            <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
         `;
         
         updateCharts(filtered);
         
         if (filtered.length === 0) {
-            document.getElementById('tableContainer').innerHTML = '<div class="loading">Нет данных по выбранным фильтрам</div>';
+            document.getElementById('tableContainer').innerHTML = '<div class="loading">🔍 Нет данных по выбранным фильтрам</div>';
             return;
         }
         
-        let html = `<table><thead><tr><th onclick="sortTable('name')">Наименование</th><th onclick="sortTable('group')">Группа</th><th onclick="sortTable('supplier')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable('price')">Цена общая</th><th>Сайт</th></tr></thead><tbody>`;
+        let html = `<table><thead><tr><th onclick="sortTable('name')">📦 Наименование</th><th onclick="sortTable('group')">📁 Группа</th><th onclick="sortTable('supplier')">🏭 Поставщик</th><th>📏 Размер</th><th>📐 Ед.изм</th><th>💵 Цена/ед</th><th onclick="sortTable('price')">💰 Цена общая</th><th>🔗 Сайт</th></tr></thead><tbody>`;
         
         for (let item of filtered) {
-            const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
-            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">открыть</a>` : '—';
+            const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">⚠️ нет цены</span>`;
+            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🔗 открыть</a>` : '—';
             html += `<tr>
                 <td style="max-width:280px;">${escapeHtml(item.name)}</td>
                 <td>${escapeHtml(item.group)}</td>
@@ -506,8 +514,8 @@
     }
     
     function resetAllFilters() {
-        document.getElementById('filterGroup').value = '';
-        document.getElementById('filterSupplier').value = '';
+        document.getElementById('filterGroup').value = '📁 Все группы';
+        document.getElementById('filterSupplier').value = '🏭 Все поставщики';
         document.getElementById('priceMin').value = '';
         document.getElementById('priceMax').value = '';
         document.getElementById('searchText').value = '';
