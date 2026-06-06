@@ -37,6 +37,7 @@
         .total-row td { background: #fef6e0; font-weight: 700; }
         .loading, .error-message { text-align: center; padding: 48px; }
         .search-hint { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
+        a { color: #2e7d32; text-decoration: none; }
         @media (max-width: 900px) { .filters-row { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 600px) { .filters-row { grid-template-columns: 1fr; } }
     </style>
@@ -95,22 +96,26 @@
 </div>
 
 <script>
+    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ (тот же, что и раньше) ⚠️
     const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
-    const SHEET_NAME = "Лист1";
     
-    let allItems = [];      // Храним уже обработанные данные (каждый объект = одна позиция)
+    let allItems = [];
     let allGroups = [];
     let allSuppliers = [];
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
 
-    // Функция для безопасного извлечения числа из цены
     function parsePrice(value) {
         if (value === undefined || value === null || value === '') return 0;
         if (typeof value === 'number') return value;
         const str = String(value).trim();
         if (str === '') return 0;
-        const num = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        let clean = str.replace(/\s/g, '').replace(',', '.');
+        let num = parseFloat(clean);
+        if (isNaN(num)) {
+            let match = str.match(/(\d+[.,]?\d*)/);
+            if (match) num = parseFloat(match[1].replace(',', '.'));
+        }
         return isNaN(num) ? 0 : num;
     }
 
@@ -119,55 +124,76 @@
         container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
         
         try {
-            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+            // Используем CSV экспорт Google Sheets — нет дублей!
+            const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`;
             const response = await fetch(url);
-            const text = await response.text();
-            const jsonStr = text.substring(47, text.length - 2);
-            const json = JSON.parse(jsonStr);
+            const csvText = await response.text();
             
-            const rows = json.table.rows;
+            // Парсим CSV
+            const rows = csvText.split('\n');
+            const headers = rows[0].split(',');
             
-            // Преобразуем строки в массив объектов
-            const rawData = [];
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i].c;
-                const rowData = [];
-                for (let j = 0; j < row.length; j++) {
-                    rowData.push(row[j] ? row[j].v : '');
-                }
-                if (rowData.length >= 8 && rowData[0] && String(rowData[0]).trim() !== '') {
-                    rawData.push(rowData);
-                }
-            }
+            console.log("Заголовки:", headers);
+            console.log("Всего строк в CSV:", rows.length);
             
-            // Создаем обработанный массив объектов
+            // Очищаем старые данные
             allItems = [];
             const groupsSet = new Set();
             const suppliersSet = new Set();
             
-            for (let row of rawData) {
-                const group = String(row[0] || '').trim();
-                const name = String(row[1] || '').trim();
-                const supplier = String(row[2] || '').trim();
-                const unit = String(row[3] || '').trim();
-                const pricePerUnitRaw = row[4];
-                const totalPriceRaw = row[5];
-                const size = String(row[6] || '').trim();
-                const site = String(row[7] || '').trim();
+            // Проходим по строкам, начиная с 1 (пропускаем заголовок)
+            for (let i = 1; i < rows.length; i++) {
+                if (!rows[i].trim()) continue;
                 
-                if (!group) continue;
+                // Простой парсинг CSV (учитываем кавычки)
+                let row = rows[i];
+                let cells = [];
+                let inQuote = false;
+                let current = '';
                 
-                // Форматируем цену за единицу для отображения
+                for (let j = 0; j < row.length; j++) {
+                    const char = row[j];
+                    if (char === '"') {
+                        inQuote = !inQuote;
+                    } else if (char === ',' && !inQuote) {
+                        cells.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                cells.push(current.trim());
+                
+                // Убираем кавычки из ячеек
+                cells = cells.map(c => c.replace(/^"|"$/g, ''));
+                
+                if (cells.length < 8) continue;
+                
+                const group = cells[0] || '';
+                const name = cells[1] || '';
+                const supplier = cells[2] || '';
+                const unit = cells[3] || '';
+                const pricePerUnitRaw = cells[4];
+                const totalPriceRaw = cells[5];
+                const size = cells[6] || '';
+                const site = cells[7] || '';
+                
+                if (!group || group === 'Группа') continue;
+                
+                // Форматируем цену за единицу
                 let pricePerUnitDisplay = '—';
                 const pricePerUnitNum = parsePrice(pricePerUnitRaw);
                 if (pricePerUnitNum > 0) {
                     pricePerUnitDisplay = pricePerUnitNum.toFixed(2).replace('.', ',') + ' ₽';
-                } else if (pricePerUnitRaw && String(pricePerUnitRaw).trim() !== '') {
-                    pricePerUnitDisplay = String(pricePerUnitRaw);
                 }
                 
-                // Парсим общую цену (для суммирования)
+                // Общая цена
                 let totalPrice = parsePrice(totalPriceRaw);
+                
+                // ВАЖНО: выводим для проверки первую строку
+                if (i === 1) {
+                    console.log("Первая строка данных:", { group, name, supplier, totalPriceRaw, totalPrice });
+                }
                 
                 allItems.push({
                     group: group,
@@ -181,7 +207,7 @@
                     site: site
                 });
                 
-                groupsSet.add(group);
+                if (group) groupsSet.add(group);
                 if (supplier) suppliersSet.add(supplier);
             }
             
@@ -189,9 +215,9 @@
             allSuppliers = Array.from(suppliersSet).sort();
             
             console.log(`Загружено ${allItems.length} позиций`);
-            console.log(`Группы: ${allGroups.length}, Поставщики: ${allSuppliers.length}`);
+            console.log("Пример суммы по первым 3:", allItems.slice(0,3).map(i => i.totalPrice));
             
-            // Заполняем выпадающие списки
+            // Заполняем фильтры
             const groupSelect = document.getElementById('filterGroup');
             groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
             allGroups.forEach(g => {
@@ -210,7 +236,6 @@
                 supplierSelect.appendChild(opt);
             });
             
-            // Обработчики событий
             document.getElementById('filterGroup').addEventListener('change', () => {
                 updateSupplierFilter();
                 renderTable();
@@ -226,7 +251,9 @@
             
         } catch (error) {
             console.error('Ошибка:', error);
-            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки: ${error.message}<br><br>Проверьте доступ к таблице и ID</div>`;
+            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки: ${error.message}<br><br>
+                1. Проверьте доступ к таблице (Файл → Предоставить доступ → "Все, у кого есть ссылка")<br>
+                2. ID таблицы: ${SPREADSHEET_ID}</div>`;
         }
     }
     
@@ -273,28 +300,22 @@
         let filtered = [];
         
         for (let item of allItems) {
-            // Фильтры
             if (filterGroup && filterGroup !== "📁 Все группы" && item.group !== filterGroup) continue;
             if (filterSupplier && filterSupplier !== "🏭 Все поставщики" && item.supplier !== filterSupplier) continue;
             if (!isNaN(priceMin) && item.totalPrice < priceMin) continue;
             if (!isNaN(priceMax) && item.totalPrice > priceMax) continue;
-            
-            // Поиск
             if (searchText) {
                 const searchable = `${item.name} ${item.group} ${item.supplier} ${item.size}`.toLowerCase();
                 if (!searchable.includes(searchText)) continue;
             }
-            
             filtered.push(item);
         }
-        
         return filtered;
     }
     
     function renderTable() {
         let filtered = getFilteredItems();
         
-        // Сортировка
         filtered.sort((a, b) => {
             if (currentSort.column === 'name') return currentSort.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
             if (currentSort.column === 'group') return currentSort.direction === 'asc' ? a.group.localeCompare(b.group) : b.group.localeCompare(a.group);
@@ -302,7 +323,6 @@
             return currentSort.direction === 'asc' ? a.totalPrice - b.totalPrice : b.totalPrice - a.totalPrice;
         });
         
-        // Подсчет суммы (один раз, без дублирования)
         let totalSum = 0;
         for (let item of filtered) {
             totalSum += item.totalPrice;
@@ -318,7 +338,6 @@
             <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
         `;
         
-        // Графики
         updateCharts(filtered);
         
         if (filtered.length === 0) {
@@ -342,7 +361,7 @@
             const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🔗 открыть</a>` : '—';
             html += `<tr>
                 <td style="max-width:280px;">${escapeHtml(item.name)}</td>
-                <td>${escapeHtml(item.group)}</td>
+                <td>${escapeHtml(item.group)}<td>
                 <td>${escapeHtml(item.supplier)}</td>
                 <td>${escapeHtml(item.size)}</td>
                 <td>${escapeHtml(item.unit)}</td>
@@ -353,7 +372,7 @@
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td class="price-cell">—</td></tr>`;
-        html += `</tbody>树`;
+        html += `</tbody>~`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
