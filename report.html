@@ -70,8 +70,10 @@
 </div>
 
 <script>
-    // ТВОЯ НОВАЯ ССЫЛКА (уже вставлена)
-    const API_URL = "https://script.google.com/macros/s/AKfycbyvWqqrl3J9rRNhjvQ4nQdSpz3sf60XKG1Wtc-plmvhvE3-zToLZIy7trtfdKpDIbIMyQ/exec";
+    // ID твоей таблицы
+    const SHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
+    // Название листа (по умолчанию "Лист1")
+    const SHEET_NAME = "Лист1";
     
     let allData = [];
     let groups = [];
@@ -82,13 +84,34 @@
         container.innerHTML = '<div class="loading">📡 Загрузка данных из таблицы...</div>';
         
         try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            // Используем Google Sheets API (публичный доступ)
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
             
-            const json = await response.json();
-            allData = json.data;
+            const response = await fetch(url);
+            const text = await response.text();
             
-            if (!allData || allData.length === 0) {
+            // Парсим JSONP ответ
+            const jsonStr = text.substring(47, text.length - 2);
+            const json = JSON.parse(jsonStr);
+            
+            const rows = json.table.rows;
+            const cols = json.table.cols;
+            
+            // Получаем заголовки
+            const headers = cols.map(c => c.label);
+            
+            // Преобразуем строки в массив массивов
+            allData = [];
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i].c;
+                const rowData = [];
+                for (let j = 0; j < row.length; j++) {
+                    rowData.push(row[j] ? row[j].v : '');
+                }
+                allData.push(rowData);
+            }
+            
+            if (allData.length === 0) {
                 container.innerHTML = '<div class="loading">📭 В таблице пока нет данных</div>';
                 return;
             }
@@ -140,9 +163,9 @@
             container.innerHTML = `<div class="error-message">
                 ❌ Ошибка загрузки: ${error.message}<br><br>
                 <strong>Проверьте:</strong><br>
-                1. Веб-приложение развернуто с доступом "Все, у кого есть ссылка"<br>
-                2. Откройте ссылку отдельно — должен быть JSON<br>
-                <a href="${API_URL}" target="_blank">${API_URL}</a>
+                1. Таблица доступна по ссылке (Файл → Предоставить доступ → "Все, у кого есть ссылка" → "Просматривать")<br>
+                2. Название листа — "${SHEET_NAME}"<br>
+                3. ID таблицы правильный
             </div>`;
         }
     }
@@ -222,8 +245,8 @@
             </tr>`;
         }
         
-        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
-        html += `</tbody></table>`;
+        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></tr>`;
+        html += `</tbody> licensierad`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
