@@ -94,7 +94,6 @@
 </div>
 
 <script>
-    // ⚠️ ТВОЙ ID ТАБЛИЦЫ (уже вставлен) ⚠️
     const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
     const SHEET_NAME = "Лист1";
     
@@ -103,37 +102,18 @@
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
 
-    // Функция правильного парсинга числа из строки типа "3 936,53" или "3,936.53"
-    function parseRussianNumber(str) {
-        if (str === undefined || str === null || str === '') return 0;
-        if (typeof str === 'number') return str;
+    // ПРОСТЕЙШИЙ ПАРСИНГ — просто убираем пробелы и меняем запятую на точку
+    function parsePrice(value) {
+        if (value === undefined || value === null || value === '') return 0;
+        if (typeof value === 'number') return value;
         
-        let s = String(str).trim();
+        let s = String(value).trim();
         if (s === '') return 0;
         
-        // Удаляем пробелы (разделители тысяч)
+        // Убираем пробелы
         s = s.replace(/\s/g, '');
-        
-        // Определяем формат: если есть и точка, и запятая
-        if (s.includes(',') && s.includes('.')) {
-            // Если точка перед запятой — формат "1,000.50" (американский)
-            if (s.indexOf('.') < s.indexOf(',')) {
-                s = s.replace(/\./g, '');
-                s = s.replace(',', '.');
-            } else {
-                s = s.replace(/,/g, '');
-            }
-        } 
-        // Если только запятая
-        else if (s.includes(',')) {
-            // Проверяем, является ли запятая разделителем тысяч (например, "1,000")
-            let parts = s.split(',');
-            if (parts.length === 2 && parts[1].length === 3) {
-                s = s.replace(',', '');
-            } else {
-                s = s.replace(',', '.');
-            }
-        }
+        // Меняем запятую на точку
+        s = s.replace(',', '.');
         
         let num = parseFloat(s);
         return isNaN(num) ? 0 : num;
@@ -152,9 +132,15 @@
             const json = JSON.parse(jsonStr);
             const rows = json.table.rows;
             
+            console.log("=== ДАННЫЕ ИЗ ТАБЛИЦЫ ===");
+            console.log("Всего строк:", rows.length);
+            
             allData = [];
             const groupsSet = new Set();
             const suppliersSet = new Set();
+            
+            let debugSum = 0;
+            let debugCount = 0;
             
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i].c;
@@ -171,12 +157,19 @@
                 
                 if (!group) continue;
                 
-                // ПРАВИЛЬНЫЙ ПАРСИНГ ЦЕНЫ
-                let totalPrice = parseRussianNumber(totalRaw);
+                // Парсим цену
+                let totalPrice = parsePrice(totalRaw);
+                
+                // Для отладки: выводим первые 10 строк с ценой
+                if (debugCount < 10 && totalPrice > 0) {
+                    console.log(`Строка ${i}: "${totalRaw}" → ${totalPrice} ₽`);
+                    debugCount++;
+                }
+                debugSum += totalPrice;
                 
                 // Цена за единицу для отображения
                 let pricePerUnitDisplay = '—';
-                let pupNum = parseRussianNumber(pricePerUnitRaw);
+                let pupNum = parsePrice(pricePerUnitRaw);
                 if (pupNum > 0) {
                     pricePerUnitDisplay = pupNum.toFixed(2).replace('.', ',') + ' ₽';
                 }
@@ -186,22 +179,24 @@
                     pricePerUnit: pricePerUnitDisplay,
                     totalPrice: totalPrice,
                     hasPrice: totalPrice > 0,
-                    size, site
+                    size, site,
+                    totalRaw: totalRaw  // сохраняем оригинал для отладки
                 });
                 
                 if (group) groupsSet.add(group);
                 if (supplier) suppliersSet.add(supplier);
             }
             
+            console.log("=== ИТОГИ ОБРАБОТКИ ===");
+            console.log("Всего позиций (с группой):", allData.length);
+            console.log("Сумма по обработанным позициям:", debugSum.toLocaleString('ru-RU'));
+            console.log("Первые 5 позиций (группа, название, цена):");
+            for (let i = 0; i < Math.min(5, allData.length); i++) {
+                console.log(`  ${i+1}. ${allData[i].group} | ${allData[i].name} | "${allData[i].totalRaw}" → ${allData[i].totalPrice} ₽`);
+            }
+            
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
-            
-            // Проверка в консоли — посмотри, что тут будет
-            let testSum = 0;
-            for (let item of allData) testSum += item.totalPrice;
-            console.log("Всего позиций:", allData.length);
-            console.log("Сумма (проверка):", testSum);
-            console.log("Первые 3 цены:", allData.slice(0,3).map(i => i.totalPrice));
             
             // Заполняем фильтры
             const groupSelect = document.getElementById('filterGroup');
@@ -317,7 +312,7 @@
             return;
         }
         
-        let html = '<table><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
+        let html = '<tr><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
         
         for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
@@ -325,8 +320,8 @@
             html += `<tr><td style="max-width:250px;">${escapeHtml(item.name)}</td><td>${escapeHtml(item.group)}</td><td>${escapeHtml(item.supplier)}</td><td>${escapeHtml(item.size)}</td><td>${escapeHtml(item.unit)}</td><td>${escapeHtml(item.pricePerUnit)}</td><td class="price-cell">${priceDisplay}</td><td>${siteLink}</td></tr>`;
         }
         
-        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
-        html += `</tbody></table>>`;
+        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td>—</td></tr>`;
+        html += `</tbody>~`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
