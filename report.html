@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Умный отчет по материалам</title>
+    <title>Отчет по материалам</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 24px; background: #f0f2f5; }
         .container { max-width: 1600px; margin: 0 auto; }
-        h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 4px 0; color: #0f3b2c; }
-        .sub { color: #475569; font-size: 0.9rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
+        h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 4px 0; color: #1a5d2a; }
+        .sub { color: #475569; font-size: 0.85rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
         
-        .filters-card { background: white; border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
-        .filters-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; margin-bottom: 20px; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1; }
-        .filter-group label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5b6e8c; }
-        select, input { padding: 10px 14px; border-radius: 14px; border: 1px solid #cbd5e1; font-size: 0.9rem; font-family: inherit; background: white; }
+        .filters-card { background: white; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+        .filters-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 16px; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; flex: 1; }
+        .filter-group label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5b6e8c; letter-spacing: 0.5px; }
+        select, input { padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; font-family: inherit; background: white; }
+        select:focus, input:focus { outline: none; border-color: #2e7d32; box-shadow: 0 0 0 2px rgba(46,125,50,0.1); }
         
-        .quick-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
-        .quick-btn { background: #e9ecef; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .quick-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+        .quick-btn { background: #e9ecef; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; color: #2c3e50; transition: all 0.2s; }
         .quick-btn:hover { background: #cbd5e1; }
         
-        button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; }
+        button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
         button:hover { background: #1b5e20; }
+        .btn-secondary { background: #6c757d; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-        .stat-card { background: white; border-radius: 24px; padding: 16px 20px; border: 1px solid #e9edf2; }
-        .stat-card h3 { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; }
-        .stat-value { font-size: 1.8rem; font-weight: 700; color: #0f3b2c; }
+        .stat-card { background: white; border-radius: 20px; padding: 16px 20px; border: 1px solid #e9edf2; }
+        .stat-card h3 { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #1a5d2a; }
         
-        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 28px; }
-        .chart-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e9edf2; }
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; margin-bottom: 28px; }
+        .chart-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e9edf2; }
+        .chart-card h3 { margin: 0 0 16px 0; font-size: 0.9rem; font-weight: 600; color: #1e293b; }
         canvas { max-height: 280px; width: 100%; }
         
-        .table-wrapper { background: white; border-radius: 24px; border: 1px solid #e9edf2; overflow: auto; }
+        .table-wrapper { background: white; border-radius: 20px; border: 1px solid #e9edf2; overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
-        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; }
+        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; user-select: none; }
         th:hover { background: #e9ecef; }
         td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; }
         .price-cell { font-weight: 500; text-align: right; white-space: nowrap; }
-        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 40px; font-size: 0.7rem; }
+        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
         .total-row td { background: #fef6e0; font-weight: 700; }
         .loading, .error-message { text-align: center; padding: 48px; }
-        .error-message { background: #fff5f5; color: #b91c1c; border-radius: 24px; }
+        .error-message { background: #fff5f5; color: #b91c1c; border-radius: 20px; }
         a { color: #2e7d32; text-decoration: none; }
+        a:hover { text-decoration: underline; }
         @media (max-width: 768px) {
             body { padding: 16px; }
             .filters-row { flex-direction: column; }
@@ -55,54 +59,60 @@
 </head>
 <body>
 <div class="container">
-    <h1>🧠 Умный отчет по материалам</h1>
-    <div class="sub">🔗 Фильтры связаны: выбери группу → поставщики обновятся автоматически</div>
+    <h1>📊 Сводка по материалам</h1>
+    <div class="sub">Актуальные данные из Google Таблицы · руководителю</div>
 
     <div class="filters-card">
         <div class="filters-row">
             <div class="filter-group">
-                <label>📁 Группа</label>
+                <label>Группа</label>
                 <select id="filterGroup"><option value="">Все группы</option></select>
             </div>
             <div class="filter-group">
-                <label>🏭 Поставщик</label>
+                <label>Поставщик</label>
                 <select id="filterSupplier"><option value="">Все поставщики</option></select>
             </div>
             <div class="filter-group">
-                <label>💰 Цена от</label>
+                <label>Цена от (руб)</label>
                 <input type="number" id="priceMin" placeholder="0" step="1000">
             </div>
             <div class="filter-group">
-                <label>💰 Цена до</label>
+                <label>Цена до (руб)</label>
                 <input type="number" id="priceMax" placeholder="Любая" step="1000">
             </div>
             <div class="filter-group">
-                <label>🔍 Поиск</label>
+                <label>Поиск</label>
                 <input type="text" id="searchText" placeholder="Наименование...">
             </div>
         </div>
         
         <div class="quick-filters">
-            <span style="font-size:0.7rem; color:#666; align-self:center;">⚡ Быстрые фильтры:</span>
-            <button type="button" class="quick-btn" data-quick="expensive">💎 Дорогие (>10000)</button>
-            <button type="button" class="quick-btn" data-quick="noPrice">⚠️ Без цены</button>
-            <button type="button" class="quick-btn" data-quick="noSite">🔗 Без сайта</button>
-            <button type="button" id="resetAllBtn" style="margin-left:auto; background:#6c757d;">⟳ Сбросить всё</button>
+            <span style="font-size:0.7rem; color:#666;">Быстрые фильтры:</span>
+            <button type="button" class="quick-btn" data-quick="expensive">Дорогие (>10000 ₽)</button>
+            <button type="button" class="quick-btn" data-quick="noPrice">Без цены</button>
+            <button type="button" id="resetAllBtn">Сбросить всё</button>
         </div>
     </div>
 
-    <div class="stats-grid" id="statsContainer">...</div>
-
-    <div class="charts-row">
-        <div class="chart-card"><h3>📊 Сумма по группам</h3><canvas id="sumChart"></canvas></div>
-        <div class="chart-card"><h3>🥧 Количество по группам</h3><canvas id="countChart"></canvas></div>
+    <div class="stats-grid" id="statsContainer">
+        <div class="stat-card"><h3>Общая сумма</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>Всего позиций</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>Групп</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>Без цены</h3><div class="stat-value">—</div></div>
     </div>
 
-    <div class="table-wrapper"><div id="tableContainer" class="loading">🔄 Загрузка...</div></div>
+    <div class="charts-row">
+        <div class="chart-card"><h3>Сумма по группам</h3><canvas id="sumChart"></canvas></div>
+        <div class="chart-card"><h3>Количество позиций по группам</h3><canvas id="countChart"></canvas></div>
+    </div>
+
+    <div class="table-wrapper">
+        <div id="tableContainer" class="loading">Загрузка данных...</div>
+    </div>
 </div>
 
 <script>
-    // ⚠️ СЮДА ВСТАВЬ СВОЮ ССЫЛКУ НА APPS SCRIPT ⚠️
+    // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ НА APPS SCRIPT ⚠️
     const API_URL = "https://script.google.com/macros/s/AKfycbx4mWEU7SzgWQkQVihSXTRFlrXBhM-2QbSlwVTrcQKMK8wbh0DKjYkr9iRzaMiw9pxvWQ/exec";
     
     let allData = [];
@@ -111,10 +121,9 @@
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
     
-    // Загрузка данных
     function loadData() {
         const container = document.getElementById('tableContainer');
-        container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
+        container.innerHTML = '<div class="loading">Загрузка данных...</div>';
         
         const callbackName = 'jsonp_callback_' + Math.random().toString(36).substr(2);
         window[callbackName] = function(data) {
@@ -123,11 +132,10 @@
             allData = data.data || [];
             
             if (!allData.length) {
-                container.innerHTML = '<div class="loading">📭 В таблице пока нет данных</div>';
+                container.innerHTML = '<div class="loading">Нет данных в таблице</div>';
                 return;
             }
             
-            // Собираем все группы и поставщиков
             const groupsSet = new Set();
             const suppliersSet = new Set();
             for (let row of allData) {
@@ -139,9 +147,8 @@
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
             
-            // Заполняем список групп
             const groupSelect = document.getElementById('filterGroup');
-            groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
+            groupSelect.innerHTML = '<option value="">Все группы</option>';
             allGroups.forEach(g => {
                 const opt = document.createElement('option');
                 opt.value = g;
@@ -149,9 +156,8 @@
                 groupSelect.appendChild(opt);
             });
             
-            // Добавляем обработчики событий
             document.getElementById('filterGroup').addEventListener('change', () => {
-                updateSupplierFilter(); // КАСКАД: обновляем поставщиков
+                updateSupplierFilter();
                 renderTable();
             });
             document.getElementById('filterSupplier').addEventListener('change', () => renderTable());
@@ -160,12 +166,10 @@
             document.getElementById('searchText').addEventListener('input', () => renderTable());
             document.getElementById('resetAllBtn').addEventListener('click', resetAllFilters);
             
-            // Быстрые фильтры
             document.querySelectorAll('.quick-btn').forEach(btn => {
                 btn.addEventListener('click', () => applyQuickFilter(btn.dataset.quick));
             });
             
-            // Первоначальное заполнение поставщиков
             updateSupplierFilter();
             renderTable();
         };
@@ -175,39 +179,30 @@
         script.onerror = () => {
             delete window[callbackName];
             document.body.removeChild(script);
-            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки. Проверьте ссылку API.</div>`;
+            container.innerHTML = `<div class="error-message">Ошибка загрузки данных. Проверьте настройки доступа к таблице.</div>`;
         };
         document.body.appendChild(script);
     }
     
-    // КАСКАДНОЕ ОБНОВЛЕНИЕ СПИСКА ПОСТАВЩИКОВ
     function updateSupplierFilter() {
         const selectedGroup = document.getElementById('filterGroup').value;
         const supplierSelect = document.getElementById('filterSupplier');
-        
-        // Сохраняем текущее выбранное значение
         const currentSupplier = supplierSelect.value;
         
-        // Определяем, каких поставщиков показывать
         let availableSuppliers;
         if (selectedGroup) {
-            // Фильтруем поставщиков только по выбранной группе
             const suppliersInGroup = new Set();
             for (let row of allData) {
                 const group = row[0] ? row[0].toString().trim() : '';
                 const supplier = row[2] ? row[2].toString().trim() : '';
-                if (group === selectedGroup && supplier) {
-                    suppliersInGroup.add(supplier);
-                }
+                if (group === selectedGroup && supplier) suppliersInGroup.add(supplier);
             }
             availableSuppliers = Array.from(suppliersInGroup).sort();
         } else {
-            // Если группа не выбрана — показываем всех поставщиков
             availableSuppliers = [...allSuppliers];
         }
         
-        // Перестраиваем выпадающий список
-        supplierSelect.innerHTML = '<option value="">🏭 Все поставщики</option>';
+        supplierSelect.innerHTML = '<option value="">Все поставщики</option>';
         availableSuppliers.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
@@ -215,7 +210,6 @@
             supplierSelect.appendChild(opt);
         });
         
-        // Восстанавливаем выбранное значение, если оно ещё доступно
         if (currentSupplier && availableSuppliers.includes(currentSupplier)) {
             supplierSelect.value = currentSupplier;
         } else {
@@ -223,7 +217,6 @@
         }
     }
     
-    // Получение отфильтрованных данных
     function getFilteredData() {
         const filterGroup = document.getElementById('filterGroup').value;
         const filterSupplier = document.getElementById('filterSupplier').value;
@@ -238,23 +231,36 @@
             const name = row[1] ? row[1].toString().trim() : '';
             const supplier = row[2] ? row[2].toString().trim() : '';
             const unit = row[3] || '';
-            const pricePerUnit = row[4] || '';
+            let pricePerUnitRaw = row[4];
             let totalRaw = row[5];
             const size = row[6] ? row[6].toString().trim() : '';
             const site = row[7] || '';
             
+            // Форматирование цены до 2 знаков
+            let pricePerUnitFormatted = '';
+            if (pricePerUnitRaw && String(pricePerUnitRaw).trim() !== '') {
+                let priceStr = String(pricePerUnitRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
+                let priceNum = parseFloat(priceStr);
+                if (!isNaN(priceNum)) {
+                    pricePerUnitFormatted = priceNum.toFixed(2).replace('.', ',') + ' ₽';
+                } else {
+                    pricePerUnitFormatted = pricePerUnitRaw;
+                }
+            } else {
+                pricePerUnitFormatted = '—';
+            }
+            
             let totalNum = 0;
             let hasPrice = false;
             if (totalRaw && String(totalRaw).trim() !== '') {
-                const priceStr = String(totalRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
-                const parsed = parseFloat(priceStr);
+                let priceStr = String(totalRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
+                let parsed = parseFloat(priceStr);
                 if (!isNaN(parsed)) {
                     totalNum = parsed;
                     hasPrice = true;
                 }
             }
             
-            // Фильтры
             if (filterGroup && group !== filterGroup) continue;
             if (filterSupplier && supplier !== filterSupplier) continue;
             if (!isNaN(priceMin) && totalNum < priceMin) continue;
@@ -262,7 +268,7 @@
             if (searchText && !name.toLowerCase().includes(searchText)) continue;
             if (!group) continue;
             
-            filtered.push({ group, name, supplier, unit, pricePerUnit, totalRaw, totalNum, hasPrice, size, site });
+            filtered.push({ group, name, supplier, unit, pricePerUnit: pricePerUnitFormatted, totalRaw, totalNum, hasPrice, size, site });
         }
         
         return filtered;
@@ -275,17 +281,12 @@
             document.getElementById('priceMin').value = '-1';
             document.getElementById('priceMax').value = '0';
         }
-        if (type === 'noSite') {
-            // Просто показываем уведомление, что фильтр по сайту не встроен
-            alert('Фильтр "Без сайта" можно сделать через поиск по слову "site:"');
-        }
         renderTable();
     }
     
     function renderTable() {
         let filtered = getFilteredData();
         
-        // Сортировка
         filtered.sort((a, b) => {
             if (currentSort.column === 'name') return currentSort.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
             if (currentSort.column === 'group') return currentSort.direction === 'asc' ? a.group.localeCompare(b.group) : b.group.localeCompare(a.group);
@@ -293,32 +294,29 @@
             return currentSort.direction === 'asc' ? a.totalNum - b.totalNum : b.totalNum - a.totalNum;
         });
         
-        // Статистика
         const totalSum = filtered.reduce((s, i) => s + i.totalNum, 0);
         const uniqueGroups = new Set(filtered.map(i => i.group)).size;
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
         
         document.getElementById('statsContainer').innerHTML = `
-            <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
-            <div class="stat-card"><h3>📦 Позиций</h3><div class="stat-value">${filtered.length}</div></div>
-            <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
-            <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
+            <div class="stat-card"><h3>Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
+            <div class="stat-card"><h3>Всего позиций</h3><div class="stat-value">${filtered.length}</div></div>
+            <div class="stat-card"><h3>Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
+            <div class="stat-card"><h3>Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
         `;
         
-        // Графики
         updateCharts(filtered);
         
-        // Таблица
         if (filtered.length === 0) {
-            document.getElementById('tableContainer').innerHTML = '<div class="loading">😕 Нет данных по выбранным фильтрам</div>';
+            document.getElementById('tableContainer').innerHTML = '<div class="loading">Нет данных по выбранным фильтрам</div>';
             return;
         }
         
-        let html = `<table><thead><tr><th onclick="sortTable('name')">📦 Наименование</th><th onclick="sortTable('group')">📁 Группа</th><th onclick="sortTable('supplier')">🏭 Поставщик</th><th>📏 Размер</th><th>📐 Ед.изм</th><th>💵 Цена/ед</th><th onclick="sortTable('price')">💰 Цена общая</th><th>🔗 Сайт</th></tr></thead><tbody>`;
+        let html = `<table><thead><tr><th onclick="sortTable('name')">Наименование</th><th onclick="sortTable('group')">Группа</th><th onclick="sortTable('supplier')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable('price')">Цена общая</th><th>Сайт</th></tr></thead><tbody>`;
         
         for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
-            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🌐 сайт</a>` : '—';
+            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">открыть</a>` : '—';
             html += `<tr>
                 <td style="max-width:280px;">${escapeHtml(item.name)}</td>
                 <td>${escapeHtml(item.group)}</td>
@@ -328,7 +326,7 @@
                 <td>${escapeHtml(item.pricePerUnit)}</td>
                 <td class="price-cell">${priceDisplay}</td>
                 <td>${siteLink}</td>
-            </td>`;
+            </tr>`;
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
@@ -352,13 +350,15 @@
         if (sumChart) sumChart.destroy();
         sumChart = new Chart(document.getElementById('sumChart'), {
             type: 'bar',
-            data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#4CAF50', borderRadius: 8 }] }
+            data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#2e7d32', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
         
         if (countChart) countChart.destroy();
         countChart = new Chart(document.getElementById('countChart'), {
             type: 'pie',
-            data: { labels, datasets: [{ data: countData, backgroundColor: ['#4CAF50','#2196F3','#FF9800','#9C27B0','#F44336','#00BCD4','#795548'] }] }
+            data: { labels, datasets: [{ data: countData, backgroundColor: ['#2e7d32','#1565c0','#e65100','#6a1b9a','#c62828','#00838f','#5d4037'] }] },
+            options: { responsive: true, maintainAspectRatio: true }
         });
     }
     
