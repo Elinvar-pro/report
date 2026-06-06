@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Отчет по материалам</title>
-    <!-- Chart.js для графиков -->
+    <title>Умный отчет по материалам</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -13,47 +12,42 @@
         h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 4px 0; color: #0f3b2c; }
         .sub { color: #475569; font-size: 0.9rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
         
-        /* Панель фильтров */
-        .filters-card { background: white; border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; border: 1px solid #e2e8f0; }
-        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+        .filters-card { background: white; border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
+        .filters-row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; margin-bottom: 20px; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1; }
         .filter-group label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5b6e8c; }
         select, input { padding: 10px 14px; border-radius: 14px; border: 1px solid #cbd5e1; font-size: 0.9rem; font-family: inherit; background: white; }
+        
+        .quick-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; padding-top: 10px; border-top: 1px solid #e2e8f0; }
+        .quick-btn { background: #e9ecef; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
+        .quick-btn:hover { background: #cbd5e1; }
+        
         button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; }
         button:hover { background: #1b5e20; }
-        .btn-secondary { background: #6c757d; }
-        .btn-secondary:hover { background: #5a6268; }
         
-        /* Карточки статистики */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
         .stat-card { background: white; border-radius: 24px; padding: 16px 20px; border: 1px solid #e9edf2; }
-        .stat-card h3 { font-size: 0.75rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; }
-        .stat-value { font-size: 2rem; font-weight: 700; color: #0f3b2c; }
+        .stat-card h3 { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #0f3b2c; }
         
-        /* Графики */
         .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 28px; }
         .chart-card { background: white; border-radius: 24px; padding: 20px; border: 1px solid #e9edf2; }
-        .chart-card h3 { margin: 0 0 16px 0; font-size: 1rem; color: #1e293b; }
-        canvas { max-height: 300px; width: 100%; }
+        canvas { max-height: 280px; width: 100%; }
         
-        /* Таблица */
         .table-wrapper { background: white; border-radius: 24px; border: 1px solid #e9edf2; overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
-        th { text-align: left; padding: 16px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; user-select: none; position: sticky; top: 0; }
+        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; }
         th:hover { background: #e9ecef; }
-        th::after { content: " ↕"; opacity: 0.3; font-size: 0.7rem; }
-        th.sort-asc::after { content: " ↑"; opacity: 1; }
-        th.sort-desc::after { content: " ↓"; opacity: 1; }
-        td { padding: 12px; border-bottom: 1px solid #f0f2f5; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; }
         .price-cell { font-weight: 500; text-align: right; white-space: nowrap; }
-        .badge-missing { background: #ffebee; color: #c62828; padding: 4px 8px; border-radius: 40px; font-size: 0.7rem; white-space: nowrap; }
+        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 40px; font-size: 0.7rem; }
         .total-row td { background: #fef6e0; font-weight: 700; }
         .loading, .error-message { text-align: center; padding: 48px; }
         .error-message { background: #fff5f5; color: #b91c1c; border-radius: 24px; }
         a { color: #2e7d32; text-decoration: none; }
-        a:hover { text-decoration: underline; }
         @media (max-width: 768px) {
             body { padding: 16px; }
-            .filters-card { flex-direction: column; }
+            .filters-row { flex-direction: column; }
             .filter-group { width: 100%; }
             .charts-row { grid-template-columns: 1fr; }
         }
@@ -61,200 +55,198 @@
 </head>
 <body>
 <div class="container">
-    <h1>📦 Сводка по материалам</h1>
-    <div class="sub">📅 Данные из Google Таблицы · обновляются автоматически</div>
+    <h1>🧠 Умный отчет по материалам</h1>
+    <div class="sub">🔗 Фильтры связаны: выбери группу → поставщики обновятся автоматически</div>
 
-    <!-- Панель фильтров -->
     <div class="filters-card">
-        <div class="filter-group">
-            <label>📁 Группа</label>
-            <select id="filterGroup"><option value="">Все группы</option></select>
+        <div class="filters-row">
+            <div class="filter-group">
+                <label>📁 Группа</label>
+                <select id="filterGroup"><option value="">Все группы</option></select>
+            </div>
+            <div class="filter-group">
+                <label>🏭 Поставщик</label>
+                <select id="filterSupplier"><option value="">Все поставщики</option></select>
+            </div>
+            <div class="filter-group">
+                <label>💰 Цена от</label>
+                <input type="number" id="priceMin" placeholder="0" step="1000">
+            </div>
+            <div class="filter-group">
+                <label>💰 Цена до</label>
+                <input type="number" id="priceMax" placeholder="Любая" step="1000">
+            </div>
+            <div class="filter-group">
+                <label>🔍 Поиск</label>
+                <input type="text" id="searchText" placeholder="Наименование...">
+            </div>
         </div>
-        <div class="filter-group">
-            <label>🏭 Поставщик</label>
-            <select id="filterSupplier"><option value="">Все поставщики</option></select>
-        </div>
-        <div class="filter-group">
-            <label>📏 Размер</label>
-            <select id="filterSize"><option value="">Все размеры</option></select>
-        </div>
-        <div class="filter-group">
-            <label>💰 Цена (мин)</label>
-            <input type="number" id="filterPriceMin" placeholder="0" step="1000">
-        </div>
-        <div class="filter-group">
-            <label>💰 Цена (макс)</label>
-            <input type="number" id="filterPriceMax" placeholder="Любая" step="1000">
-        </div>
-        <div class="filter-group">
-            <label>🔍 Поиск</label>
-            <input type="text" id="filterSearch" placeholder="Наименование...">
-        </div>
-        <div class="filter-group">
-            <label>&nbsp;</label>
-            <button id="resetBtn">⟳ Сбросить всё</button>
+        
+        <div class="quick-filters">
+            <span style="font-size:0.7rem; color:#666; align-self:center;">⚡ Быстрые фильтры:</span>
+            <button type="button" class="quick-btn" data-quick="expensive">💎 Дорогие (>10000)</button>
+            <button type="button" class="quick-btn" data-quick="noPrice">⚠️ Без цены</button>
+            <button type="button" class="quick-btn" data-quick="noSite">🔗 Без сайта</button>
+            <button type="button" id="resetAllBtn" style="margin-left:auto; background:#6c757d;">⟳ Сбросить всё</button>
         </div>
     </div>
 
-    <!-- Карточки статистики -->
-    <div class="stats-grid" id="statsContainer">
-        <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>📦 Позиций</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">—</div></div>
-    </div>
+    <div class="stats-grid" id="statsContainer">...</div>
 
-    <!-- Графики -->
     <div class="charts-row">
-        <div class="chart-card">
-            <h3>📊 Сумма по группам</h3>
-            <canvas id="sumChart"></canvas>
-        </div>
-        <div class="chart-card">
-            <h3>🥧 Количество по группам</h3>
-            <canvas id="countChart"></canvas>
-        </div>
+        <div class="chart-card"><h3>📊 Сумма по группам</h3><canvas id="sumChart"></canvas></div>
+        <div class="chart-card"><h3>🥧 Количество по группам</h3><canvas id="countChart"></canvas></div>
     </div>
 
-    <!-- Таблица -->
-    <div class="table-wrapper">
-        <div id="tableContainer" class="loading">🔄 Загрузка данных...</div>
-    </div>
+    <div class="table-wrapper"><div id="tableContainer" class="loading">🔄 Загрузка...</div></div>
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ НА APPS SCRIPT ⚠️
+    // ⚠️ СЮДА ВСТАВЬ СВОЮ ССЫЛКУ НА APPS SCRIPT ⚠️
     const API_URL = "https://script.google.com/macros/s/AKfycbx4mWEU7SzgWQkQVihSXTRFlrXBhM-2QbSlwVTrcQKMK8wbh0DKjYkr9iRzaMiw9pxvWQ/exec";
     
     let allData = [];
-    let groups = [];
-    let suppliers = [];
-    let sizes = [];
-    
-    let sumChart = null;
-    let countChart = null;
-    
+    let allGroups = [];
+    let allSuppliers = [];
     let currentSort = { column: 'price', direction: 'desc' };
-
+    let sumChart = null, countChart = null;
+    
+    // Загрузка данных
     function loadData() {
         const container = document.getElementById('tableContainer');
         container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
         
         const callbackName = 'jsonp_callback_' + Math.random().toString(36).substr(2);
-        
         window[callbackName] = function(data) {
             delete window[callbackName];
             document.body.removeChild(script);
+            allData = data.data || [];
             
-            allData = data.data;
-            
-            if (!allData || allData.length === 0) {
+            if (!allData.length) {
                 container.innerHTML = '<div class="loading">📭 В таблице пока нет данных</div>';
                 return;
             }
             
-            // Извлекаем уникальные значения для фильтров
+            // Собираем все группы и поставщиков
             const groupsSet = new Set();
             const suppliersSet = new Set();
-            const sizesSet = new Set();
-            
-            for (let i = 0; i < allData.length; i++) {
-                const row = allData[i];
-                const group = row[0] ? String(row[0]).trim() : '';
-                const supplier = row[2] ? String(row[2]).trim() : '';
-                const size = row[6] ? String(row[6]).trim() : '';
+            for (let row of allData) {
+                const group = row[0] ? row[0].toString().trim() : '';
+                const supplier = row[2] ? row[2].toString().trim() : '';
                 if (group) groupsSet.add(group);
                 if (supplier) suppliersSet.add(supplier);
-                if (size && size !== '—') sizesSet.add(size);
             }
+            allGroups = Array.from(groupsSet).sort();
+            allSuppliers = Array.from(suppliersSet).sort();
             
-            groups = Array.from(groupsSet).sort();
-            suppliers = Array.from(suppliersSet).sort();
-            sizes = Array.from(sizesSet).sort();
-            
-            // Заполняем выпадающие списки
+            // Заполняем список групп
             const groupSelect = document.getElementById('filterGroup');
-            groupSelect.innerHTML = '<option value="">Все группы</option>';
-            groups.forEach(g => {
-                const option = document.createElement('option');
-                option.value = g;
-                option.textContent = g;
-                groupSelect.appendChild(option);
+            groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
+            allGroups.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.textContent = g;
+                groupSelect.appendChild(opt);
             });
             
-            const supplierSelect = document.getElementById('filterSupplier');
-            supplierSelect.innerHTML = '<option value="">Все поставщики</option>';
-            suppliers.forEach(s => {
-                const option = document.createElement('option');
-                option.value = s;
-                option.textContent = s;
-                supplierSelect.appendChild(option);
+            // Добавляем обработчики событий
+            document.getElementById('filterGroup').addEventListener('change', () => {
+                updateSupplierFilter(); // КАСКАД: обновляем поставщиков
+                renderTable();
+            });
+            document.getElementById('filterSupplier').addEventListener('change', () => renderTable());
+            document.getElementById('priceMin').addEventListener('input', () => renderTable());
+            document.getElementById('priceMax').addEventListener('input', () => renderTable());
+            document.getElementById('searchText').addEventListener('input', () => renderTable());
+            document.getElementById('resetAllBtn').addEventListener('click', resetAllFilters);
+            
+            // Быстрые фильтры
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => applyQuickFilter(btn.dataset.quick));
             });
             
-            const sizeSelect = document.getElementById('filterSize');
-            sizeSelect.innerHTML = '<option value="">Все размеры</option>';
-            sizes.forEach(sz => {
-                const option = document.createElement('option');
-                option.value = sz;
-                option.textContent = sz;
-                sizeSelect.appendChild(option);
-            });
-            
-            // Добавляем обработчики
-            document.getElementById('filterGroup').addEventListener('change', () => { currentSort = { column: 'price', direction: 'desc' }; renderTable(); });
-            document.getElementById('filterSupplier').addEventListener('change', () => { currentSort = { column: 'price', direction: 'desc' }; renderTable(); });
-            document.getElementById('filterSize').addEventListener('change', renderTable);
-            document.getElementById('filterPriceMin').addEventListener('input', renderTable);
-            document.getElementById('filterPriceMax').addEventListener('input', renderTable);
-            document.getElementById('filterSearch').addEventListener('input', renderTable);
-            document.getElementById('resetBtn').addEventListener('click', resetFilters);
-            
+            // Первоначальное заполнение поставщиков
+            updateSupplierFilter();
             renderTable();
         };
         
         const script = document.createElement('script');
         script.src = API_URL + '?callback=' + callbackName;
-        script.onerror = function() {
+        script.onerror = () => {
             delete window[callbackName];
             document.body.removeChild(script);
-            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки данных. Проверьте ссылку API.</div>`;
+            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки. Проверьте ссылку API.</div>`;
         };
         document.body.appendChild(script);
     }
     
+    // КАСКАДНОЕ ОБНОВЛЕНИЕ СПИСКА ПОСТАВЩИКОВ
+    function updateSupplierFilter() {
+        const selectedGroup = document.getElementById('filterGroup').value;
+        const supplierSelect = document.getElementById('filterSupplier');
+        
+        // Сохраняем текущее выбранное значение
+        const currentSupplier = supplierSelect.value;
+        
+        // Определяем, каких поставщиков показывать
+        let availableSuppliers;
+        if (selectedGroup) {
+            // Фильтруем поставщиков только по выбранной группе
+            const suppliersInGroup = new Set();
+            for (let row of allData) {
+                const group = row[0] ? row[0].toString().trim() : '';
+                const supplier = row[2] ? row[2].toString().trim() : '';
+                if (group === selectedGroup && supplier) {
+                    suppliersInGroup.add(supplier);
+                }
+            }
+            availableSuppliers = Array.from(suppliersInGroup).sort();
+        } else {
+            // Если группа не выбрана — показываем всех поставщиков
+            availableSuppliers = [...allSuppliers];
+        }
+        
+        // Перестраиваем выпадающий список
+        supplierSelect.innerHTML = '<option value="">🏭 Все поставщики</option>';
+        availableSuppliers.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            supplierSelect.appendChild(opt);
+        });
+        
+        // Восстанавливаем выбранное значение, если оно ещё доступно
+        if (currentSupplier && availableSuppliers.includes(currentSupplier)) {
+            supplierSelect.value = currentSupplier;
+        } else {
+            supplierSelect.value = "";
+        }
+    }
+    
+    // Получение отфильтрованных данных
     function getFilteredData() {
         const filterGroup = document.getElementById('filterGroup').value;
         const filterSupplier = document.getElementById('filterSupplier').value;
-        const filterSize = document.getElementById('filterSize').value;
-        const filterPriceMin = parseFloat(document.getElementById('filterPriceMin').value);
-        const filterPriceMax = parseFloat(document.getElementById('filterPriceMax').value);
-        const filterSearch = document.getElementById('filterSearch').value.toLowerCase();
+        const priceMin = parseFloat(document.getElementById('priceMin').value);
+        const priceMax = parseFloat(document.getElementById('priceMax').value);
+        const searchText = document.getElementById('searchText').value.toLowerCase();
         
         let filtered = [];
         
-        for (let i = 0; i < allData.length; i++) {
-            const row = allData[i];
-            const group = row[0] ? String(row[0]).trim() : '';
-            const name = row[1] ? String(row[1]).trim() : '';
-            const supplier = row[2] ? String(row[2]).trim() : '';
+        for (let row of allData) {
+            const group = row[0] ? row[0].toString().trim() : '';
+            const name = row[1] ? row[1].toString().trim() : '';
+            const supplier = row[2] ? row[2].toString().trim() : '';
             const unit = row[3] || '';
             const pricePerUnit = row[4] || '';
-            let totalPriceRaw = row[5];
-            const size = row[6] ? String(row[6]).trim() : '';
+            let totalRaw = row[5];
+            const size = row[6] ? row[6].toString().trim() : '';
             const site = row[7] || '';
             
-            // Фильтры
-            if (filterGroup && group !== filterGroup) continue;
-            if (filterSupplier && supplier !== filterSupplier) continue;
-            if (filterSize && size !== filterSize) continue;
-            if (filterSearch && !name.toLowerCase().includes(filterSearch)) continue;
-            if (!group) continue;
-            
-            // Парсим цену
             let totalNum = 0;
             let hasPrice = false;
-            if (totalPriceRaw && String(totalPriceRaw).trim() !== '') {
-                const priceStr = String(totalPriceRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
+            if (totalRaw && String(totalRaw).trim() !== '') {
+                const priceStr = String(totalRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
                 const parsed = parseFloat(priceStr);
                 if (!isNaN(parsed)) {
                     totalNum = parsed;
@@ -262,14 +254,32 @@
                 }
             }
             
-            // Фильтр по цене
-            if (!isNaN(filterPriceMin) && totalNum < filterPriceMin) continue;
-            if (!isNaN(filterPriceMax) && totalNum > filterPriceMax) continue;
+            // Фильтры
+            if (filterGroup && group !== filterGroup) continue;
+            if (filterSupplier && supplier !== filterSupplier) continue;
+            if (!isNaN(priceMin) && totalNum < priceMin) continue;
+            if (!isNaN(priceMax) && totalNum > priceMax) continue;
+            if (searchText && !name.toLowerCase().includes(searchText)) continue;
+            if (!group) continue;
             
-            filtered.push({ group, name, supplier, unit, pricePerUnit, totalPriceRaw, totalNum, hasPrice, size, site });
+            filtered.push({ group, name, supplier, unit, pricePerUnit, totalRaw, totalNum, hasPrice, size, site });
         }
         
         return filtered;
+    }
+    
+    function applyQuickFilter(type) {
+        resetAllFilters();
+        if (type === 'expensive') document.getElementById('priceMin').value = '10000';
+        if (type === 'noPrice') {
+            document.getElementById('priceMin').value = '-1';
+            document.getElementById('priceMax').value = '0';
+        }
+        if (type === 'noSite') {
+            // Просто показываем уведомление, что фильтр по сайту не встроен
+            alert('Фильтр "Без сайта" можно сделать через поиск по слову "site:"');
+        }
+        renderTable();
     }
     
     function renderTable() {
@@ -277,18 +287,14 @@
         
         // Сортировка
         filtered.sort((a, b) => {
-            let aVal, bVal;
-            switch (currentSort.column) {
-                case 'name': aVal = a.name; bVal = b.name; return currentSort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                case 'group': aVal = a.group; bVal = b.group; return currentSort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                case 'supplier': aVal = a.supplier; bVal = b.supplier; return currentSort.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                case 'price': return currentSort.direction === 'asc' ? a.totalNum - b.totalNum : b.totalNum - a.totalNum;
-                default: return b.totalNum - a.totalNum;
-            }
+            if (currentSort.column === 'name') return currentSort.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            if (currentSort.column === 'group') return currentSort.direction === 'asc' ? a.group.localeCompare(b.group) : b.group.localeCompare(a.group);
+            if (currentSort.column === 'supplier') return currentSort.direction === 'asc' ? a.supplier.localeCompare(b.supplier) : b.supplier.localeCompare(a.supplier);
+            return currentSort.direction === 'asc' ? a.totalNum - b.totalNum : b.totalNum - a.totalNum;
         });
         
         // Статистика
-        const totalSum = filtered.reduce((sum, item) => sum + item.totalNum, 0);
+        const totalSum = filtered.reduce((s, i) => s + i.totalNum, 0);
         const uniqueGroups = new Set(filtered.map(i => i.group)).size;
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
         
@@ -308,22 +314,11 @@
             return;
         }
         
-        let html = `<table><thead><tr>
-            <th onclick="sortTable('name')" id="sort-name">📦 Наименование</th>
-            <th onclick="sortTable('group')" id="sort-group">📁 Группа</th>
-            <th onclick="sortTable('supplier')" id="sort-supplier">🏭 Поставщик</th>
-            <th>📏 Размер</th>
-            <th>📐 Ед.изм</th>
-            <th>💵 Цена/ед</th>
-            <th onclick="sortTable('price')" id="sort-price">💰 Цена общая</th>
-            <th>🔗 Сайт</th>
-        </tr></thead><tbody>`;
+        let html = `<table><thead><tr><th onclick="sortTable('name')">📦 Наименование</th><th onclick="sortTable('group')">📁 Группа</th><th onclick="sortTable('supplier')">🏭 Поставщик</th><th>📏 Размер</th><th>📐 Ед.изм</th><th>💵 Цена/ед</th><th onclick="sortTable('price')">💰 Цена общая</th><th>🔗 Сайт</th></tr></thead><tbody>`;
         
-        for (const item of filtered) {
+        for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
-            const siteLink = (item.site && (item.site.startsWith('http') || item.site.startsWith('https'))) 
-                ? `<a href="${item.site}" target="_blank">🌐 сайт</a>` : '—';
-            
+            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🌐 сайт</a>` : '—';
             html += `<tr>
                 <td style="max-width:280px;">${escapeHtml(item.name)}</td>
                 <td>${escapeHtml(item.group)}</td>
@@ -333,100 +328,66 @@
                 <td>${escapeHtml(item.pricePerUnit)}</td>
                 <td class="price-cell">${priceDisplay}</td>
                 <td>${siteLink}</td>
-            </tr>`;
+            </td>`;
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
         html += `</tbody>树`;
         
         document.getElementById('tableContainer').innerHTML = html;
-        
-        // Обновляем стрелки сортировки
-        updateSortIndicators();
     }
     
     function updateCharts(filtered) {
-        // Группировка по группам
         const groupMap = new Map();
-        for (const item of filtered) {
-            const group = item.group;
-            if (!groupMap.has(group)) {
-                groupMap.set(group, { sum: 0, count: 0 });
-            }
-            const stats = groupMap.get(group);
-            stats.sum += item.totalNum;
-            stats.count++;
+        for (let item of filtered) {
+            if (!groupMap.has(item.group)) groupMap.set(item.group, { sum: 0, count: 0 });
+            const stat = groupMap.get(item.group);
+            stat.sum += item.totalNum;
+            stat.count++;
         }
-        
         const labels = Array.from(groupMap.keys());
-        const sumData = labels.map(g => groupMap.get(g).sum);
-        const countData = labels.map(g => groupMap.get(g).count);
+        const sumData = labels.map(l => groupMap.get(l).sum);
+        const countData = labels.map(l => groupMap.get(l).count);
         
-        // График сумм
         if (sumChart) sumChart.destroy();
-        const sumCtx = document.getElementById('sumChart').getContext('2d');
-        sumChart = new Chart(sumCtx, {
+        sumChart = new Chart(document.getElementById('sumChart'), {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#4CAF50', borderRadius: 8 }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+            data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#4CAF50', borderRadius: 8 }] }
         });
         
-        // График количества
         if (countChart) countChart.destroy();
-        const countCtx = document.getElementById('countChart').getContext('2d');
-        countChart = new Chart(countCtx, {
+        countChart = new Chart(document.getElementById('countChart'), {
             type: 'pie',
-            data: { labels: labels, datasets: [{ data: countData, backgroundColor: ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#795548', '#607D8B'] }] },
-            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'right' } } }
+            data: { labels, datasets: [{ data: countData, backgroundColor: ['#4CAF50','#2196F3','#FF9800','#9C27B0','#F44336','#00BCD4','#795548'] }] }
         });
     }
     
-    function sortTable(column) {
-        if (currentSort.column === column) {
+    function sortTable(col) {
+        if (currentSort.column === col) {
             currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
         } else {
-            currentSort.column = column;
+            currentSort.column = col;
             currentSort.direction = 'desc';
         }
         renderTable();
     }
     
-    function updateSortIndicators() {
-        document.querySelectorAll('th').forEach(th => {
-            th.classList.remove('sort-asc', 'sort-desc');
-        });
-        const sortMap = { name: 'sort-name', group: 'sort-group', supplier: 'sort-supplier', price: 'sort-price' };
-        const elementId = sortMap[currentSort.column];
-        if (elementId) {
-            const el = document.getElementById(elementId);
-            if (el) el.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
-        }
-    }
-    
-    function resetFilters() {
+    function resetAllFilters() {
         document.getElementById('filterGroup').value = '';
         document.getElementById('filterSupplier').value = '';
-        document.getElementById('filterSize').value = '';
-        document.getElementById('filterPriceMin').value = '';
-        document.getElementById('filterPriceMax').value = '';
-        document.getElementById('filterSearch').value = '';
-        currentSort = { column: 'price', direction: 'desc' };
+        document.getElementById('priceMin').value = '';
+        document.getElementById('priceMax').value = '';
+        document.getElementById('searchText').value = '';
+        updateSupplierFilter();
         renderTable();
     }
     
     function escapeHtml(str) {
         if (!str) return '—';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
     }
     
-    // Глобальные функции для onclick
     window.sortTable = sortTable;
-    
     loadData();
 </script>
 </body>
