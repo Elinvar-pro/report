@@ -102,7 +102,6 @@
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
 
-    // ПРОСТЕЙШИЙ ПАРСИНГ — просто убираем пробелы и меняем запятую на точку
     function parsePrice(value) {
         if (value === undefined || value === null || value === '') return 0;
         if (typeof value === 'number') return value;
@@ -110,11 +109,8 @@
         let s = String(value).trim();
         if (s === '') return 0;
         
-        // Убираем пробелы
-        s = s.replace(/\s/g, '');
-        // Меняем запятую на точку
-        s = s.replace(',', '.');
-        
+        // Убираем пробелы и заменяем запятую на точку
+        s = s.replace(/\s/g, '').replace(',', '.');
         let num = parseFloat(s);
         return isNaN(num) ? 0 : num;
     }
@@ -132,42 +128,38 @@
             const json = JSON.parse(jsonStr);
             const rows = json.table.rows;
             
-            console.log("=== ДАННЫЕ ИЗ ТАБЛИЦЫ ===");
-            console.log("Всего строк:", rows.length);
-            
             allData = [];
             const groupsSet = new Set();
             const suppliersSet = new Set();
-            
-            let debugSum = 0;
-            let debugCount = 0;
             
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i].c;
                 if (!row || !row[0] || !row[0].v) continue;
                 
-                const group = String(row[0].v || '').trim();
+                // Правильные индексы колонок:
+                // 0 - Группа
+                // 1 - Наименование
+                // 3 - Ед.измерения
+                // 4 - Цена/ед
+                // 6 - Цена общая (!!!) — не 5, а 6!
+                // 7 - Поставщик №1
+                // 8 - Сайт
+                
+                const group = String(row[0]?.v || '').trim();
                 const name = String(row[1]?.v || '').trim();
-                const supplier = String(row[2]?.v || '').trim();
-                const unit = String(row[3]?.v || '').trim();
-                let pricePerUnitRaw = row[4]?.v || '';
-                let totalRaw = row[5]?.v || '';
-                const size = String(row[6]?.v || '').trim();
-                const site = String(row[7]?.v || '').trim();
+                const supplier = String(row[7]?.v || '').trim();      // колонка 7
+                const unit = String(row[3]?.v || '').trim();          // колонка 3
+                let pricePerUnitRaw = row[4]?.v || '';               // колонка 4
+                let totalRaw = row[6]?.v || '';                      // колонка 6 — ЦЕНА ОБЩАЯ
+                const size = String(row[5]?.v || '').trim();          // колонка 5 — РАЗМЕР
+                const site = String(row[8]?.v || '').trim();          // колонка 8 — САЙТ
                 
                 if (!group) continue;
                 
-                // Парсим цену
+                // Парсим общую цену (из колонки 6)
                 let totalPrice = parsePrice(totalRaw);
                 
-                // Для отладки: выводим первые 10 строк с ценой
-                if (debugCount < 10 && totalPrice > 0) {
-                    console.log(`Строка ${i}: "${totalRaw}" → ${totalPrice} ₽`);
-                    debugCount++;
-                }
-                debugSum += totalPrice;
-                
-                // Цена за единицу для отображения
+                // Цена за единицу для отображения (колонка 4)
                 let pricePerUnitDisplay = '—';
                 let pupNum = parsePrice(pricePerUnitRaw);
                 if (pupNum > 0) {
@@ -179,24 +171,21 @@
                     pricePerUnit: pricePerUnitDisplay,
                     totalPrice: totalPrice,
                     hasPrice: totalPrice > 0,
-                    size, site,
-                    totalRaw: totalRaw  // сохраняем оригинал для отладки
+                    size, site
                 });
                 
                 if (group) groupsSet.add(group);
                 if (supplier) suppliersSet.add(supplier);
             }
             
-            console.log("=== ИТОГИ ОБРАБОТКИ ===");
-            console.log("Всего позиций (с группой):", allData.length);
-            console.log("Сумма по обработанным позициям:", debugSum.toLocaleString('ru-RU'));
-            console.log("Первые 5 позиций (группа, название, цена):");
-            for (let i = 0; i < Math.min(5, allData.length); i++) {
-                console.log(`  ${i+1}. ${allData[i].group} | ${allData[i].name} | "${allData[i].totalRaw}" → ${allData[i].totalPrice} ₽`);
-            }
-            
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
+            
+            // Проверка в консоли
+            let testSum = 0;
+            for (let item of allData) testSum += item.totalPrice;
+            console.log("Позиций:", allData.length);
+            console.log("Сумма (проверка):", testSum.toLocaleString('ru-RU'));
             
             // Заполняем фильтры
             const groupSelect = document.getElementById('filterGroup');
@@ -312,7 +301,7 @@
             return;
         }
         
-        let html = '<tr><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
+        let html = '<table><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
         
         for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
@@ -320,8 +309,8 @@
             html += `<tr><td style="max-width:250px;">${escapeHtml(item.name)}</td><td>${escapeHtml(item.group)}</td><td>${escapeHtml(item.supplier)}</td><td>${escapeHtml(item.size)}</td><td>${escapeHtml(item.unit)}</td><td>${escapeHtml(item.pricePerUnit)}</td><td class="price-cell">${priceDisplay}</td><td>${siteLink}</td></tr>`;
         }
         
-        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td>—</td></tr>`;
-        html += `</tbody>~`;
+        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td class="price-cell">—</td></tr>`;
+        html += `</tbody>树`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
