@@ -26,27 +26,32 @@
         .stat-value { font-size: 1.4rem; font-weight: 700; color: #1a5d2a; }
         
         .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .chart-card { background: white; border-radius: 16px; padding: 16px; }
-        canvas { max-height: 240px; width: 100%; }
+        .chart-card { background: white; border-radius: 16px; padding: 16px; text-align: center; }
+        .chart-card h3 { margin: 0 0 15px 0; font-size: 0.9rem; color: #333; }
+        canvas { max-height: 250px; width: 100%; }
         
         .table-wrapper { background: white; border-radius: 16px; overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        th { text-align: left; padding: 12px; background: #f8fafc; cursor: pointer; }
+        th { text-align: left; padding: 12px; background: #f8fafc; cursor: pointer; border-bottom: 2px solid #e2e8f0; }
+        th:hover { background: #e9ecef; }
         td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; }
-        .price-cell { text-align: right; }
-        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 6px; border-radius: 20px; font-size: 0.7rem; }
+        .price-cell { text-align: right; white-space: nowrap; }
+        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
         .total-row td { background: #fef6e0; font-weight: 700; }
-        .loading { text-align: center; padding: 40px; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+        a { color: #2e7d32; text-decoration: none; }
+        a:hover { text-decoration: underline; }
         @media (max-width: 700px) {
             body { padding: 12px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            th, td { padding: 8px; font-size: 0.75rem; }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>📋 Сводка по материалам</h1>
-    <div class="sub">Данные из Google Таблицы</div>
+    <div class="sub">Данные из Google Таблицы | Обновляются автоматически</div>
 
     <div class="filters-card">
         <div class="filters-row">
@@ -64,32 +69,38 @@
             </div>
             <div class="filter-group">
                 <label>💰 Цена от</label>
-                <input type="number" id="priceMin" placeholder="0">
+                <input type="number" id="priceMin" placeholder="0" step="1000">
             </div>
             <div class="filter-group">
                 <label>💰 Цена до</label>
-                <input type="number" id="priceMax" placeholder="Любая">
+                <input type="number" id="priceMax" placeholder="Любая" step="1000">
             </div>
         </div>
         <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-            <button id="resetBtn">⟳ Сбросить</button>
+            <button id="resetBtn">⟳ Сбросить всё</button>
         </div>
     </div>
 
     <div class="stats-grid" id="statsContainer">
         <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">—</div></div>
-        <div class="stat-card"><h3>📦 Позиций</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>📦 Всего позиций</h3><div class="stat-value">—</div></div>
         <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">—</div></div>
         <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">—</div></div>
     </div>
 
     <div class="charts-row">
-        <div class="chart-card"><h3>Сумма по группам</h3><canvas id="sumChart"></canvas></div>
-        <div class="chart-card"><h3>Количество по группам</h3><canvas id="countChart"></canvas></div>
+        <div class="chart-card">
+            <h3>📊 Сумма по группам</h3>
+            <canvas id="sumChart"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3>🥧 Количество по группам</h3>
+            <canvas id="countChart"></canvas>
+        </div>
     </div>
 
     <div class="table-wrapper">
-        <div id="tableContainer" class="loading">Загрузка...</div>
+        <div id="tableContainer" class="loading">📡 Загрузка данных...</div>
     </div>
 </div>
 
@@ -105,24 +116,19 @@
     function parsePrice(value) {
         if (value === undefined || value === null || value === '') return 0;
         if (typeof value === 'number') return value;
-        
-        let s = String(value).trim();
-        if (s === '') return 0;
-        
-        s = s.replace(/\s/g, '').replace(',', '.');
+        let s = String(value).trim().replace(/\s/g, '').replace(',', '.');
         let num = parseFloat(s);
         return isNaN(num) ? 0 : num;
     }
 
     async function loadData() {
         const container = document.getElementById('tableContainer');
-        container.innerHTML = '<div class="loading">📡 Загрузка...</div>';
+        container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
         
         try {
             const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
             const response = await fetch(url);
             const text = await response.text();
-            
             const jsonStr = text.substring(47, text.length - 2);
             const json = JSON.parse(jsonStr);
             const rows = json.table.rows;
@@ -139,17 +145,17 @@
                 const name = String(row[1]?.v || '').trim();
                 const supplier = String(row[7]?.v || '').trim();
                 const unit = String(row[3]?.v || '').trim();
-                let pricePerUnitRaw = row[4]?.v || '';
-                let totalRaw = row[6]?.v || '';
+                const pricePerUnitRaw = row[4]?.v || '';
+                const totalRaw = row[6]?.v || '';
                 const size = String(row[5]?.v || '').trim();
                 const site = String(row[8]?.v || '').trim();
                 
                 if (!group) continue;
                 
-                let totalPrice = parsePrice(totalRaw);
+                const totalPrice = parsePrice(totalRaw);
                 
                 let pricePerUnitDisplay = '—';
-                let pupNum = parsePrice(pricePerUnitRaw);
+                const pupNum = parsePrice(pricePerUnitRaw);
                 if (pupNum > 0) {
                     pricePerUnitDisplay = pupNum.toFixed(2).replace('.', ',') + ' ₽';
                 }
@@ -169,11 +175,7 @@
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
             
-            let testSum = 0;
-            for (let item of allData) testSum += item.totalPrice;
-            console.log("Позиций:", allData.length);
-            console.log("Сумма:", testSum.toLocaleString('ru-RU'));
-            
+            // Заполняем фильтры
             const groupSelect = document.getElementById('filterGroup');
             groupSelect.innerHTML = '<option value="">Все группы</option>';
             allGroups.forEach(g => {
@@ -207,7 +209,7 @@
             
         } catch (error) {
             console.error(error);
-            container.innerHTML = `<div class="loading">❌ Ошибка: ${error.message}</div>`;
+            container.innerHTML = `<div class="loading">❌ Ошибка загрузки: ${error.message}</div>`;
         }
     }
     
@@ -275,7 +277,7 @@
         
         document.getElementById('statsContainer').innerHTML = `
             <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
-            <div class="stat-card"><h3>📦 Позиций</h3><div class="stat-value">${filtered.length}</div></div>
+            <div class="stat-card"><h3>📦 Всего позиций</h3><div class="stat-value">${filtered.length}</div></div>
             <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
             <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
         `;
@@ -283,54 +285,118 @@
         updateCharts(filtered);
         
         if (filtered.length === 0) {
-            document.getElementById('tableContainer').innerHTML = '<div class="loading">😕 Нет данных</div>';
+            document.getElementById('tableContainer').innerHTML = '<div class="loading">😕 Нет данных по выбранным фильтрам</div>';
             return;
         }
         
-        let html = '<tr><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
+        let html = `<table>
+            <thead>
+                <tr>
+                    <th onclick="sortTable('name')">📦 Наименование</th>
+                    <th onclick="sortTable('group')">📁 Группа</th>
+                    <th onclick="sortTable('supplier')">🏭 Поставщик</th>
+                    <th>📏 Размер</th>
+                    <th>📐 Ед.изм</th>
+                    <th>💵 Цена/ед</th>
+                    <th onclick="sortTable('price')">💰 Цена общая</th>
+                    <th>🔗 Сайт</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
         
         for (let item of filtered) {
-            const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
-            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">открыть</a>` : '—';
-            html += `<tr><td style="max-width:250px;">${escapeHtml(item.name)}</td><td>${escapeHtml(item.group)}</td><td>${escapeHtml(item.supplier)}</td><td>${escapeHtml(item.size)}</td><td>${escapeHtml(item.unit)}</td><td>${escapeHtml(item.pricePerUnit)}</td><td class="price-cell">${priceDisplay}</td><td>${siteLink}</td></tr>`;
+            const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">⚠️ нет цены</span>`;
+            const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🌐 открыть</a>` : '—';
+            html += `
+                <tr>
+                    <td style="max-width:280px;">${escapeHtml(item.name)}</td>
+                    <td>${escapeHtml(item.group)}</td>
+                    <td>${escapeHtml(item.supplier)}</td>
+                    <td>${escapeHtml(item.size)}</td>
+                    <td>${escapeHtml(item.unit)}</td>
+                    <td>${escapeHtml(item.pricePerUnit)}</td>
+                    <td class="price-cell">${priceDisplay}</td>
+                    <td>${siteLink}</td>
+                </tr>
+            `;
         }
         
-        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td class="price-cell">—</td></tr>`;
-        html += `</tbody>`;
+        html += `
+            <tr class="total-row">
+                <td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td>
+                <td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td>
+                <td>—</td>
+            </tr>
+            </tbody>
+        </table>`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
     
     function updateCharts(filtered) {
-        const map = new Map();
+        const groupMap = new Map();
         for (let item of filtered) {
-            if (!map.has(item.group)) map.set(item.group, { sum: 0, count: 0 });
-            const stat = map.get(item.group);
+            if (!groupMap.has(item.group)) groupMap.set(item.group, { sum: 0, count: 0 });
+            const stat = groupMap.get(item.group);
             stat.sum += item.totalPrice;
             stat.count++;
         }
-        const labels = Array.from(map.keys());
-        const sumData = labels.map(l => map.get(l).sum);
-        const countData = labels.map(l => map.get(l).count);
+        const labels = Array.from(groupMap.keys());
+        const sumData = labels.map(l => groupMap.get(l).sum);
+        const countData = labels.map(l => groupMap.get(l).count);
         
         if (sumChart) sumChart.destroy();
         if (countChart) countChart.destroy();
         
-        if (labels.length) {
+        if (labels.length > 0) {
             sumChart = new Chart(document.getElementById('sumChart'), {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#2e7d32' }] }
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Сумма, руб',
+                        data: sumData,
+                        backgroundColor: '#2e7d32',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
             });
+            
             countChart = new Chart(document.getElementById('countChart'), {
                 type: 'pie',
-                data: { labels, datasets: [{ data: countData, backgroundColor: ['#2e7d32','#1565c0','#e65100','#6a1b9a','#c62828','#00838f'] }] }
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: countData,
+                        backgroundColor: ['#2e7d32', '#1565c0', '#e65100', '#6a1b9a', '#c62828', '#00838f', '#5d4037', '#f9a825', '#ad1457', '#1b5e20']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
             });
         }
     }
     
     function sortTable(col) {
-        if (currentSort.column === col) currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        else { currentSort.column = col; currentSort.direction = 'desc'; }
+        if (currentSort.column === col) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = col;
+            currentSort.direction = 'desc';
+        }
         renderTable();
     }
     
@@ -344,7 +410,15 @@
         renderTable();
     }
     
-    function escapeHtml(str) { if (!str) return '—'; return String(str).replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function escapeHtml(str) {
+        if (!str) return '—';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
     
     window.sortTable = sortTable;
     loadData();
