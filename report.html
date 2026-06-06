@@ -36,7 +36,7 @@
 <body>
 <div class="container">
     <h1>📦 Сводка по материалам</h1>
-    <div class="sub">📅 Данные из Google Таблицы · руководитель</div>
+    <div class="sub">📅 Данные из Google Таблицы · обновляются автоматически</div>
 
     <div class="filters-card">
         <div class="filter-group">
@@ -53,7 +53,7 @@
         </div>
         <div class="filter-group">
             <label>&nbsp;</label>
-            <button id="resetBtn">⟳ Сбросить</button>
+            <button id="resetBtn">⟳ Сбросить фильтры</button>
         </div>
     </div>
 
@@ -70,8 +70,8 @@
 </div>
 
 <script>
-    // ✅ ТВОЯ ССЫЛКА УЖЕ ВСТАВЛЕНА
-    const API_URL = "https://script.google.com/macros/s/AKfycbxMZil0-M9ZNFuMxH3mmgpXbpiNefx1p1I3po3oMbHW116IGy4-JjTnjSG8GeuuFkV84w/exec";
+    // ТВОЯ НОВАЯ ССЫЛКА (уже вставлена)
+    const API_URL = "https://script.google.com/macros/s/AKfycbyvWqqrl3J9rRNhjvQ4nQdSpz3sf60XKG1Wtc-plmvhvE3-zToLZIy7trtfdKpDIbIMyQ/exec";
     
     let allData = [];
     let groups = [];
@@ -89,12 +89,11 @@
             allData = json.data;
             
             if (!allData || allData.length === 0) {
-                throw new Error("Нет данных в таблице");
+                container.innerHTML = '<div class="loading">📭 В таблице пока нет данных</div>';
+                return;
             }
             
-            console.log("Загружено строк:", allData.length);
-            
-            // Извлекаем уникальные группы (колонка 0) и поставщиков (колонка 2)
+            // Извлекаем уникальные группы и поставщиков
             const groupsSet = new Set();
             const suppliersSet = new Set();
             
@@ -141,8 +140,8 @@
             container.innerHTML = `<div class="error-message">
                 ❌ Ошибка загрузки: ${error.message}<br><br>
                 <strong>Проверьте:</strong><br>
-                1. Веб-приложение развернуто с доступом "Все, у кого есть ссылка"?<br>
-                2. Откройте эту ссылку в браузере отдельно — должен быть JSON:<br>
+                1. Веб-приложение развернуто с доступом "Все, у кого есть ссылка"<br>
+                2. Откройте ссылку отдельно — должен быть JSON<br>
                 <a href="${API_URL}" target="_blank">${API_URL}</a>
             </div>`;
         }
@@ -167,13 +166,11 @@
             const size = row[6] || '';
             const site = row[7] || '';
             
-            // Фильтры
             if (filterGroup && group !== filterGroup) continue;
             if (filterSupplier && supplier !== filterSupplier) continue;
             if (filterSearch && !name.toLowerCase().includes(filterSearch)) continue;
             if (!group) continue;
             
-            // Парсим цену
             let totalNum = 0;
             let hasPrice = false;
             if (totalPriceRaw && String(totalPriceRaw).trim() !== '') {
@@ -189,10 +186,8 @@
             filtered.push({ group, name, supplier, unit, pricePerUnit, totalPriceRaw, totalNum, hasPrice, size, site });
         }
         
-        // Сортировка по цене (дорогие сверху)
         filtered.sort((a, b) => b.totalNum - a.totalNum);
         
-        // Статистика
         const uniqueGroups = new Set(filtered.map(i => i.group)).size;
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
         
@@ -227,7 +222,7 @@
             </tr>`;
         }
         
-        html += `<tr class="total-row"><td colspan="6" style="text-align:right;">ИТОГО:</td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td>Noscript`;
+        html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
         html += `</tbody></table>`;
         
         document.getElementById('tableContainer').innerHTML = html;
@@ -250,7 +245,6 @@
         renderTable();
     }
     
-    // Запуск
     loadData();
 </script>
 </body>
