@@ -13,155 +13,32 @@
         .sub { color: #475569; font-size: 0.85rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
         
         .filters-card { background: white; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
-        
-        .filters-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            align-items: end;
-        }
-        
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        
-        .filter-group label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #5b6e8c;
-            letter-spacing: 0.5px;
-        }
-        
-        select, input {
-            padding: 10px 14px;
-            border-radius: 12px;
-            border: 1px solid #cbd5e1;
-            font-size: 0.85rem;
-            font-family: inherit;
-            background: white;
-            width: 100%;
-        }
-        
-        .search-row {
-            margin-top: 20px;
-        }
-        
-        .reset-row {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-        
-        button {
-            background: #2e7d32;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: white;
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.85rem;
-        }
+        .filters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: end; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5b6e8c; }
+        select, input { padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; background: white; width: 100%; }
+        .search-row { margin-top: 20px; }
+        .reset-row { display: flex; justify-content: flex-end; margin-top: 20px; }
+        button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; }
         button:hover { background: #1b5e20; }
-        .btn-outline {
-            background: white;
-            border: 1px solid #2e7d32;
-            color: #2e7d32;
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 20px;
-            padding: 16px 20px;
-            border: 1px solid #e9edf2;
-        }
-        .stat-card h3 {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #5b6e8c;
-            margin: 0 0 8px 0;
-            text-transform: uppercase;
-        }
-        .stat-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1a5d2a;
-        }
-        
-        .charts-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
-            margin-bottom: 28px;
-        }
-        .chart-card {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #e9edf2;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-card { background: white; border-radius: 20px; padding: 16px 20px; border: 1px solid #e9edf2; }
+        .stat-card h3 { font-size: 0.7rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; text-transform: uppercase; }
+        .stat-value { font-size: 1.6rem; font-weight: 700; color: #1a5d2a; }
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-bottom: 28px; }
+        .chart-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e9edf2; }
         canvas { max-height: 260px; width: 100%; }
-        
-        .table-wrapper {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #e9edf2;
-            overflow: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 800px;
-        }
-        th {
-            text-align: left;
-            padding: 14px 12px;
-            background: #f8fafc;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #f0f2f5;
-        }
-        .price-cell {
-            font-weight: 500;
-            text-align: right;
-        }
-        .badge-missing {
-            background: #ffebee;
-            color: #c62828;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-        }
-        .total-row td {
-            background: #fef6e0;
-            font-weight: 700;
-        }
-        .loading, .error-message {
-            text-align: center;
-            padding: 48px;
-        }
-        a { color: #2e7d32; text-decoration: none; }
+        .table-wrapper { background: white; border-radius: 20px; border: 1px solid #e9edf2; overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
+        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; cursor: pointer; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; }
+        .price-cell { font-weight: 500; text-align: right; }
+        .badge-missing { background: #ffebee; color: #c62828; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
+        .total-row td { background: #fef6e0; font-weight: 700; }
+        .loading, .error-message { text-align: center; padding: 48px; }
         .search-hint { font-size: 0.7rem; color: #6c757d; margin-top: 4px; }
-        
-        @media (max-width: 900px) {
-            .filters-row { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 600px) {
-            .filters-row { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 900px) { .filters-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .filters-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -188,7 +65,6 @@
                 <input type="number" id="priceMax" placeholder="Любая" step="1000">
             </div>
         </div>
-        
         <div class="search-row">
             <div class="filter-group">
                 <label>🔎 Умный поиск</label>
@@ -196,7 +72,6 @@
                 <div class="search-hint">📌 Ищет одновременно в 4 полях</div>
             </div>
         </div>
-        
         <div class="reset-row">
             <button id="resetAllBtn">⟳ Сбросить всё</button>
         </div>
@@ -220,15 +95,24 @@
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ ⚠️
     const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
     const SHEET_NAME = "Лист1";
     
-    let allData = [];
+    let allItems = [];      // Храним уже обработанные данные (каждый объект = одна позиция)
     let allGroups = [];
     let allSuppliers = [];
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
+
+    // Функция для безопасного извлечения числа из цены
+    function parsePrice(value) {
+        if (value === undefined || value === null || value === '') return 0;
+        if (typeof value === 'number') return value;
+        const str = String(value).trim();
+        if (str === '') return 0;
+        const num = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
+        return isNaN(num) ? 0 : num;
+    }
 
     async function loadData() {
         const container = document.getElementById('tableContainer');
@@ -238,58 +122,76 @@
             const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
             const response = await fetch(url);
             const text = await response.text();
-            
-            // Парсим JSONP ответ
             const jsonStr = text.substring(47, text.length - 2);
             const json = JSON.parse(jsonStr);
             
             const rows = json.table.rows;
-            const cols = json.table.cols;
             
-            // Очищаем старые данные
-            allData = [];
-            
-            // Проходим по всем строкам
+            // Преобразуем строки в массив объектов
+            const rawData = [];
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i].c;
                 const rowData = [];
                 for (let j = 0; j < row.length; j++) {
-                    // Получаем значение, если оно есть
-                    let value = '';
-                    if (row[j] && row[j].v !== null && row[j].v !== undefined) {
-                        value = row[j].v;
-                    }
-                    rowData.push(value);
+                    rowData.push(row[j] ? row[j].v : '');
                 }
-                // Добавляем только если есть хоть какие-то данные
-                if (rowData.length > 0 && rowData.some(cell => cell !== '' && cell !== null && cell !== undefined)) {
-                    allData.push(rowData);
+                if (rowData.length >= 8 && rowData[0] && String(rowData[0]).trim() !== '') {
+                    rawData.push(rowData);
                 }
             }
             
-            console.log("Загружено строк (сырых):", allData.length);
-            console.log("Первые 3 строки:", allData.slice(0, 3));
-            
-            if (!allData.length) {
-                container.innerHTML = '<div class="loading">📭 Нет данных в таблице</div>';
-                return;
-            }
-            
-            // Собираем группы и поставщиков
+            // Создаем обработанный массив объектов
+            allItems = [];
             const groupsSet = new Set();
             const suppliersSet = new Set();
-            for (let row of allData) {
-                const group = row[0] ? String(row[0]).trim() : '';
-                const supplier = row[2] ? String(row[2]).trim() : '';
-                if (group && group !== '') groupsSet.add(group);
-                if (supplier && supplier !== '') suppliersSet.add(supplier);
+            
+            for (let row of rawData) {
+                const group = String(row[0] || '').trim();
+                const name = String(row[1] || '').trim();
+                const supplier = String(row[2] || '').trim();
+                const unit = String(row[3] || '').trim();
+                const pricePerUnitRaw = row[4];
+                const totalPriceRaw = row[5];
+                const size = String(row[6] || '').trim();
+                const site = String(row[7] || '').trim();
+                
+                if (!group) continue;
+                
+                // Форматируем цену за единицу для отображения
+                let pricePerUnitDisplay = '—';
+                const pricePerUnitNum = parsePrice(pricePerUnitRaw);
+                if (pricePerUnitNum > 0) {
+                    pricePerUnitDisplay = pricePerUnitNum.toFixed(2).replace('.', ',') + ' ₽';
+                } else if (pricePerUnitRaw && String(pricePerUnitRaw).trim() !== '') {
+                    pricePerUnitDisplay = String(pricePerUnitRaw);
+                }
+                
+                // Парсим общую цену (для суммирования)
+                let totalPrice = parsePrice(totalPriceRaw);
+                
+                allItems.push({
+                    group: group,
+                    name: name,
+                    supplier: supplier,
+                    unit: unit,
+                    pricePerUnit: pricePerUnitDisplay,
+                    totalPrice: totalPrice,
+                    hasPrice: totalPrice > 0,
+                    size: size,
+                    site: site
+                });
+                
+                groupsSet.add(group);
+                if (supplier) suppliersSet.add(supplier);
             }
+            
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
             
-            console.log("Найдено групп:", allGroups.length);
-            console.log("Найдено поставщиков:", allSuppliers.length);
+            console.log(`Загружено ${allItems.length} позиций`);
+            console.log(`Группы: ${allGroups.length}, Поставщики: ${allSuppliers.length}`);
             
+            // Заполняем выпадающие списки
             const groupSelect = document.getElementById('filterGroup');
             groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
             allGroups.forEach(g => {
@@ -308,6 +210,7 @@
                 supplierSelect.appendChild(opt);
             });
             
+            // Обработчики событий
             document.getElementById('filterGroup').addEventListener('change', () => {
                 updateSupplierFilter();
                 renderTable();
@@ -323,10 +226,7 @@
             
         } catch (error) {
             console.error('Ошибка:', error);
-            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки данных: ${error.message}<br><br>
-                1. Таблица опубликована (Файл → Предоставить доступ → "Все, у кого есть ссылка")<br>
-                2. ID таблицы правильный<br>
-                3. Название листа "${SHEET_NAME}"</div>`;
+            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки: ${error.message}<br><br>Проверьте доступ к таблице и ID</div>`;
         }
     }
     
@@ -338,10 +238,10 @@
         let availableSuppliers;
         if (selectedGroup && selectedGroup !== "📁 Все группы") {
             const suppliersInGroup = new Set();
-            for (let row of allData) {
-                const group = row[0] ? String(row[0]).trim() : '';
-                const supplier = row[2] ? String(row[2]).trim() : '';
-                if (group === selectedGroup && supplier) suppliersInGroup.add(supplier);
+            for (let item of allItems) {
+                if (item.group === selectedGroup && item.supplier) {
+                    suppliersInGroup.add(item.supplier);
+                }
             }
             availableSuppliers = Array.from(suppliersInGroup).sort();
         } else {
@@ -363,16 +263,7 @@
         }
     }
     
-    function parsePrice(value) {
-        if (!value || value === '') return 0;
-        if (typeof value === 'number') return value;
-        const str = String(value).trim();
-        if (str === '') return 0;
-        const num = parseFloat(str.replace(/[^\d,.-]/g, '').replace(',', '.'));
-        return isNaN(num) ? 0 : num;
-    }
-    
-    function getFilteredData() {
+    function getFilteredItems() {
         const filterGroup = document.getElementById('filterGroup').value;
         const filterSupplier = document.getElementById('filterSupplier').value;
         const priceMin = parseFloat(document.getElementById('priceMin').value);
@@ -381,66 +272,42 @@
         
         let filtered = [];
         
-        for (let row of allData) {
-            const group = row[0] ? String(row[0]).trim() : '';
-            const name = row[1] ? String(row[1]).trim() : '';
-            const supplier = row[2] ? String(row[2]).trim() : '';
-            const unit = row[3] || '';
-            let pricePerUnitRaw = row[4];
-            let totalRaw = row[5];
-            const size = row[6] ? String(row[6]).trim() : '';
-            const site = row[7] || '';
-            
-            // Форматирование цены за единицу
-            let pricePerUnitFormatted = '';
-            const pricePerUnitNum = parsePrice(pricePerUnitRaw);
-            if (pricePerUnitNum > 0) {
-                pricePerUnitFormatted = pricePerUnitNum.toFixed(2).replace('.', ',') + ' ₽';
-            } else {
-                pricePerUnitFormatted = pricePerUnitRaw ? String(pricePerUnitRaw) : '—';
-            }
-            
-            // Парсим общую цену
-            let totalNum = parsePrice(totalRaw);
-            let hasPrice = totalNum > 0;
-            
-            // Пропускаем пустые строки
-            if (!group || group === '') continue;
-            
+        for (let item of allItems) {
             // Фильтры
-            if (filterGroup && filterGroup !== "📁 Все группы" && group !== filterGroup) continue;
-            if (filterSupplier && filterSupplier !== "🏭 Все поставщики" && supplier !== filterSupplier) continue;
-            if (!isNaN(priceMin) && totalNum < priceMin) continue;
-            if (!isNaN(priceMax) && totalNum > priceMax) continue;
+            if (filterGroup && filterGroup !== "📁 Все группы" && item.group !== filterGroup) continue;
+            if (filterSupplier && filterSupplier !== "🏭 Все поставщики" && item.supplier !== filterSupplier) continue;
+            if (!isNaN(priceMin) && item.totalPrice < priceMin) continue;
+            if (!isNaN(priceMax) && item.totalPrice > priceMax) continue;
             
-            // Умный поиск
+            // Поиск
             if (searchText) {
-                const searchable = `${name} ${group} ${supplier} ${size}`.toLowerCase();
+                const searchable = `${item.name} ${item.group} ${item.supplier} ${item.size}`.toLowerCase();
                 if (!searchable.includes(searchText)) continue;
             }
             
-            filtered.push({ 
-                group, name, supplier, unit, 
-                pricePerUnit: pricePerUnitFormatted, 
-                totalNum, hasPrice, size, site 
-            });
+            filtered.push(item);
         }
         
         return filtered;
     }
     
     function renderTable() {
-        let filtered = getFilteredData();
+        let filtered = getFilteredItems();
         
         // Сортировка
         filtered.sort((a, b) => {
             if (currentSort.column === 'name') return currentSort.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
             if (currentSort.column === 'group') return currentSort.direction === 'asc' ? a.group.localeCompare(b.group) : b.group.localeCompare(a.group);
             if (currentSort.column === 'supplier') return currentSort.direction === 'asc' ? a.supplier.localeCompare(b.supplier) : b.supplier.localeCompare(a.supplier);
-            return currentSort.direction === 'asc' ? a.totalNum - b.totalNum : b.totalNum - a.totalNum;
+            return currentSort.direction === 'asc' ? a.totalPrice - b.totalPrice : b.totalPrice - a.totalPrice;
         });
         
-        const totalSum = filtered.reduce((s, i) => s + i.totalNum, 0);
+        // Подсчет суммы (один раз, без дублирования)
+        let totalSum = 0;
+        for (let item of filtered) {
+            totalSum += item.totalPrice;
+        }
+        
         const uniqueGroups = new Set(filtered.map(i => i.group)).size;
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
         
@@ -451,6 +318,7 @@
             <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
         `;
         
+        // Графики
         updateCharts(filtered);
         
         if (filtered.length === 0) {
@@ -470,7 +338,7 @@
         html += '</tr></thead><tbody>';
         
         for (let item of filtered) {
-            const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">⚠️ нет цены</span>`;
+            const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">⚠️ нет цены</span>`;
             const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🔗 открыть</a>` : '—';
             html += `<tr>
                 <td style="max-width:280px;">${escapeHtml(item.name)}</td>
@@ -495,7 +363,7 @@
         for (let item of filtered) {
             if (!groupMap.has(item.group)) groupMap.set(item.group, { sum: 0, count: 0 });
             const stat = groupMap.get(item.group);
-            stat.sum += item.totalNum;
+            stat.sum += item.totalPrice;
             stat.count++;
         }
         const labels = Array.from(groupMap.keys());
@@ -503,6 +371,8 @@
         const countData = labels.map(l => groupMap.get(l).count);
         
         if (sumChart) sumChart.destroy();
+        if (countChart) countChart.destroy();
+        
         if (labels.length > 0) {
             sumChart = new Chart(document.getElementById('sumChart'), {
                 type: 'bar',
