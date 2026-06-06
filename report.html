@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет по материалам</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 24px; background: #f0f2f5; }
+        .container { max-width: 1600px; margin: 0 auto; }
+        h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 4px 0; color: #0f3b2c; }
+        .sub { color: #475569; font-size: 0.9rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
+        .filters-card { background: white; border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; border: 1px solid #e2e8f0; }
+        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 180px; }
+        .filter-group label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: #5b6e8c; }
+        select, input { padding: 10px 14px; border-radius: 14px; border: 1px solid #cbd5e1; font-size: 0.9rem; font-family: inherit; }
+        button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; }
+        button:hover { background: #1b5e20; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .stat-card { background: white; border-radius: 24px; padding: 16px 20px; border: 1px solid #e9edf2; }
+        .stat-card h3 { font-size: 0.75rem; font-weight: 600; color: #5b6e8c; margin: 0 0 8px 0; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #0f3b2c; }
+        .table-wrapper { background: white; border-radius: 24px; border: 1px solid #e9edf2; overflow: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
+        th { text-align: left; padding: 16px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; }
+        td { padding: 12px; border-bottom: 1px solid #f0f2f5; }
+        .price-cell { font-weight: 500; text-align: right; white-space: nowrap; }
+        .badge-missing { background: #ffebee; color: #c62828; padding: 4px 8px; border-radius: 40px; font-size: 0.7rem; white-space: nowrap; }
+        .total-row td { background: #fef6e0; font-weight: 700; }
+        .loading, .error-message { text-align: center; padding: 48px; }
+        .error-message { background: #fff5f5; color: #b91c1c; border-radius: 24px; }
+        a { color: #2e7d32; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📦 Сводка по материалам</h1>
+    <div class="sub">📅 Данные из Google Таблицы · руководитель</div>
+
+    <div class="filters-card">
+        <div class="filter-group">
+            <label>📁 Группа</label>
+            <select id="groupFilter"><option value="">Все группы</option></select>
+        </div>
+        <div class="filter-group">
+            <label>🏭 Поставщик</label>
+            <select id="supplierFilter"><option value="">Все поставщики</option></select>
+        </div>
+        <div class="filter-group">
+            <label>🔍 Поиск</label>
+            <input type="text" id="searchInput" placeholder="Наименование...">
+        </div>
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <button id="resetBtn">⟳ Сбросить</button>
+        </div>
+    </div>
+
+    <div class="stats-grid" id="statsContainer">
+        <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>📦 Позиций</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">—</div></div>
+        <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">—</div></div>
+    </div>
+
+    <div class="table-wrapper">
+        <div id="tableContainer" class="loading">🔄 Загрузка данных...</div>
+    </div>
+</div>
+
+<script>
+    // ✅ ТВОЯ ССЫЛКА УЖЕ ВСТАВЛЕНА
+    const API_URL = "https://script.google.com/macros/s/AKfycbyj1V4480G2WgBmOMI7BTJLZ1WJyW2DuCvkFHrf2tCUI62b0ACZzLdJmvmNldQ8Sqg5IQ/exec";
+    
+    let allData = [];
+    let groups = [];
+    let suppliers = [];
+
+    async function loadData() {
+        const container = document.getElementById('tableContainer');
+        container.innerHTML = '<div class="loading">📡 Загрузка данных из таблицы...</div>';
+        
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const json = await response.json();
+            allData = json.data;
+            
+            if (!allData || allData.length === 0) {
+                throw new Error("Нет данных в таблице");
+            }
+            
+            console.log("Загружено строк:", allData.length);
+            
+            // Извлекаем уникальные группы (колонка 0) и поставщиков (колонка 2)
+            const groupsSet = new Set();
+            const suppliersSet = new Set();
+            
+            for (let i = 0; i < allData.length; i++) {
+                const row = allData[i];
+                const group = row[0] ? String(row[0]).trim() : '';
+                const supplier = row[2] ? String(row[2]).trim() : '';
+                if (group) groupsSet.add(group);
+                if (supplier) suppliersSet.add(supplier);
+            }
+            
+            groups = Array.from(groupsSet).sort();
+            suppliers = Array.from(suppliersSet).sort();
+            
+            // Заполняем выпадающие списки
+            const groupSelect = document.getElementById('groupFilter');
+            groupSelect.innerHTML = '<option value="">Все группы</option>';
+            groups.forEach(g => {
+                const option = document.createElement('option');
+                option.value = g;
+                option.textContent = g;
+                groupSelect.appendChild(option);
+            });
+            
+            const supplierSelect = document.getElementById('supplierFilter');
+            supplierSelect.innerHTML = '<option value="">Все поставщики</option>';
+            suppliers.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s;
+                option.textContent = s;
+                supplierSelect.appendChild(option);
+            });
+            
+            // Добавляем обработчики
+            document.getElementById('groupFilter').addEventListener('change', renderTable);
+            document.getElementById('supplierFilter').addEventListener('change', renderTable);
+            document.getElementById('searchInput').addEventListener('input', renderTable);
+            document.getElementById('resetBtn').addEventListener('click', resetFilters);
+            
+            renderTable();
+            
+        } catch (error) {
+            console.error('Ошибка:', error);
+            container.innerHTML = `<div class="error-message">
+                ❌ Ошибка загрузки: ${error.message}<br><br>
+                <strong>Проверьте:</strong><br>
+                1. Веб-приложение развернуто с доступом "Все, у кого есть ссылка"?<br>
+                2. Откройте эту ссылку в браузере отдельно — должен быть JSON:<br>
+                <a href="${API_URL}" target="_blank">${API_URL}</a>
+            </div>`;
+        }
+    }
+    
+    function renderTable() {
+        const filterGroup = document.getElementById('groupFilter').value;
+        const filterSupplier = document.getElementById('supplierFilter').value;
+        const filterSearch = document.getElementById('searchInput').value.toLowerCase();
+        
+        let filtered = [];
+        let totalSum = 0;
+        
+        for (let i = 0; i < allData.length; i++) {
+            const row = allData[i];
+            const group = row[0] ? String(row[0]).trim() : '';
+            const name = row[1] ? String(row[1]).trim() : '';
+            const supplier = row[2] ? String(row[2]).trim() : '';
+            const unit = row[3] || '';
+            const pricePerUnit = row[4] || '';
+            let totalPriceRaw = row[5];
+            const size = row[6] || '';
+            const site = row[7] || '';
+            
+            // Фильтры
+            if (filterGroup && group !== filterGroup) continue;
+            if (filterSupplier && supplier !== filterSupplier) continue;
+            if (filterSearch && !name.toLowerCase().includes(filterSearch)) continue;
+            if (!group) continue;
+            
+            // Парсим цену
+            let totalNum = 0;
+            let hasPrice = false;
+            if (totalPriceRaw && String(totalPriceRaw).trim() !== '') {
+                const priceStr = String(totalPriceRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
+                const parsed = parseFloat(priceStr);
+                if (!isNaN(parsed)) {
+                    totalNum = parsed;
+                    hasPrice = true;
+                    totalSum += parsed;
+                }
+            }
+            
+            filtered.push({ group, name, supplier, unit, pricePerUnit, totalPriceRaw, totalNum, hasPrice, size, site });
+        }
+        
+        // Сортировка по цене (дорогие сверху)
+        filtered.sort((a, b) => b.totalNum - a.totalNum);
+        
+        // Статистика
+        const uniqueGroups = new Set(filtered.map(i => i.group)).size;
+        const withoutPrice = filtered.filter(i => !i.hasPrice).length;
+        
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
+            <div class="stat-card"><h3>📦 Позиций</h3><div class="stat-value">${filtered.length}</div></div>
+            <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
+            <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
+        `;
+        
+        if (filtered.length === 0) {
+            document.getElementById('tableContainer').innerHTML = '<div class="loading">😕 Нет данных по выбранным фильтрам</div>';
+            return;
+        }
+        
+        let html = '<table><thead><tr><th>📦 Наименование</th><th>📁 Группа</th><th>🏭 Поставщик</th><th>📏 Размер</th><th>📐 Ед.изм</th><th>💵 Цена/ед</th><th>💰 Цена общая</th><th>🔗 Сайт</th></tr></thead><tbody>';
+        
+        for (const item of filtered) {
+            const priceDisplay = item.hasPrice ? `${item.totalNum.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
+            const siteLink = (item.site && (item.site.startsWith('http') || item.site.startsWith('https'))) 
+                ? `<a href="${item.site}" target="_blank">🌐 сайт</a>` : '—';
+            
+            html += `<tr>
+                <td style="max-width:280px;">${escapeHtml(item.name)}</td>
+                <td>${escapeHtml(item.group)}</td>
+                <td>${escapeHtml(item.supplier)}</td>
+                <td>${escapeHtml(item.size)}</td>
+                <td>${escapeHtml(item.unit)}</td>
+                <td>${escapeHtml(item.pricePerUnit)}</td>
+                <td class="price-cell">${priceDisplay}</td>
+                <td>${siteLink}</td>
+            </tr>`;
+        }
+        
+        html += `<tr class="total-row"><td colspan="6" style="text-align:right;">ИТОГО:</td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td>Noscript`;
+        html += `</tbody></table>`;
+        
+        document.getElementById('tableContainer').innerHTML = html;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '—';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function resetFilters() {
+        document.getElementById('groupFilter').value = '';
+        document.getElementById('supplierFilter').value = '';
+        document.getElementById('searchInput').value = '';
+        renderTable();
+    }
+    
+    // Запуск
+    loadData();
+</script>
+</body>
+</html>
