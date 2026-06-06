@@ -109,7 +109,6 @@
         let s = String(value).trim();
         if (s === '') return 0;
         
-        // Убираем пробелы и заменяем запятую на точку
         s = s.replace(/\s/g, '').replace(',', '.');
         let num = parseFloat(s);
         return isNaN(num) ? 0 : num;
@@ -136,30 +135,19 @@
                 const row = rows[i].c;
                 if (!row || !row[0] || !row[0].v) continue;
                 
-                // Правильные индексы колонок:
-                // 0 - Группа
-                // 1 - Наименование
-                // 3 - Ед.измерения
-                // 4 - Цена/ед
-                // 6 - Цена общая (!!!) — не 5, а 6!
-                // 7 - Поставщик №1
-                // 8 - Сайт
-                
                 const group = String(row[0]?.v || '').trim();
                 const name = String(row[1]?.v || '').trim();
-                const supplier = String(row[7]?.v || '').trim();      // колонка 7
-                const unit = String(row[3]?.v || '').trim();          // колонка 3
-                let pricePerUnitRaw = row[4]?.v || '';               // колонка 4
-                let totalRaw = row[6]?.v || '';                      // колонка 6 — ЦЕНА ОБЩАЯ
-                const size = String(row[5]?.v || '').trim();          // колонка 5 — РАЗМЕР
-                const site = String(row[8]?.v || '').trim();          // колонка 8 — САЙТ
+                const supplier = String(row[7]?.v || '').trim();
+                const unit = String(row[3]?.v || '').trim();
+                let pricePerUnitRaw = row[4]?.v || '';
+                let totalRaw = row[6]?.v || '';
+                const size = String(row[5]?.v || '').trim();
+                const site = String(row[8]?.v || '').trim();
                 
                 if (!group) continue;
                 
-                // Парсим общую цену (из колонки 6)
                 let totalPrice = parsePrice(totalRaw);
                 
-                // Цена за единицу для отображения (колонка 4)
                 let pricePerUnitDisplay = '—';
                 let pupNum = parsePrice(pricePerUnitRaw);
                 if (pupNum > 0) {
@@ -181,13 +169,11 @@
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
             
-            // Проверка в консоли
             let testSum = 0;
             for (let item of allData) testSum += item.totalPrice;
             console.log("Позиций:", allData.length);
-            console.log("Сумма (проверка):", testSum.toLocaleString('ru-RU'));
+            console.log("Сумма:", testSum.toLocaleString('ru-RU'));
             
-            // Заполняем фильтры
             const groupSelect = document.getElementById('filterGroup');
             groupSelect.innerHTML = '<option value="">Все группы</option>';
             allGroups.forEach(g => {
@@ -301,7 +287,7 @@
             return;
         }
         
-        let html = '<table><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
+        let html = '<tr><thead><tr><th onclick="sortTable(\'name\')">Наименование</th><th onclick="sortTable(\'group\')">Группа</th><th onclick="sortTable(\'supplier\')">Поставщик</th><th>Размер</th><th>Ед.изм</th><th>Цена/ед</th><th onclick="sortTable(\'price\')">Цена общая</th><th>Сайт</th></tr></thead><tbody>';
         
         for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">нет цены</span>`;
@@ -310,7 +296,7 @@
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td class="price-cell">—</td></tr>`;
-        html += `</tbody>树`;
+        html += `</tbody>`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
