@@ -20,12 +20,11 @@
         select:focus, input:focus { outline: none; border-color: #2e7d32; box-shadow: 0 0 0 2px rgba(46,125,50,0.1); }
         
         .quick-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
-        .quick-btn { background: #e9ecef; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; color: #2c3e50; transition: all 0.2s; }
+        .quick-btn { background: #e9ecef; border: none; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-size: 0.75rem; color: #2c3e50; }
         .quick-btn:hover { background: #cbd5e1; }
         
         button { background: #2e7d32; border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
         button:hover { background: #1b5e20; }
-        .btn-secondary { background: #6c757d; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
         .stat-card { background: white; border-radius: 20px; padding: 16px 20px; border: 1px solid #e9edf2; }
@@ -39,7 +38,7 @@
         
         .table-wrapper { background: white; border-radius: 20px; border: 1px solid #e9edf2; overflow: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
-        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; user-select: none; }
+        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; border-bottom: 1px solid #e2e8f0; cursor: pointer; }
         th:hover { background: #e9ecef; }
         td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; }
         .price-cell { font-weight: 500; text-align: right; white-space: nowrap; }
@@ -59,8 +58,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>📊 Сводка по материалам</h1>
-    <div class="sub">Актуальные данные из Google Таблицы · руководителю</div>
+    <h1>Сводка по материалам</h1>
+    <div class="sub">Актуальные данные из Google Таблицы</div>
 
     <div class="filters-card">
         <div class="filters-row">
@@ -103,7 +102,7 @@
 
     <div class="charts-row">
         <div class="chart-card"><h3>Сумма по группам</h3><canvas id="sumChart"></canvas></div>
-        <div class="chart-card"><h3>Количество позиций по группам</h3><canvas id="countChart"></canvas></div>
+        <div class="chart-card"><h3>Количество по группам</h3><canvas id="countChart"></canvas></div>
     </div>
 
     <div class="table-wrapper">
@@ -112,7 +111,6 @@
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ НА APPS SCRIPT ⚠️
     const API_URL = "https://script.google.com/macros/s/AKfycbx4mWEU7SzgWQkQVihSXTRFlrXBhM-2QbSlwVTrcQKMK8wbh0DKjYkr9iRzaMiw9pxvWQ/exec";
     
     let allData = [];
@@ -236,7 +234,6 @@
             const size = row[6] ? row[6].toString().trim() : '';
             const site = row[7] || '';
             
-            // Форматирование цены до 2 знаков
             let pricePerUnitFormatted = '';
             if (pricePerUnitRaw && String(pricePerUnitRaw).trim() !== '') {
                 let priceStr = String(pricePerUnitRaw).replace(/[^\d,.-]/g, '').replace(',', '.');
@@ -330,7 +327,7 @@
         }
         
         html += `<tr class="total-row"><td colspan="6" style="text-align:right;"><strong>ИТОГО:</strong></td><td class="price-cell"><strong>${totalSum.toLocaleString('ru-RU')} ₽</strong></td><td></td></tr>`;
-        html += `</tbody>树`;
+        html += `</tbody>`;
         
         document.getElementById('tableContainer').innerHTML = html;
     }
