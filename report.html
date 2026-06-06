@@ -11,7 +11,6 @@
         .container { max-width: 1600px; margin: 0 auto; }
         h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 4px 0; color: #1a5d2a; }
         .sub { color: #475569; font-size: 0.85rem; border-left: 3px solid #2e7d32; padding-left: 12px; margin: 8px 0 24px 0; }
-        
         .filters-card { background: white; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; }
         .filters-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: end; }
         .filter-group { display: flex; flex-direction: column; gap: 6px; }
@@ -96,7 +95,6 @@
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ (тот же, что и раньше) ⚠️
     const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
     
     let allItems = [];
@@ -108,14 +106,20 @@
     function parsePrice(value) {
         if (value === undefined || value === null || value === '') return 0;
         if (typeof value === 'number') return value;
-        const str = String(value).trim();
+        
+        let str = String(value).trim();
         if (str === '') return 0;
+        
+        // Убираем пробелы и заменяем запятую на точку
         let clean = str.replace(/\s/g, '').replace(',', '.');
         let num = parseFloat(clean);
+        
+        // Если не получилось, пробуем найти число в строке
         if (isNaN(num)) {
             let match = str.match(/(\d+[.,]?\d*)/);
             if (match) num = parseFloat(match[1].replace(',', '.'));
         }
+        
         return isNaN(num) ? 0 : num;
     }
 
@@ -124,28 +128,26 @@
         container.innerHTML = '<div class="loading">📡 Загрузка данных...</div>';
         
         try {
-            // Используем CSV экспорт Google Sheets — нет дублей!
+            // Используем CSV экспорт
             const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=0`;
             const response = await fetch(url);
             const csvText = await response.text();
             
-            // Парсим CSV
             const rows = csvText.split('\n');
             const headers = rows[0].split(',');
             
+            console.log("=== ЗАГРУЗКА ДАННЫХ ===");
             console.log("Заголовки:", headers);
             console.log("Всего строк в CSV:", rows.length);
             
-            // Очищаем старые данные
             allItems = [];
             const groupsSet = new Set();
             const suppliersSet = new Set();
             
-            // Проходим по строкам, начиная с 1 (пропускаем заголовок)
+            // Простейший парсинг CSV
             for (let i = 1; i < rows.length; i++) {
                 if (!rows[i].trim()) continue;
                 
-                // Простой парсинг CSV (учитываем кавычки)
                 let row = rows[i];
                 let cells = [];
                 let inQuote = false;
@@ -163,8 +165,6 @@
                     }
                 }
                 cells.push(current.trim());
-                
-                // Убираем кавычки из ячеек
                 cells = cells.map(c => c.replace(/^"|"$/g, ''));
                 
                 if (cells.length < 8) continue;
@@ -180,7 +180,7 @@
                 
                 if (!group || group === 'Группа') continue;
                 
-                // Форматируем цену за единицу
+                // Форматируем цену за единицу для отображения
                 let pricePerUnitDisplay = '—';
                 const pricePerUnitNum = parsePrice(pricePerUnitRaw);
                 if (pricePerUnitNum > 0) {
@@ -189,11 +189,6 @@
                 
                 // Общая цена
                 let totalPrice = parsePrice(totalPriceRaw);
-                
-                // ВАЖНО: выводим для проверки первую строку
-                if (i === 1) {
-                    console.log("Первая строка данных:", { group, name, supplier, totalPriceRaw, totalPrice });
-                }
                 
                 allItems.push({
                     group: group,
@@ -204,7 +199,8 @@
                     totalPrice: totalPrice,
                     hasPrice: totalPrice > 0,
                     size: size,
-                    site: site
+                    site: site,
+                    totalPriceRaw: totalPriceRaw  // сохраняем для отладки
                 });
                 
                 if (group) groupsSet.add(group);
@@ -214,10 +210,21 @@
             allGroups = Array.from(groupsSet).sort();
             allSuppliers = Array.from(suppliersSet).sort();
             
-            console.log(`Загружено ${allItems.length} позиций`);
-            console.log("Пример суммы по первым 3:", allItems.slice(0,3).map(i => i.totalPrice));
+            // ========== ОТЛАДКА ==========
+            let testSum = 0;
+            let withPriceCount = 0;
+            for (let i = 0; i < allItems.length; i++) {
+                testSum += allItems[i].totalPrice;
+                if (allItems[i].totalPrice > 0) withPriceCount++;
+            }
+            console.log(`[ИТОГО] Позиций: ${allItems.length}, с ценой: ${withPriceCount}, сумма: ${testSum.toLocaleString('ru-RU')} ₽`);
+            console.log(`[ПРОВЕРКА] Первые 5 позиций:`);
+            for (let i = 0; i < Math.min(5, allItems.length); i++) {
+                console.log(`  ${i+1}. ${allItems[i].name} — ${allItems[i].totalPrice} ₽ (исходно: "${allItems[i].totalPriceRaw}")`);
+            }
+            // ============================
             
-            // Заполняем фильтры
+            // Заполняем выпадающие списки
             const groupSelect = document.getElementById('filterGroup');
             groupSelect.innerHTML = '<option value="">📁 Все группы</option>';
             allGroups.forEach(g => {
@@ -251,9 +258,7 @@
             
         } catch (error) {
             console.error('Ошибка:', error);
-            container.innerHTML = `<div class="error-message">❌ Ошибка загрузки: ${error.message}<br><br>
-                1. Проверьте доступ к таблице (Файл → Предоставить доступ → "Все, у кого есть ссылка")<br>
-                2. ID таблицы: ${SPREADSHEET_ID}</div>`;
+            container.innerHTML = `<div class="error-message">❌ Ошибка: ${error.message}</div>`;
         }
     }
     
@@ -298,7 +303,6 @@
         const searchText = document.getElementById('searchText').value.toLowerCase().trim();
         
         let filtered = [];
-        
         for (let item of allItems) {
             if (filterGroup && filterGroup !== "📁 Все группы" && item.group !== filterGroup) continue;
             if (filterSupplier && filterSupplier !== "🏭 Все поставщики" && item.supplier !== filterSupplier) continue;
@@ -324,9 +328,7 @@
         });
         
         let totalSum = 0;
-        for (let item of filtered) {
-            totalSum += item.totalPrice;
-        }
+        for (let item of filtered) totalSum += item.totalPrice;
         
         const uniqueGroups = new Set(filtered.map(i => i.group)).size;
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
@@ -341,7 +343,7 @@
         updateCharts(filtered);
         
         if (filtered.length === 0) {
-            document.getElementById('tableContainer').innerHTML = '<div class="loading">🔍 Нет данных по выбранным фильтрам</div>';
+            document.getElementById('tableContainer').innerHTML = '<div class="loading">🔍 Нет данных</div>';
             return;
         }
         
@@ -354,14 +356,14 @@
         html += '<th>💵 Цена/ед</th>';
         html += '<th onclick="sortTable(\'price\')">💰 Цена общая</th>';
         html += '<th>🔗 Сайт</th>';
-        html += '</tr></thead><tbody>';
+        html += '</table></thead><tbody>';
         
         for (let item of filtered) {
             const priceDisplay = item.hasPrice ? `${item.totalPrice.toLocaleString('ru-RU')} ₽` : `<span class="badge-missing">⚠️ нет цены</span>`;
             const siteLink = (item.site && item.site.startsWith('http')) ? `<a href="${item.site}" target="_blank">🔗 открыть</a>` : '—';
             html += `<tr>
                 <td style="max-width:280px;">${escapeHtml(item.name)}</td>
-                <td>${escapeHtml(item.group)}<td>
+                <td>${escapeHtml(item.group)}</td>
                 <td>${escapeHtml(item.supplier)}</td>
                 <td>${escapeHtml(item.size)}</td>
                 <td>${escapeHtml(item.unit)}</td>
@@ -395,10 +397,9 @@
         if (labels.length > 0) {
             sumChart = new Chart(document.getElementById('sumChart'), {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#2e7d32', borderRadius: 6 }] },
+                data: { labels, datasets: [{ label: 'Сумма, руб', data: sumData, backgroundColor: '#2e7d32' }] },
                 options: { responsive: true, maintainAspectRatio: true }
             });
-            
             countChart = new Chart(document.getElementById('countChart'), {
                 type: 'pie',
                 data: { labels, datasets: [{ data: countData, backgroundColor: ['#2e7d32','#1565c0','#e65100','#6a1b9a','#c62828','#00838f','#5d4037'] }] },
