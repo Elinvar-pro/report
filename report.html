@@ -19,6 +19,12 @@
         select, input { padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.85rem; }
         
         button { background: #2e7d32; border: none; padding: 8px 16px; border-radius: 40px; color: white; cursor: pointer; }
+        .btn-outline { background: white; border: 1px solid #2e7d32; color: #2e7d32; }
+        .btn-outline:hover { background: #e8f5e9; }
+        .btn-active { background: #2e7d32; color: white; }
+        
+        .chart-switch { display: flex; gap: 10px; margin-bottom: 16px; justify-content: center; }
+        .chart-switch button { padding: 8px 20px; font-size: 0.85rem; cursor: pointer; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .stat-card { background: white; border-radius: 16px; padding: 12px 16px; text-align: center; }
@@ -45,6 +51,7 @@
             body { padding: 12px; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             th, td { padding: 8px; font-size: 0.75rem; }
+            .chart-switch button { padding: 6px 12px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -81,6 +88,12 @@
         </div>
     </div>
 
+    <!-- Переключатель графиков -->
+    <div class="chart-switch">
+        <button id="switchGroups" class="btn-active">📊 По группам</button>
+        <button id="switchSuppliers" class="btn-outline">🏭 По поставщикам</button>
+    </div>
+
     <div class="stats-grid" id="statsContainer">
         <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">—</div></div>
         <div class="stat-card"><h3>📦 Всего позиций</h3><div class="stat-value">—</div></div>
@@ -90,11 +103,11 @@
 
     <div class="charts-row">
         <div class="chart-card">
-            <h3>📊 Сумма по группам</h3>
+            <h3 id="sumChartTitle">📊 Сумма по группам</h3>
             <canvas id="sumChart"></canvas>
         </div>
         <div class="chart-card">
-            <h3>🥧 Количество по группам</h3>
+            <h3 id="countChartTitle">🥧 Количество по группам</h3>
             <canvas id="countChart"></canvas>
         </div>
     </div>
@@ -112,6 +125,7 @@
     let allGroups = [], allSuppliers = [];
     let currentSort = { column: 'price', direction: 'desc' };
     let sumChart = null, countChart = null;
+    let chartMode = 'groups'; // 'groups' или 'suppliers'
 
     function parsePrice(value) {
         if (value === undefined || value === null || value === '') return 0;
@@ -194,6 +208,20 @@
                 supplierSelect.appendChild(opt);
             });
             
+            // Кнопки переключения графиков
+            document.getElementById('switchGroups').addEventListener('click', () => {
+                chartMode = 'groups';
+                document.getElementById('switchGroups').className = 'btn-active';
+                document.getElementById('switchSuppliers').className = 'btn-outline';
+                updateCharts(getFiltered());
+            });
+            document.getElementById('switchSuppliers').addEventListener('click', () => {
+                chartMode = 'suppliers';
+                document.getElementById('switchSuppliers').className = 'btn-active';
+                document.getElementById('switchGroups').className = 'btn-outline';
+                updateCharts(getFiltered());
+            });
+            
             document.getElementById('filterGroup').addEventListener('change', () => {
                 updateSupplierFilter();
                 renderTable();
@@ -273,13 +301,14 @@
         
         const totalSum = filtered.reduce((s, i) => s + i.totalPrice, 0);
         const uniqueGroups = new Set(filtered.map(i => i.group)).size;
+        const uniqueSuppliers = new Set(filtered.map(i => i.supplier)).size;
         const withoutPrice = filtered.filter(i => !i.hasPrice).length;
         
         document.getElementById('statsContainer').innerHTML = `
             <div class="stat-card"><h3>💰 Общая сумма</h3><div class="stat-value">${totalSum.toLocaleString('ru-RU')} ₽</div></div>
             <div class="stat-card"><h3>📦 Всего позиций</h3><div class="stat-value">${filtered.length}</div></div>
             <div class="stat-card"><h3>📁 Групп</h3><div class="stat-value">${uniqueGroups}</div></div>
-            <div class="stat-card"><h3>⚠️ Без цены</h3><div class="stat-value">${withoutPrice}</div></div>
+            <div class="stat-card"><h3>🏭 Поставщиков</h3><div class="stat-value">${uniqueSuppliers}</div></div>
         `;
         
         updateCharts(filtered);
@@ -335,16 +364,40 @@
     }
     
     function updateCharts(filtered) {
-        const groupMap = new Map();
-        for (let item of filtered) {
-            if (!groupMap.has(item.group)) groupMap.set(item.group, { sum: 0, count: 0 });
-            const stat = groupMap.get(item.group);
-            stat.sum += item.totalPrice;
-            stat.count++;
+        let labels, sumData, countData;
+        
+        if (chartMode === 'groups') {
+            // Группировка по группам
+            const map = new Map();
+            for (let item of filtered) {
+                if (!map.has(item.group)) map.set(item.group, { sum: 0, count: 0 });
+                const stat = map.get(item.group);
+                stat.sum += item.totalPrice;
+                stat.count++;
+            }
+            labels = Array.from(map.keys());
+            sumData = labels.map(l => map.get(l).sum);
+            countData = labels.map(l => map.get(l).count);
+            document.getElementById('sumChartTitle').innerHTML = '📊 Сумма по группам';
+            document.getElementById('countChartTitle').innerHTML = '🥧 Количество по группам';
+        } else {
+            // Группировка по поставщикам
+            const map = new Map();
+            for (let item of filtered) {
+                const supplier = item.supplier || 'Не указан';
+                if (!map.has(supplier)) map.set(supplier, { sum: 0, count: 0 });
+                const stat = map.get(supplier);
+                stat.sum += item.totalPrice;
+                stat.count++;
+            }
+            // Сортируем по сумме (убывание)
+            const sorted = Array.from(map.entries()).sort((a, b) => b[1].sum - a[1].sum);
+            labels = sorted.map(entry => entry[0]);
+            sumData = sorted.map(entry => entry[1].sum);
+            countData = sorted.map(entry => entry[1].count);
+            document.getElementById('sumChartTitle').innerHTML = '📊 Сумма по поставщикам';
+            document.getElementById('countChartTitle').innerHTML = '🥧 Количество по поставщикам';
         }
-        const labels = Array.from(groupMap.keys());
-        const sumData = labels.map(l => groupMap.get(l).sum);
-        const countData = labels.map(l => groupMap.get(l).count);
         
         if (sumChart) sumChart.destroy();
         if (countChart) countChart.destroy();
@@ -355,7 +408,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Сумма, руб',
+                        label: chartMode === 'groups' ? 'Сумма, руб' : 'Сумма, руб',
                         data: sumData,
                         backgroundColor: '#2e7d32',
                         borderRadius: 6
@@ -376,7 +429,7 @@
                     labels: labels,
                     datasets: [{
                         data: countData,
-                        backgroundColor: ['#2e7d32', '#1565c0', '#e65100', '#6a1b9a', '#c62828', '#00838f', '#5d4037', '#f9a825', '#ad1457', '#1b5e20']
+                        backgroundColor: ['#2e7d32', '#1565c0', '#e65100', '#6a1b9a', '#c62828', '#00838f', '#5d4037', '#f9a825', '#ad1457', '#1b5e20', '#4a148c', '#0d47a1']
                     }]
                 },
                 options: {
