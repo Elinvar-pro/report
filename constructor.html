@@ -35,6 +35,9 @@
         .info-label { color: #6c7a8a; font-size: 13px; }
         .info-value { font-weight: 600; color: #1a2a3a; font-size: 15px; }
         
+        .parsed-size-info { background: #e8f5e9; border-radius: 12px; padding: 12px; margin: 12px 0; text-align: center; }
+        .parsed-size-info .value { font-weight: 700; color: #1a5d2a; font-size: 16px; }
+        
         .size-input-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; margin-bottom: 12px; }
         .size-field { flex: 1; min-width: 100px; }
         .size-field label { font-size: 11px; color: #6c7a8a; margin-bottom: 4px; display: block; }
@@ -76,7 +79,7 @@
 <div class="container">
     <div class="header">
         <h1>📋 Смета</h1>
-        <p>Выберите категорию → выберите позицию → укажите размер и количество</p>
+        <p>Выберите категорию → выберите позицию → укажите количество</p>
     </div>
     
     <div class="two-columns">
@@ -99,43 +102,54 @@
                 <div class="info-line"><span class="info-label">💰 Цена за ед.</span><span class="info-value" id="priceValue">—</span></div>
             </div>
             
-            <!-- Блок расчёта для материалов -->
+            <!-- Блок для материалов -->
             <div id="materialCalcPanel" style="display:none;">
-                <div class="form-row">
-                    <label>📐 Способ расчёта</label>
+                <!-- Если размер найден в таблице -->
+                <div id="parsedSizePanel" style="display:none;" class="parsed-size-info">
+                    📐 Размер из таблицы: <span id="parsedSizeText" class="value"></span>
+                    <div style="font-size:12px; margin-top:5px;">→ Площадь: <span id="parsedArea" class="value"></span> м²</div>
+                </div>
+                
+                <!-- Если размера нет в таблице -->
+                <div id="manualSizePanel" style="display:none;">
                     <div class="calc-type-select">
                         <button type="button" class="calc-type-btn active" data-calc="area" onclick="setCalcType('area')">📏 По площади</button>
                         <button type="button" class="calc-type-btn" data-calc="length" onclick="setCalcType('length')">📐 По длине</button>
                         <button type="button" class="calc-type-btn" data-calc="piece" onclick="setCalcType('piece')">🔢 Поштучно</button>
                     </div>
+                    
+                    <div id="areaInputs">
+                        <div class="size-input-row">
+                            <div class="size-field"><label>Ширина (м)</label><input type="number" id="areaWidth" value="1" step="0.01" placeholder="м"></div>
+                            <div class="size-field"><label>Высота (м)</label><input type="number" id="areaHeight" value="1" step="0.01" placeholder="м"></div>
+                            <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="areaCount" value="1" step="1" placeholder="шт"></div>
+                        </div>
+                        <div class="calc-hint">📐 Площадь = Ширина × Высота × Кол-во</div>
+                    </div>
+                    
+                    <div id="lengthInputs" style="display:none;">
+                        <div class="size-input-row">
+                            <div class="size-field"><label>Длина (м)</label><input type="number" id="lengthValue" value="1" step="0.1" placeholder="м"></div>
+                            <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="lengthCount" value="1" step="1" placeholder="шт"></div>
+                        </div>
+                        <div class="calc-hint">📐 Общая длина = Длина × Кол-во</div>
+                    </div>
+                    
+                    <div id="pieceInputs" style="display:none;">
+                        <div class="size-input-row">
+                            <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="pieceCount" value="1" step="1" placeholder="шт"></div>
+                        </div>
+                        <div class="calc-hint">🔢 Стоимость = Цена × Количество</div>
+                    </div>
                 </div>
                 
-                <div id="areaInputs">
-                    <div class="size-input-row">
-                        <div class="size-field"><label>Ширина (м)</label><input type="number" id="areaWidth" value="1" step="0.01" placeholder="м"></div>
-                        <div class="size-field"><label>Высота (м)</label><input type="number" id="areaHeight" value="1" step="0.01" placeholder="м"></div>
-                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="areaCount" value="1" step="1" placeholder="шт"></div>
-                    </div>
-                    <div class="calc-hint">📐 Площадь = Ширина × Высота × Кол-во</div>
-                </div>
-                
-                <div id="lengthInputs" style="display:none;">
-                    <div class="size-input-row">
-                        <div class="size-field"><label>Длина (м)</label><input type="number" id="lengthValue" value="1" step="0.1" placeholder="м"></div>
-                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="lengthCount" value="1" step="1" placeholder="шт"></div>
-                    </div>
-                    <div class="calc-hint">📐 Общая длина = Длина × Кол-во</div>
-                </div>
-                
-                <div id="pieceInputs" style="display:none;">
-                    <div class="size-input-row">
-                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="pieceCount" value="1" step="1" placeholder="шт"></div>
-                    </div>
-                    <div class="calc-hint">🔢 Стоимость = Цена × Количество</div>
+                <div class="form-row">
+                    <label>🔢 Количество единиц</label>
+                    <input type="number" id="materialQuantity" value="1" step="1">
                 </div>
             </div>
             
-            <!-- Блок для работ (просто количество) -->
+            <!-- Блок для работ -->
             <div id="workCalcPanel" style="display:none;">
                 <div class="form-row">
                     <label>🔢 Количество</label>
@@ -171,7 +185,58 @@
     let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
     let estimateItems = [];
     let currentCalcType = 'area';
+    let parsedSizeData = null; // { width, height, area, original }
 
+    function parseSize(sizeStr) {
+        if (!sizeStr || sizeStr === '') return null;
+        
+        const str = String(sizeStr).trim();
+        
+        // Формат: 2030х3050 или 2030x3050
+        let match = str.match(/(\d+)[хxX×](\d+)/);
+        if (match) {
+            const width_mm = parseFloat(match[1]);
+            const height_mm = parseFloat(match[2]);
+            const width_m = width_mm / 1000;
+            const height_m = height_mm / 1000;
+            return {
+                width: width_m,
+                height: height_m,
+                area: width_m * height_m,
+                original: str,
+                unit: 'м²',
+                type: 'area'
+            };
+        }
+        
+        // Формат: 6000мм, 6000 мм
+        match = str.match(/(\d+)\s*мм/i);
+        if (match) {
+            const length_mm = parseFloat(match[1]);
+            const length_m = length_mm / 1000;
+            return {
+                length: length_m,
+                original: str,
+                unit: 'м.п',
+                type: 'length'
+            };
+        }
+        
+        // Формат: 2.7м, 2,7м
+        match = str.match(/(\d+[.,]?\d*)\s*м/i);
+        if (match) {
+            const length = parseFloat(match[1].replace(',', '.'));
+            return {
+                length: length,
+                original: str,
+                unit: 'м.п',
+                type: 'length'
+            };
+        }
+        
+        return null;
+    }
+    
     function loadCatalog() {
         const materialsDiv = document.getElementById('materialsList');
         const worksDiv = document.getElementById('worksList');
@@ -246,6 +311,7 @@
         currentCategory = null;
         currentItems = [];
         currentItem = null;
+        parsedSizeData = null;
         document.getElementById('itemSelect').innerHTML = '<option value="">Сначала выберите категорию</option>';
         document.getElementById('infoPanel').style.display = 'none';
         document.getElementById('materialCalcPanel').style.display = 'none';
@@ -267,7 +333,6 @@
             catalog.materials.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: 'material' }); });
             document.getElementById('materialCalcPanel').style.display = 'block';
             document.getElementById('workCalcPanel').style.display = 'none';
-            setCalcType('area');
         } else {
             catalog.works.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: 'work' }); });
             document.getElementById('materialCalcPanel').style.display = 'none';
@@ -318,13 +383,36 @@
         document.getElementById('unitValue').innerHTML = selected.unit || '—';
         document.getElementById('priceValue').innerHTML = selected.price ? selected.price.toLocaleString('ru-RU') + ' ₽' : '—';
         
+        // Парсим размер из таблицы
+        parsedSizeData = parseSize(selected.size);
+        
+        if (currentType === 'material') {
+            if (parsedSizeData) {
+                // Размер найден в таблице — показываем автоматический расчёт
+                document.getElementById('parsedSizePanel').style.display = 'block';
+                document.getElementById('manualSizePanel').style.display = 'none';
+                document.getElementById('parsedSizeText').innerHTML = parsedSizeData.original;
+                if (parsedSizeData.type === 'area') {
+                    document.getElementById('parsedArea').innerHTML = parsedSizeData.area.toFixed(2);
+                } else if (parsedSizeData.type === 'length') {
+                    document.getElementById('parsedArea').innerHTML = parsedSizeData.length.toFixed(2) + ' м';
+                }
+            } else {
+                // Размера нет — показываем поля для ручного ввода
+                document.getElementById('parsedSizePanel').style.display = 'none';
+                document.getElementById('manualSizePanel').style.display = 'block';
+                setCalcType('area');
+            }
+        }
+        
         currentItem = {
             type: currentType === 'material' ? 'Материал' : 'Работа',
             category: currentCategory,
             name: selected.name,
             unit: selected.unit || '—',
             price: parseFloat(selected.price) || 0,
-            size: selected.size || ''
+            size: selected.size || '',
+            parsedSize: parsedSizeData
         };
         
         if (currentType === 'material') calculateMaterialTotal();
@@ -335,25 +423,41 @@
         if (!currentItem) return 0;
         let total = 0, qty = 0, calcText = '';
         
-        if (currentCalcType === 'area') {
-            const width = parseFloat(document.getElementById('areaWidth').value) || 0;
-            const height = parseFloat(document.getElementById('areaHeight').value) || 0;
-            const count = parseFloat(document.getElementById('areaCount').value) || 0;
-            const area = width * height;
-            total = area * currentItem.price * count;
-            qty = count;
-            calcText = `${width}×${height}м = ${area.toFixed(2)}м² × ${count}шт`;
-        } else if (currentCalcType === 'length') {
-            const length = parseFloat(document.getElementById('lengthValue').value) || 0;
-            const count = parseFloat(document.getElementById('lengthCount').value) || 0;
-            total = length * currentItem.price * count;
-            qty = count;
-            calcText = `${length}м × ${count}шт`;
+        const unitQty = parseFloat(document.getElementById('materialQuantity').value) || 0;
+        
+        if (parsedSizeData) {
+            // Размер из таблицы — считаем автоматически
+            if (parsedSizeData.type === 'area') {
+                total = parsedSizeData.area * currentItem.price * unitQty;
+                calcText = `${parsedSizeData.original} = ${parsedSizeData.area.toFixed(2)}м² × ${unitQty}шт`;
+                qty = unitQty;
+            } else if (parsedSizeData.type === 'length') {
+                total = parsedSizeData.length * currentItem.price * unitQty;
+                calcText = `${parsedSizeData.original} = ${parsedSizeData.length.toFixed(2)}м × ${unitQty}шт`;
+                qty = unitQty;
+            }
         } else {
-            const count = parseFloat(document.getElementById('pieceCount').value) || 0;
-            total = count * currentItem.price;
-            qty = count;
-            calcText = `${count}шт`;
+            // Ручной ввод размеров
+            if (currentCalcType === 'area') {
+                const width = parseFloat(document.getElementById('areaWidth').value) || 0;
+                const height = parseFloat(document.getElementById('areaHeight').value) || 0;
+                const count = parseFloat(document.getElementById('areaCount').value) || 0;
+                const area = width * height;
+                total = area * currentItem.price * count;
+                qty = count;
+                calcText = `${width}×${height}м = ${area.toFixed(2)}м² × ${count}шт`;
+            } else if (currentCalcType === 'length') {
+                const length = parseFloat(document.getElementById('lengthValue').value) || 0;
+                const count = parseFloat(document.getElementById('lengthCount').value) || 0;
+                total = length * currentItem.price * count;
+                qty = count;
+                calcText = `${length}м × ${count}шт`;
+            } else {
+                const count = parseFloat(document.getElementById('pieceCount').value) || 0;
+                total = count * currentItem.price;
+                qty = count;
+                calcText = `${count}шт`;
+            }
         }
         
         document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
@@ -395,7 +499,6 @@
         });
         
         renderEstimate();
-        document.getElementById('rowTotal').innerHTML = '0 ₽';
     }
     
     function renderEstimate() {
@@ -404,7 +507,7 @@
         let grand = 0;
         
         if (estimateItems.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>';
             document.getElementById('totalEstimate').innerHTML = '0 ₽';
             return;
         }
@@ -447,6 +550,7 @@
     }
     
     document.getElementById('itemSelect').addEventListener('change', fillDetails);
+    document.getElementById('materialQuantity').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
     document.getElementById('areaWidth').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
     document.getElementById('areaHeight').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
     document.getElementById('areaCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
