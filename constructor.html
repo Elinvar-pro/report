@@ -5,304 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Смета | Конструктор</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; padding: 20px; color: #1a2a3a; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { margin-bottom: 24px; }
+        .header h1 { font-size: 24px; font-weight: 600; color: #1a5d2a; display: flex; align-items: center; gap: 8px; }
+        .header p { color: #6c7a8a; font-size: 14px; margin-top: 4px; }
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fb;
-            padding: 20px;
-            color: #1a2a3a;
-        }
+        .two-columns { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 32px; }
+        .left-panel { flex: 1.2; min-width: 260px; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e8ecf0; }
+        .right-panel { flex: 2; min-width: 320px; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e8ecf0; }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        .categories-title { font-size: 12px; text-transform: uppercase; color: #8a99a8; letter-spacing: 0.5px; margin-bottom: 12px; margin-top: 16px; }
+        .categories-title:first-of-type { margin-top: 0; }
+        .category-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; max-height: 350px; overflow-y: auto; }
+        .category-btn { background: #f8f9fc; border: none; border-radius: 14px; padding: 12px 16px; text-align: left; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; color: #2c3e50; border: 1px solid transparent; }
+        .category-btn:hover { background: #eef2f7; }
+        .category-btn.active { background: #e8f5e9; border-color: #2e7d32; color: #1a5d2a; }
+        .category-icon { font-size: 18px; }
+        .separator { height: 1px; background: #e8ecf0; margin: 16px 0; }
         
-        .header {
-            margin-bottom: 24px;
-        }
+        .form-row { margin-bottom: 16px; }
+        .form-row label { display: block; font-size: 12px; font-weight: 600; color: #5b6e8c; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .form-row select, .form-row input { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid #dce2e8; font-size: 15px; background: white; font-family: inherit; }
         
-        .header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1a5d2a;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .selected-info { background: #f8f9fc; border-radius: 16px; padding: 16px; margin: 16px 0; }
+        .info-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8ecf0; }
+        .info-line:last-child { border-bottom: none; }
+        .info-label { color: #6c7a8a; font-size: 13px; }
+        .info-value { font-weight: 600; color: #1a2a3a; font-size: 15px; }
         
-        .header p {
-            color: #6c7a8a;
-            font-size: 14px;
-            margin-top: 4px;
-        }
+        .size-input-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; margin-bottom: 12px; }
+        .size-field { flex: 1; min-width: 100px; }
+        .size-field label { font-size: 11px; color: #6c7a8a; margin-bottom: 4px; display: block; }
+        .size-field input { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #dce2e8; font-size: 14px; }
         
-        .two-columns {
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-            margin-bottom: 32px;
-        }
+        .calc-type-select { display: flex; gap: 10px; margin-bottom: 15px; }
+        .calc-type-btn { background: #eef2f7; border: none; padding: 8px 16px; border-radius: 30px; font-size: 13px; cursor: pointer; }
+        .calc-type-btn.active { background: #2e7d32; color: white; }
         
-        .left-panel {
-            flex: 1.2;
-            min-width: 260px;
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #e8ecf0;
-        }
+        .price-preview { background: #f0fdf4; border-radius: 14px; padding: 16px; margin: 16px 0; text-align: center; }
+        .price-preview .label { font-size: 12px; color: #2e7d32; text-transform: uppercase; }
+        .price-preview .value { font-size: 28px; font-weight: 700; color: #1a5d2a; }
+        .calc-hint { font-size: 11px; color: #8a99a8; text-align: center; margin-top: 8px; }
         
-        .right-panel {
-            flex: 2;
-            min-width: 320px;
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #e8ecf0;
-        }
+        .add-btn { width: 100%; background: #2e7d32; color: white; border: none; padding: 14px; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        .add-btn:hover { background: #1b5e20; }
         
-        .categories-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #8a99a8;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            margin-top: 16px;
-        }
+        .estimate-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 16px; }
+        .estimate-header h2 { font-size: 18px; font-weight: 600; color: #1a2a3a; }
+        .estimate-total { font-size: 22px; font-weight: 700; color: #1a5d2a; }
         
-        .categories-title:first-of-type {
-            margin-top: 0;
-        }
-        
-        .category-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 20px;
-        }
-        
-        .category-btn {
-            background: #f8f9fc;
-            border: none;
-            border-radius: 14px;
-            padding: 12px 16px;
-            text-align: left;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #2c3e50;
-            border: 1px solid transparent;
-        }
-        
-        .category-btn:hover {
-            background: #eef2f7;
-        }
-        
-        .category-btn.active {
-            background: #e8f5e9;
-            border-color: #2e7d32;
-            color: #1a5d2a;
-        }
-        
-        .category-icon {
-            font-size: 18px;
-        }
-        
-        .separator {
-            height: 1px;
-            background: #e8ecf0;
-            margin: 16px 0;
-        }
-        
-        .form-row {
-            margin-bottom: 16px;
-        }
-        
-        .form-row label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: #5b6e8c;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        
-        .form-row select, .form-row input {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 14px;
-            border: 1px solid #dce2e8;
-            font-size: 15px;
-            background: white;
-            font-family: inherit;
-        }
-        
-        .selected-info {
-            background: #f8f9fc;
-            border-radius: 16px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-        
-        .info-line {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e8ecf0;
-        }
-        
-        .info-line:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            color: #6c7a8a;
-            font-size: 13px;
-        }
-        
-        .info-value {
-            font-weight: 600;
-            color: #1a2a3a;
-            font-size: 15px;
-        }
-        
-        .price-preview {
-            background: #f0fdf4;
-            border-radius: 14px;
-            padding: 16px;
-            margin: 16px 0;
-            text-align: center;
-        }
-        
-        .price-preview .label {
-            font-size: 12px;
-            color: #2e7d32;
-            text-transform: uppercase;
-        }
-        
-        .price-preview .value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a5d2a;
-        }
-        
-        .add-btn {
-            width: 100%;
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 40px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: background 0.2s;
-        }
-        
-        .add-btn:hover {
-            background: #1b5e20;
-        }
-        
-        .estimate-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        
-        .estimate-header h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a2a3a;
-        }
-        
-        .estimate-total {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a5d2a;
-        }
-        
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 16px;
-            border: 1px solid #e8ecf0;
-            background: white;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-        
-        th {
-            text-align: left;
-            padding: 14px 12px;
-            background: #f8fafc;
-            font-weight: 600;
-            color: #4a5a6a;
-            border-bottom: 1px solid #e8ecf0;
-        }
-        
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #f0f2f5;
-        }
-        
-        .delete-item {
-            color: #e74c3c;
-            cursor: pointer;
-            font-size: 18px;
-            background: none;
-            border: none;
-        }
-        
-        .empty-estimate {
-            text-align: center;
-            padding: 40px;
-            color: #8a99a8;
-        }
-        
-        .export-btn {
-            background: white;
-            border: 1px solid #2e7d32;
-            color: #2e7d32;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-        
-        .refresh-btn {
-            background: #eef2f7;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            cursor: pointer;
-            margin-top: 16px;
-            width: 100%;
-        }
+        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #e8ecf0; background: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; color: #4a5a6a; border-bottom: 1px solid #e8ecf0; }
+        td { padding: 12px; border-bottom: 1px solid #f0f2f5; }
+        .delete-item { color: #e74c3c; cursor: pointer; font-size: 18px; background: none; border: none; }
+        .empty-estimate { text-align: center; padding: 40px; color: #8a99a8; }
+        .export-btn { background: white; border: 1px solid #2e7d32; color: #2e7d32; padding: 10px 20px; border-radius: 40px; font-weight: 500; cursor: pointer; margin-top: 16px; }
+        .refresh-btn { background: #eef2f7; border: none; padding: 8px 16px; border-radius: 30px; font-size: 13px; cursor: pointer; margin-top: 16px; width: 100%; }
         
         @media (max-width: 700px) {
             body { padding: 16px; }
             .two-columns { flex-direction: column; }
+            .size-input-row { flex-direction: column; }
         }
     </style>
 </head>
@@ -310,56 +76,72 @@
 <div class="container">
     <div class="header">
         <h1>📋 Смета</h1>
-        <p>Выберите категорию → выберите позицию → укажите количество</p>
+        <p>Выберите категорию → выберите позицию → укажите размер и количество</p>
     </div>
     
     <div class="two-columns">
         <div class="left-panel">
-            <div style="margin-bottom: 16px;">
-                <div class="categories-title">📦 МАТЕРИАЛЫ</div>
-                <div class="category-list" id="materialsList">
-                    <div style="text-align:center; padding:20px;">Загрузка...</div>
-                </div>
-            </div>
-            
+            <div><div class="categories-title">📦 МАТЕРИАЛЫ</div><div class="category-list" id="materialsList"><div style="text-align:center; padding:20px;">Загрузка...</div></div></div>
             <div class="separator"></div>
-            
-            <div>
-                <div class="categories-title">🔧 РАБОТЫ И УСЛУГИ</div>
-                <div class="category-list" id="worksList">
-                    <div style="text-align:center; padding:20px;">Загрузка...</div>
-                </div>
-            </div>
-            
+            <div><div class="categories-title">🔧 РАБОТЫ И УСЛУГИ</div><div class="category-list" id="worksList"><div style="text-align:center; padding:20px;">Загрузка...</div></div></div>
             <button class="refresh-btn" onclick="loadCatalog()">🔄 Обновить</button>
         </div>
         
         <div class="right-panel">
             <div class="form-row">
                 <label>📦 Позиция</label>
-                <select id="itemSelect">
-                    <option>Сначала выберите категорию</option>
-                </select>
+                <select id="itemSelect"><option>Сначала выберите категорию</option></select>
             </div>
             
             <div id="infoPanel" style="display:none;" class="selected-info">
-                <div class="info-line">
-                    <span class="info-label">📏 Размер</span>
-                    <span class="info-value" id="sizeValue">—</span>
+                <div class="info-line"><span class="info-label">📏 Размер из таблицы</span><span class="info-value" id="sizeValue">—</span></div>
+                <div class="info-line"><span class="info-label">📐 Ед. измерения</span><span class="info-value" id="unitValue">—</span></div>
+                <div class="info-line"><span class="info-label">💰 Цена за ед.</span><span class="info-value" id="priceValue">—</span></div>
+            </div>
+            
+            <!-- Блок расчёта для материалов -->
+            <div id="materialCalcPanel" style="display:none;">
+                <div class="form-row">
+                    <label>📐 Способ расчёта</label>
+                    <div class="calc-type-select">
+                        <button type="button" class="calc-type-btn active" data-calc="area" onclick="setCalcType('area')">📏 По площади</button>
+                        <button type="button" class="calc-type-btn" data-calc="length" onclick="setCalcType('length')">📐 По длине</button>
+                        <button type="button" class="calc-type-btn" data-calc="piece" onclick="setCalcType('piece')">🔢 Поштучно</button>
+                    </div>
                 </div>
-                <div class="info-line">
-                    <span class="info-label">📐 Ед. измерения</span>
-                    <span class="info-value" id="unitValue">—</span>
+                
+                <div id="areaInputs">
+                    <div class="size-input-row">
+                        <div class="size-field"><label>Ширина (м)</label><input type="number" id="areaWidth" value="1" step="0.01" placeholder="м"></div>
+                        <div class="size-field"><label>Высота (м)</label><input type="number" id="areaHeight" value="1" step="0.01" placeholder="м"></div>
+                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="areaCount" value="1" step="1" placeholder="шт"></div>
+                    </div>
+                    <div class="calc-hint">📐 Площадь = Ширина × Высота × Кол-во</div>
                 </div>
-                <div class="info-line">
-                    <span class="info-label">💰 Цена за единицу</span>
-                    <span class="info-value" id="priceValue">—</span>
+                
+                <div id="lengthInputs" style="display:none;">
+                    <div class="size-input-row">
+                        <div class="size-field"><label>Длина (м)</label><input type="number" id="lengthValue" value="1" step="0.1" placeholder="м"></div>
+                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="lengthCount" value="1" step="1" placeholder="шт"></div>
+                    </div>
+                    <div class="calc-hint">📐 Общая длина = Длина × Кол-во</div>
+                </div>
+                
+                <div id="pieceInputs" style="display:none;">
+                    <div class="size-input-row">
+                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="pieceCount" value="1" step="1" placeholder="шт"></div>
+                    </div>
+                    <div class="calc-hint">🔢 Стоимость = Цена × Количество</div>
                 </div>
             </div>
             
-            <div class="form-row">
-                <label>🔢 Количество</label>
-                <input type="number" id="quantity" value="1" step="1">
+            <!-- Блок для работ (просто количество) -->
+            <div id="workCalcPanel" style="display:none;">
+                <div class="form-row">
+                    <label>🔢 Количество</label>
+                    <input type="number" id="workQuantity" value="1" step="1">
+                </div>
+                <div class="calc-hint">💰 Стоимость = Цена × Количество</div>
             </div>
             
             <div class="price-preview">
@@ -371,18 +153,11 @@
         </div>
     </div>
     
-    <div class="estimate-header">
-        <h2>📋 Смета</h2>
-        <div class="estimate-total" id="totalEstimate">0 ₽</div>
-    </div>
+    <div class="estimate-header"><h2>📋 Смета</h2><div class="estimate-total" id="totalEstimate">0 ₽</div></div>
     <div class="table-wrapper">
         <table>
-            <thead>
-                <tr><th>Категория</th><th>Наименование</th><th>Размер</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
-            </thead>
-            <tbody id="estimateBody">
-                <tr><td colspan="8" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>
-            </tbody>
+            <thead><tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr></thead>
+            <tbody id="estimateBody"><tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr></tbody>
         </table>
     </div>
     <button class="export-btn" onclick="exportEstimate()">📤 Экспорт в CSV</button>
@@ -392,14 +167,10 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxqcZfgZ9cyIAnY3u_P0XD5Nv7ZpD4IohzltLtFDOjVhbgeagNgDp0mN0MeHP9dBkm-/exec";
     
     let catalog = { materials: [], works: [] };
-    let materialCategories = [];
-    let workCategories = [];
-    
-    let currentType = null;      // 'material' или 'work'
-    let currentCategory = null;
-    let currentItems = [];
-    let currentItem = null;
+    let materialCategories = [], workCategories = [];
+    let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
     let estimateItems = [];
+    let currentCalcType = 'area';
 
     function loadCatalog() {
         const materialsDiv = document.getElementById('materialsList');
@@ -413,12 +184,10 @@
             document.body.removeChild(script);
             catalog = data;
             
-            // Собираем категории материалов (из Листа1)
             const matSet = new Set();
             catalog.materials.forEach(item => { if (item.group) matSet.add(item.group); });
             materialCategories = Array.from(matSet).sort();
             
-            // Собираем категории работ (из Листа2)
             const workSet = new Set();
             catalog.works.forEach(item => { if (item.group) workSet.add(item.group); });
             workCategories = Array.from(workSet).sort();
@@ -438,98 +207,73 @@
     }
     
     function renderCategories() {
-        // Материалы
         const materialsDiv = document.getElementById('materialsList');
         materialsDiv.innerHTML = '';
-        if (materialCategories.length === 0) {
-            materialsDiv.innerHTML = '<div style="color:#8a99a8; text-align:center; padding:20px;">Нет данных</div>';
-        } else {
-            materialCategories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'category-btn';
-                btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
-                btn.onclick = () => selectCategory('material', cat);
-                materialsDiv.appendChild(btn);
-            });
-        }
-        
-        // Работы и услуги
-        const worksDiv = document.getElementById('worksList');
-        worksDiv.innerHTML = '';
-        if (workCategories.length === 0) {
-            worksDiv.innerHTML = '<div style="color:#8a99a8; text-align:center; padding:20px;">Нет данных</div>';
-        } else {
-            workCategories.forEach(cat => {
-                const btn = document.createElement('button');
-                btn.className = 'category-btn';
-                btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
-                btn.onclick = () => selectCategory('work', cat);
-                worksDiv.appendChild(btn);
-            });
-        }
-        
-        // Снимаем активность со всех кнопок
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active');
+        materialCategories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'category-btn';
+            btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
+            btn.onclick = () => selectCategory('material', cat);
+            materialsDiv.appendChild(btn);
         });
         
-        // Сбрасываем выбор
-        currentType = null;
-        currentCategory = null;
-        currentItems = [];
-        const select = document.getElementById('itemSelect');
-        select.innerHTML = '<option value="">Сначала выберите категорию</option>';
-        document.getElementById('infoPanel').style.display = 'none';
-        document.getElementById('quantity').value = 1;
-        document.getElementById('rowTotal').innerHTML = '0 ₽';
-        currentItem = null;
+        const worksDiv = document.getElementById('worksList');
+        worksDiv.innerHTML = '';
+        workCategories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = 'category-btn';
+            btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
+            btn.onclick = () => selectCategory('work', cat);
+            worksDiv.appendChild(btn);
+        });
+        
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        resetForm();
     }
     
     function getIcon(category) {
         const icons = {
-            'Материалы': '📦', 'Листовые материалы': '📄', 'Профиль металлический': '📐',
-            'Профиль алюминиевый': '🥤', 'Нержавеющая сталь': '⚙️', 'Пленки': '🎨',
-            'Светотехника': '💡', 'Обнарядка': '🎄', 'Работы': '🔧', 'Подряд': '📋',
-            'Монтаж': '🚚', 'Транспорт': '🚛'
+            'Листовые материалы': '📄', 'Профиль металлический': '📐',
+            'Профиль алюминиевый': '🥤', 'Нержавеющая сталь': '⚙️',
+            'Пленки': '🎨', 'Светотехника': '💡', 'Обнарядка': '🎄',
+            'Работы': '🔧', 'Подряд': '📋', 'Монтаж': '🚚', 'Транспорт': '🚛'
         };
         return icons[category] || '📁';
+    }
+    
+    function resetForm() {
+        currentType = null;
+        currentCategory = null;
+        currentItems = [];
+        currentItem = null;
+        document.getElementById('itemSelect').innerHTML = '<option value="">Сначала выберите категорию</option>';
+        document.getElementById('infoPanel').style.display = 'none';
+        document.getElementById('materialCalcPanel').style.display = 'none';
+        document.getElementById('workCalcPanel').style.display = 'none';
+        document.getElementById('rowTotal').innerHTML = '0 ₽';
     }
     
     function selectCategory(type, category) {
         currentType = type;
         currentCategory = category;
         
-        // Снимаем активность со всех кнопок
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Подсвечиваем активную кнопку
-        const btns = document.querySelectorAll('.category-btn');
-        for (let btn of btns) {
-            if (btn.innerText.includes(category)) {
-                btn.classList.add('active');
-                break;
-            }
+        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+        for (let btn of document.querySelectorAll('.category-btn')) {
+            if (btn.innerText.includes(category)) { btn.classList.add('active'); break; }
         }
         
-        // Собираем позиции
         currentItems = [];
         if (type === 'material') {
-            catalog.materials.forEach(item => {
-                if (item.group === category) {
-                    currentItems.push({ ...item, itemType: 'material' });
-                }
-            });
+            catalog.materials.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: 'material' }); });
+            document.getElementById('materialCalcPanel').style.display = 'block';
+            document.getElementById('workCalcPanel').style.display = 'none';
+            setCalcType('area');
         } else {
-            catalog.works.forEach(item => {
-                if (item.group === category) {
-                    currentItems.push({ ...item, itemType: 'work' });
-                }
-            });
+            catalog.works.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: 'work' }); });
+            document.getElementById('materialCalcPanel').style.display = 'none';
+            document.getElementById('workCalcPanel').style.display = 'block';
         }
         
-        // Заполняем выпадающий список
         const select = document.getElementById('itemSelect');
         select.innerHTML = '<option value="">Выберите позицию</option>';
         currentItems.forEach(item => {
@@ -539,18 +283,26 @@
             opt.dataset.unit = item.unit || '';
             opt.dataset.price = item.price || 0;
             opt.dataset.size = item.size || '';
-            opt.dataset.type = item.itemType;
             select.appendChild(opt);
         });
         
-        // Сбрасываем форму
         document.getElementById('infoPanel').style.display = 'none';
-        document.getElementById('sizeValue').innerHTML = '—';
-        document.getElementById('unitValue').innerHTML = '—';
-        document.getElementById('priceValue').innerHTML = '—';
-        document.getElementById('quantity').value = 1;
         document.getElementById('rowTotal').innerHTML = '0 ₽';
         currentItem = null;
+    }
+    
+    function setCalcType(type) {
+        currentCalcType = type;
+        document.querySelectorAll('.calc-type-btn').forEach(btn => {
+            if (btn.dataset.calc === type) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        
+        document.getElementById('areaInputs').style.display = type === 'area' ? 'block' : 'none';
+        document.getElementById('lengthInputs').style.display = type === 'length' ? 'block' : 'none';
+        document.getElementById('pieceInputs').style.display = type === 'piece' ? 'block' : 'none';
+        
+        calculateMaterialTotal();
     }
     
     function fillDetails() {
@@ -561,9 +313,8 @@
         const selected = currentItems.find(item => item.name === opt.value);
         if (!selected) return;
         
-        // Показываем панель с информацией
         document.getElementById('infoPanel').style.display = 'block';
-        document.getElementById('sizeValue').innerHTML = selected.size && selected.size !== '' ? selected.size : '—';
+        document.getElementById('sizeValue').innerHTML = selected.size || '—';
         document.getElementById('unitValue').innerHTML = selected.unit || '—';
         document.getElementById('priceValue').innerHTML = selected.price ? selected.price.toLocaleString('ru-RU') + ' ₽' : '—';
         
@@ -573,41 +324,78 @@
             name: selected.name,
             unit: selected.unit || '—',
             price: parseFloat(selected.price) || 0,
-            size: selected.size || '',
-            itemType: selected.itemType
+            size: selected.size || ''
         };
-        calculateRowTotal();
+        
+        if (currentType === 'material') calculateMaterialTotal();
+        else calculateWorkTotal();
     }
     
-    function calculateRowTotal() {
-        const price = currentItem ? currentItem.price : 0;
-        const qty = parseFloat(document.getElementById('quantity').value) || 0;
-        const total = price * qty;
+    function calculateMaterialTotal() {
+        if (!currentItem) return 0;
+        let total = 0, qty = 0, calcText = '';
+        
+        if (currentCalcType === 'area') {
+            const width = parseFloat(document.getElementById('areaWidth').value) || 0;
+            const height = parseFloat(document.getElementById('areaHeight').value) || 0;
+            const count = parseFloat(document.getElementById('areaCount').value) || 0;
+            const area = width * height;
+            total = area * currentItem.price * count;
+            qty = count;
+            calcText = `${width}×${height}м = ${area.toFixed(2)}м² × ${count}шт`;
+        } else if (currentCalcType === 'length') {
+            const length = parseFloat(document.getElementById('lengthValue').value) || 0;
+            const count = parseFloat(document.getElementById('lengthCount').value) || 0;
+            total = length * currentItem.price * count;
+            qty = count;
+            calcText = `${length}м × ${count}шт`;
+        } else {
+            const count = parseFloat(document.getElementById('pieceCount').value) || 0;
+            total = count * currentItem.price;
+            qty = count;
+            calcText = `${count}шт`;
+        }
+        
         document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
-        return total;
+        return { total, qty, calcText };
+    }
+    
+    function calculateWorkTotal() {
+        if (!currentItem) return 0;
+        const qty = parseFloat(document.getElementById('workQuantity').value) || 0;
+        const total = qty * currentItem.price;
+        document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
+        return { total, qty, calcText: `${qty} ${currentItem.unit}` };
     }
     
     function addToEstimate() {
-        const qty = parseFloat(document.getElementById('quantity').value) || 0;
-        if (!currentItem || !currentItem.name || qty === 0) {
-            alert('Выберите позицию и укажите количество');
-            return;
+        if (!currentItem || !currentItem.name) { alert('Выберите позицию'); return; }
+        
+        let total = 0, qty = 0, calcText = '';
+        
+        if (currentType === 'material') {
+            const result = calculateMaterialTotal();
+            total = result.total; qty = result.qty; calcText = result.calcText;
+        } else {
+            const result = calculateWorkTotal();
+            total = result.total; qty = result.qty; calcText = result.calcText;
         }
+        
+        if (total === 0) { alert('Укажите размеры или количество'); return; }
         
         estimateItems.push({
             type: currentItem.type,
             category: currentItem.category,
             name: currentItem.name,
-            size: currentItem.size || '',
+            calcText: calcText,
             unit: currentItem.unit,
             quantity: qty,
             price: currentItem.price,
-            total: currentItem.price * qty
+            total: total
         });
         
         renderEstimate();
-        document.getElementById('quantity').value = 1;
-        calculateRowTotal();
+        document.getElementById('rowTotal').innerHTML = '0 ₽';
     }
     
     function renderEstimate() {
@@ -616,7 +404,7 @@
         let grand = 0;
         
         if (estimateItems.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>';
             document.getElementById('totalEstimate').innerHTML = '0 ₽';
             return;
         }
@@ -627,7 +415,7 @@
             row.insertCell(0).innerHTML = item.type;
             row.insertCell(1).innerHTML = item.category;
             row.insertCell(2).innerHTML = item.name;
-            row.insertCell(3).innerHTML = item.size || '—';
+            row.insertCell(3).innerHTML = item.calcText;
             row.insertCell(4).innerHTML = item.unit;
             row.insertCell(5).innerHTML = item.quantity;
             row.insertCell(6).innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
@@ -646,9 +434,9 @@
     
     function exportEstimate() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-        let csv = "Тип,Категория,Наименование,Размер,Ед.изм,Кол-во,Цена/ед,Итого\n";
+        let csv = "Тип,Категория,Наименование,Расчёт,Ед.изм,Кол-во,Цена/ед,Итого\n";
         estimateItems.forEach(i => {
-            csv += `"${i.type}","${i.category}","${i.name}","${i.size || ''}","${i.unit}",${i.quantity},${i.price.toFixed(2)},${i.total.toFixed(2)}\n`;
+            csv += `"${i.type}","${i.category}","${i.name}","${i.calcText}","${i.unit}",${i.quantity},${i.price.toFixed(2)},${i.total.toFixed(2)}\n`;
         });
         const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -659,7 +447,13 @@
     }
     
     document.getElementById('itemSelect').addEventListener('change', fillDetails);
-    document.getElementById('quantity').addEventListener('input', calculateRowTotal);
+    document.getElementById('areaWidth').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
+    document.getElementById('areaHeight').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
+    document.getElementById('areaCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
+    document.getElementById('lengthValue').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
+    document.getElementById('lengthCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
+    document.getElementById('pieceCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
+    document.getElementById('workQuantity').addEventListener('input', () => { if (currentType === 'work') calculateWorkTotal(); });
     
     const saved = localStorage.getItem('estimate');
     if (saved) { try { estimateItems = JSON.parse(saved); renderEstimate(); } catch(e) {} }
