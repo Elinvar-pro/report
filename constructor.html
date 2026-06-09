@@ -2,133 +2,386 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конструктор сметы</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Смета | Конструктор</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: #f0f2f5; }
-        .container { max-width: 1600px; margin: 0 auto; }
-        h1 { font-size: 1.6rem; margin: 0 0 4px 0; color: #1a5d2a; }
-        .sub { color: #475569; font-size: 0.8rem; margin-bottom: 20px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .refresh-btn { background: #1565c0; color: white; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; }
-        .refresh-btn:hover { background: #0d47a1; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fb;
+            padding: 20px;
+            color: #1a2a3a;
+        }
         
-        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-btn { padding: 8px 16px; border: none; background: #e0e0e0; border-radius: 30px; cursor: pointer; font-weight: 500; font-size: 0.85rem; }
-        .tab-btn.active { background: #2e7d32; color: white; }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
         
-        .constructor-card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
-        .row-builder { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end; margin-bottom: 15px; }
-        .field { flex: 1; min-width: 140px; }
-        .field label { display: block; font-size: 0.7rem; font-weight: 600; color: #666; margin-bottom: 5px; }
-        select, input, textarea { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 0.85rem; }
-        .price-result { font-weight: bold; color: #2e7d32; font-size: 1.2rem; padding: 8px 0; }
-        .add-btn { background: #2e7d32; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: 500; }
-        .add-btn:hover { background: #1b5e20; }
+        /* Шапка */
+        .header {
+            margin-bottom: 24px;
+        }
         
-        .estimate-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
-        .estimate-table th, .estimate-table td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
-        .estimate-table th { background: #f0f2f5; font-weight: 600; }
-        .total-estimate { font-size: 1.2rem; font-weight: bold; text-align: right; margin-top: 20px; padding: 15px; background: #fef6e0; border-radius: 12px; }
-        .delete-btn { background: none; border: none; color: #c62828; cursor: pointer; font-size: 1.2rem; }
-        .delete-btn:hover { color: #b71c1c; }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a5d2a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header p {
+            color: #6c7a8a;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        /* Две колонки */
+        .two-columns {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        
+        .left-panel {
+            flex: 1.2;
+            min-width: 260px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e8ecf0;
+        }
+        
+        .right-panel {
+            flex: 2;
+            min-width: 320px;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e8ecf0;
+        }
+        
+        /* Категории */
+        .categories-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #8a99a8;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .category-btn {
+            background: #f8f9fc;
+            border: none;
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #2c3e50;
+            border: 1px solid transparent;
+        }
+        
+        .category-btn:hover {
+            background: #eef2f7;
+        }
+        
+        .category-btn.active {
+            background: #e8f5e9;
+            border-color: #2e7d32;
+            color: #1a5d2a;
+        }
+        
+        .category-icon {
+            font-size: 20px;
+        }
+        
+        /* Форма */
+        .form-row {
+            margin-bottom: 16px;
+        }
+        
+        .form-row label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5b6e8c;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .form-row select, .form-row input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #dce2e8;
+            font-size: 15px;
+            background: white;
+            font-family: inherit;
+        }
+        
+        .form-row select:focus, .form-row input:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+        }
+        
+        .info-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .info-field {
+            flex: 1;
+        }
+        
+        .price-preview {
+            background: #f0fdf4;
+            border-radius: 14px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        
+        .price-preview .label {
+            font-size: 12px;
+            color: #2e7d32;
+            text-transform: uppercase;
+        }
+        
+        .price-preview .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a5d2a;
+        }
+        
+        .add-btn {
+            width: 100%;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        
+        .add-btn:hover {
+            background: #1b5e20;
+        }
+        
+        /* Смета */
+        .estimate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        
+        .estimate-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a2a3a;
+        }
+        
+        .estimate-total {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a5d2a;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid #e8ecf0;
+            background: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            text-align: left;
+            padding: 14px 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #4a5a6a;
+            border-bottom: 1px solid #e8ecf0;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        
+        .delete-item {
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 18px;
+            background: none;
+            border: none;
+        }
+        
+        .empty-estimate {
+            text-align: center;
+            padding: 40px;
+            color: #8a99a8;
+        }
+        
+        .export-btn {
+            background: white;
+            border: 1px solid #2e7d32;
+            color: #2e7d32;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+        
+        .refresh-btn {
+            background: #eef2f7;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+        }
         
         @media (max-width: 700px) {
-            .row-builder { flex-direction: column; }
-            .field { width: 100%; }
+            body { padding: 16px; }
+            .info-row { flex-direction: column; }
+            .two-columns { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🏗️ Конструктор сметы</h1>
-    <div class="sub">Материалы + Работы + Подряд + Монтаж + Транспорт</div>
-    
-    <div class="toolbar">
-        <div class="tabs" id="tabs"></div>
-        <button class="refresh-btn" onclick="loadCatalog()">🔄 Обновить</button>
+    <div class="header">
+        <h1>📋 Смета</h1>
+        <p>Выберите категорию и позицию, укажите количество</p>
     </div>
     
-    <div class="constructor-card">
-        <div class="row-builder">
-            <div class="field" style="flex:2">
-                <label>📦 Наименование</label>
-                <select id="itemSelect"><option>Выберите группу</option></select>
+    <div class="two-columns">
+        <!-- Левая колонка: категории -->
+        <div class="left-panel">
+            <div class="categories-title">КАТЕГОРИИ</div>
+            <div class="category-list" id="categoryList">
+                <div style="text-align:center; padding:20px;">Загрузка...</div>
             </div>
-            <div class="field">
-                <label>📏 Ед.изм</label>
-                <input type="text" id="unit" readonly placeholder="Авто">
+            <button class="refresh-btn" onclick="loadCatalog()" style="margin-top: 20px; width:100%;">🔄 Обновить</button>
+        </div>
+        
+        <!-- Правая колонка: форма добавления -->
+        <div class="right-panel">
+            <div class="form-row">
+                <label>📦 Что добавляем?</label>
+                <select id="itemSelect">
+                    <option>Сначала выберите категорию</option>
+                </select>
             </div>
-            <div class="field">
-                <label>💰 Цена/ед</label>
-                <input type="text" id="price" readonly placeholder="Авто">
+            
+            <div class="info-row">
+                <div class="info-field">
+                    <label>📏 Ед. измерения</label>
+                    <input type="text" id="unit" readonly placeholder="—">
+                </div>
+                <div class="info-field">
+                    <label>💰 Цена за ед.</label>
+                    <input type="text" id="price" readonly placeholder="—">
+                </div>
             </div>
-            <div class="field">
+            
+            <div class="form-row">
                 <label>🔢 Количество</label>
                 <input type="number" id="quantity" value="1" step="1">
             </div>
-            <div class="field">
-                <label>💵 Итого</label>
-                <div id="rowTotal" class="price-result">0 ₽</div>
+            
+            <div class="price-preview">
+                <div class="label">ИТОГО ЗА ПОЗИЦИЮ</div>
+                <div class="value" id="rowTotal">0 ₽</div>
             </div>
-            <div class="field">
-                <label>&nbsp;</label>
-                <button class="add-btn" onclick="addToEstimate()">➕ Добавить</button>
-            </div>
-        </div>
-        <div class="field">
-            <label>📝 Примечания</label>
-            <textarea id="notes" rows="2" placeholder="Размер, производитель, доп. информация..."></textarea>
+            
+            <button class="add-btn" onclick="addToEstimate()">➕ Добавить в смету</button>
         </div>
     </div>
     
-    <h3>📋 Смета</h3>
-    <table class="estimate-table" id="estimateTable">
-        <thead><tr><th>Тип</th><th>Группа</th><th>Наименование</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th>Примечания</th><th></th></tr></thead>
-        <tbody id="estimateBody"></tbody>
-    </table>
-    <div class="total-estimate" id="totalEstimate">💰 Общая сумма: 0 ₽</div>
-    <button onclick="exportEstimate()" style="background: #1565c0; padding: 10px 24px; margin-top: 10px;">📤 Экспорт CSV</button>
+    <!-- Смета -->
+    <div class="estimate-header">
+        <h2>📋 Смета</h2>
+        <div class="estimate-total" id="totalEstimate">0 ₽</div>
+    </div>
+    <div class="table-wrapper" id="estimateWrapper">
+        <table id="estimateTable">
+            <thead>
+                <tr><th>Категория</th><th>Наименование</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
+            </thead>
+            <tbody id="estimateBody">
+                <tr><td colspan="7" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <button class="export-btn" onclick="exportEstimate()">📤 Экспорт в CSV</button>
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЮ ССЫЛКУ (ту, что получишь после переразвертывания) ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycbylJupCLdwajnxoE4P4owJ6nFy-I9VuqPUoOuYAsgHwo3J3UxLqBAAjN9_n9RH9gR_K3Q/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycby8q420E_z1oAl_tNHvGh_7BTIY25gILMiNfy5Ya2cdITi3JZ8dYBcUkNY1BQAv_I3YgQ/exec";
     
     let catalog = { materials: [], works: [] };
-    let allGroups = [];
-    let currentGroup = null;
+    let allCategories = [];
+    let currentCategory = null;
     let currentItems = [];
     let currentItem = null;
     let estimateItems = [];
-    
-    // Загрузка через JSONP (обходит CORS)
+
     function loadCatalog() {
-        const tabsDiv = document.getElementById('tabs');
-        tabsDiv.innerHTML = '<span>📡 Загрузка...</span>';
+        const categoryDiv = document.getElementById('categoryList');
+        categoryDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка...</div>';
         
         const callbackName = 'jsonp_callback_' + Math.random().toString(36).substr(2);
-        
         window[callbackName] = function(data) {
             delete window[callbackName];
             document.body.removeChild(script);
-            
             catalog = data;
             
-            // Собираем все уникальные группы
-            const groupsSet = new Set();
-            catalog.materials.forEach(item => { if (item.group) groupsSet.add(item.group); });
-            catalog.works.forEach(item => { if (item.group) groupsSet.add(item.group); });
-            allGroups = Array.from(groupsSet).sort();
+            const categoriesSet = new Set();
+            catalog.materials.forEach(item => { if (item.group) categoriesSet.add(item.group); });
+            catalog.works.forEach(item => { if (item.group) categoriesSet.add(item.group); });
+            allCategories = Array.from(categoriesSet).sort();
             
-            buildTabs();
-            if (allGroups.length > 0) switchToGroup(allGroups[0]);
-            
-            console.log("Загружено материалов:", catalog.materials.length);
-            console.log("Загружено работ:", catalog.works.length);
-            console.log("Группы:", allGroups);
+            renderCategories();
+            if (allCategories.length > 0) selectCategory(allCategories[0]);
         };
         
         const script = document.createElement('script');
@@ -136,68 +389,58 @@
         script.onerror = () => {
             delete window[callbackName];
             document.body.removeChild(script);
-            tabsDiv.innerHTML = '<span style="color:red;">❌ Ошибка загрузки. Проверьте ссылку API.</span>';
+            categoryDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки</div>';
         };
         document.body.appendChild(script);
     }
     
-    function buildTabs() {
-        const tabsDiv = document.getElementById('tabs');
-        tabsDiv.innerHTML = '';
-        allGroups.forEach(group => {
+    function renderCategories() {
+        const container = document.getElementById('categoryList');
+        container.innerHTML = '';
+        allCategories.forEach(cat => {
             const btn = document.createElement('button');
-            btn.className = 'tab-btn';
-            btn.textContent = getGroupIcon(group) + ' ' + group;
-            btn.dataset.group = group;
-            btn.onclick = () => switchToGroup(group);
-            tabsDiv.appendChild(btn);
+            btn.className = 'category-btn';
+            btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
+            btn.onclick = () => selectCategory(cat);
+            container.appendChild(btn);
         });
     }
     
-    function getGroupIcon(group) {
+    function getIcon(category) {
         const icons = {
             'Материалы': '📦', 'Листовые материалы': '📄', 'Профиль металлический': '📐',
             'Профиль алюминиевый': '🥤', 'Нержавеющая сталь': '⚙️', 'Пленки': '🎨',
             'Светотехника': '💡', 'Обнарядка': '🎄', 'Работы': '🔧', 'Подряд': '📋',
             'Монтаж': '🚚', 'Транспорт': '🚛'
         };
-        return icons[group] || '📁';
+        return icons[category] || '📁';
     }
     
-    function switchToGroup(group) {
-        currentGroup = group;
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.group === group);
+    function selectCategory(category) {
+        currentCategory = category;
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            if (btn.innerText.includes(category)) btn.classList.add('active');
+            else btn.classList.remove('active');
         });
         
         currentItems = [];
-        catalog.materials.forEach(item => {
-            if (item.group === group) {
-                currentItems.push({ ...item, typeLabel: '📦 Материал' });
-            }
-        });
-        catalog.works.forEach(item => {
-            if (item.group === group) {
-                currentItems.push({ ...item, typeLabel: '🔧 Работа' });
-            }
-        });
+        catalog.materials.forEach(item => { if (item.group === category) currentItems.push({ ...item, type: 'material' }); });
+        catalog.works.forEach(item => { if (item.group === category) currentItems.push({ ...item, type: 'work' }); });
         
         const select = document.getElementById('itemSelect');
         select.innerHTML = '<option value="">Выберите позицию</option>';
         currentItems.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.name;
-            option.textContent = item.name;
-            option.dataset.unit = item.unit || '';
-            option.dataset.price = item.price || 0;
-            option.dataset.notes = item.notes || item.size || item.supplier || '';
-            option.dataset.typeLabel = item.typeLabel || '';
-            select.appendChild(option);
+            const opt = document.createElement('option');
+            opt.value = item.name;
+            opt.textContent = item.name;
+            opt.dataset.unit = item.unit || '';
+            opt.dataset.price = item.price || 0;
+            opt.dataset.notes = item.notes || item.size || item.supplier || '';
+            select.appendChild(opt);
         });
         
         document.getElementById('unit').value = '';
         document.getElementById('price').value = '';
-        document.getElementById('notes').value = '';
         document.getElementById('quantity').value = 1;
         document.getElementById('rowTotal').innerHTML = '0 ₽';
         currentItem = null;
@@ -211,23 +454,21 @@
         const selected = currentItems.find(item => item.name === opt.value);
         if (!selected) return;
         
-        document.getElementById('unit').value = selected.unit || '';
-        document.getElementById('price').value = selected.price || '';
-        document.getElementById('notes').value = selected.notes || '';
+        document.getElementById('unit').value = selected.unit || '—';
+        document.getElementById('price').value = selected.price ? selected.price.toLocaleString('ru-RU') + ' ₽' : '—';
         
         currentItem = {
-            group: currentGroup,
+            category: currentCategory,
             name: selected.name,
-            unit: selected.unit,
+            unit: selected.unit || '—',
             price: parseFloat(selected.price) || 0,
-            notes: document.getElementById('notes').value,
-            typeLabel: selected.typeLabel || '📦 Материал'
+            type: selected.type
         };
         calculateRowTotal();
     }
     
     function calculateRowTotal() {
-        const price = parseFloat(document.getElementById('price').value) || 0;
+        const price = currentItem ? currentItem.price : 0;
         const qty = parseFloat(document.getElementById('quantity').value) || 0;
         const total = price * qty;
         document.getElementById('rowTotal').innerHTML = total.toLocaleString('ru-RU') + ' ₽';
@@ -242,14 +483,12 @@
         }
         
         estimateItems.push({
-            typeLabel: currentItem.typeLabel,
-            group: currentGroup,
+            category: currentItem.category,
             name: currentItem.name,
             unit: currentItem.unit,
             quantity: qty,
             price: currentItem.price,
-            total: currentItem.price * qty,
-            notes: document.getElementById('notes').value
+            total: currentItem.price * qty
         });
         
         renderEstimate();
@@ -261,33 +500,39 @@
         const tbody = document.getElementById('estimateBody');
         tbody.innerHTML = '';
         let grand = 0;
+        
+        if (estimateItems.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>';
+            document.getElementById('totalEstimate').innerHTML = '0 ₽';
+            return;
+        }
+        
         estimateItems.forEach((item, idx) => {
             grand += item.total;
             const row = tbody.insertRow();
-            row.insertCell(0).innerHTML = item.typeLabel;
-            row.insertCell(1).innerHTML = item.group;
-            row.insertCell(2).innerHTML = item.name;
-            row.insertCell(3).innerHTML = item.unit;
-            row.insertCell(4).innerHTML = item.quantity;
-            row.insertCell(5).innerHTML = item.price.toLocaleString('ru-RU') + ' ₽';
-            row.insertCell(6).innerHTML = item.total.toLocaleString('ru-RU') + ' ₽';
-            row.insertCell(7).innerHTML = item.notes;
-            const delCell = row.insertCell(8);
+            row.insertCell(0).innerHTML = item.category;
+            row.insertCell(1).innerHTML = item.name;
+            row.insertCell(2).innerHTML = item.unit;
+            row.insertCell(3).innerHTML = item.quantity;
+            row.insertCell(4).innerHTML = item.price.toLocaleString('ru-RU') + ' ₽';
+            row.insertCell(5).innerHTML = item.total.toLocaleString('ru-RU') + ' ₽';
+            const delCell = row.insertCell(6);
             const delBtn = document.createElement('button');
             delBtn.innerHTML = '🗑️';
-            delBtn.className = 'delete-btn';
+            delBtn.className = 'delete-item';
             delBtn.onclick = () => { estimateItems.splice(idx, 1); renderEstimate(); };
             delCell.appendChild(delBtn);
         });
-        document.getElementById('totalEstimate').innerHTML = `💰 Общая сумма: ${grand.toLocaleString('ru-RU')} ₽`;
+        
+        document.getElementById('totalEstimate').innerHTML = grand.toLocaleString('ru-RU') + ' ₽';
         localStorage.setItem('estimate', JSON.stringify(estimateItems));
     }
     
     function exportEstimate() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-        let csv = "Тип,Группа,Наименование,Ед.изм,Кол-во,Цена/ед,Итого,Примечания\n";
+        let csv = "Категория,Наименование,Ед.изм,Кол-во,Цена/ед,Итого\n";
         estimateItems.forEach(i => {
-            csv += `"${i.typeLabel}","${i.group}","${i.name}","${i.unit}",${i.quantity},${i.price},${i.total},"${i.notes}"\n`;
+            csv += `"${i.category}","${i.name}","${i.unit}",${i.quantity},${i.price},${i.total}\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
