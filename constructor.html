@@ -35,43 +35,42 @@
         .info-label { color: #6c7a8a; font-size: 13px; }
         .info-value { font-weight: 600; color: #1a2a3a; font-size: 15px; }
         
-        .parsed-size-info { background: #e8f5e9; border-radius: 12px; padding: 12px; margin: 12px 0; text-align: center; }
-        .parsed-size-info .value { font-weight: 700; color: #1a5d2a; font-size: 16px; }
-        
-        .size-input-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; margin-bottom: 12px; }
+        .calc-card { background: #f8f9fc; border-radius: 16px; padding: 16px; margin: 16px 0; }
+        .parsed-info { background: #e8f5e9; border-radius: 12px; padding: 12px; margin-bottom: 16px; text-align: center; }
+        .parsed-info .value { font-weight: 700; color: #1a5d2a; font-size: 16px; }
+        .size-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
         .size-field { flex: 1; min-width: 100px; }
         .size-field label { font-size: 11px; color: #6c7a8a; margin-bottom: 4px; display: block; }
         .size-field input { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #dce2e8; font-size: 14px; }
-        
-        .calc-type-select { display: flex; gap: 10px; margin-bottom: 15px; }
-        .calc-type-btn { background: #eef2f7; border: none; padding: 8px 16px; border-radius: 30px; font-size: 13px; cursor: pointer; }
-        .calc-type-btn.active { background: #2e7d32; color: white; }
+        .calc-result { font-size: 13px; color: #2e7d32; text-align: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e4e8; }
         
         .price-preview { background: #f0fdf4; border-radius: 14px; padding: 16px; margin: 16px 0; text-align: center; }
         .price-preview .label { font-size: 12px; color: #2e7d32; text-transform: uppercase; }
         .price-preview .value { font-size: 28px; font-weight: 700; color: #1a5d2a; }
-        .calc-hint { font-size: 11px; color: #8a99a8; text-align: center; margin-top: 8px; }
         
-        .add-btn { width: 100%; background: #2e7d32; color: white; border: none; padding: 14px; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        .add-btn { width: 100%; background: #2e7d32; color: white; border: none; padding: 14px; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
         .add-btn:hover { background: #1b5e20; }
         
         .estimate-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 16px; }
         .estimate-header h2 { font-size: 18px; font-weight: 600; color: #1a2a3a; }
         .estimate-total { font-size: 22px; font-weight: 700; color: #1a5d2a; }
         
-        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #e8ecf0; background: white; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; padding: 14px 12px; background: #f8fafc; font-weight: 600; color: #4a5a6a; border-bottom: 1px solid #e8ecf0; }
-        td { padding: 12px; border-bottom: 1px solid #f0f2f5; }
+        .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #e8ecf0; background: white; max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 12px 10px; background: #f8fafc; font-weight: 600; color: #4a5a6a; border-bottom: 1px solid #e8ecf0; position: sticky; top: 0; }
+        td { padding: 10px; border-bottom: 1px solid #f0f2f5; }
         .delete-item { color: #e74c3c; cursor: pointer; font-size: 18px; background: none; border: none; }
         .empty-estimate { text-align: center; padding: 40px; color: #8a99a8; }
-        .export-btn { background: white; border: 1px solid #2e7d32; color: #2e7d32; padding: 10px 20px; border-radius: 40px; font-weight: 500; cursor: pointer; margin-top: 16px; }
+        
+        .export-buttons { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .export-btn { background: white; border: 1px solid #2e7d32; color: #2e7d32; padding: 10px 20px; border-radius: 40px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .export-btn:hover { background: #e8f5e9; }
         .refresh-btn { background: #eef2f7; border: none; padding: 8px 16px; border-radius: 30px; font-size: 13px; cursor: pointer; margin-top: 16px; width: 100%; }
         
         @media (max-width: 700px) {
             body { padding: 16px; }
             .two-columns { flex-direction: column; }
-            .size-input-row { flex-direction: column; }
+            .size-row { flex-direction: column; }
         }
     </style>
 </head>
@@ -79,7 +78,7 @@
 <div class="container">
     <div class="header">
         <h1>📋 Смета</h1>
-        <p>Выберите категорию → выберите позицию → укажите количество</p>
+        <p>Выберите категорию → выберите позицию → укажите параметры</p>
     </div>
     
     <div class="two-columns">
@@ -102,61 +101,8 @@
                 <div class="info-line"><span class="info-label">💰 Цена за ед.</span><span class="info-value" id="priceValue">—</span></div>
             </div>
             
-            <!-- Блок для материалов -->
-            <div id="materialCalcPanel" style="display:none;">
-                <!-- Если размер найден в таблице -->
-                <div id="parsedSizePanel" style="display:none;" class="parsed-size-info">
-                    📐 Размер из таблицы: <span id="parsedSizeText" class="value"></span>
-                    <div style="font-size:12px; margin-top:5px;">→ Площадь: <span id="parsedArea" class="value"></span> м²</div>
-                </div>
-                
-                <!-- Если размера нет в таблице -->
-                <div id="manualSizePanel" style="display:none;">
-                    <div class="calc-type-select">
-                        <button type="button" class="calc-type-btn active" data-calc="area" onclick="setCalcType('area')">📏 По площади</button>
-                        <button type="button" class="calc-type-btn" data-calc="length" onclick="setCalcType('length')">📐 По длине</button>
-                        <button type="button" class="calc-type-btn" data-calc="piece" onclick="setCalcType('piece')">🔢 Поштучно</button>
-                    </div>
-                    
-                    <div id="areaInputs">
-                        <div class="size-input-row">
-                            <div class="size-field"><label>Ширина (м)</label><input type="number" id="areaWidth" value="1" step="0.01" placeholder="м"></div>
-                            <div class="size-field"><label>Высота (м)</label><input type="number" id="areaHeight" value="1" step="0.01" placeholder="м"></div>
-                            <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="areaCount" value="1" step="1" placeholder="шт"></div>
-                        </div>
-                        <div class="calc-hint">📐 Площадь = Ширина × Высота × Кол-во</div>
-                    </div>
-                    
-                    <div id="lengthInputs" style="display:none;">
-                        <div class="size-input-row">
-                            <div class="size-field"><label>Длина (м)</label><input type="number" id="lengthValue" value="1" step="0.1" placeholder="м"></div>
-                            <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="lengthCount" value="1" step="1" placeholder="шт"></div>
-                        </div>
-                        <div class="calc-hint">📐 Общая длина = Длина × Кол-во</div>
-                    </div>
-                    
-                    <div id="pieceInputs" style="display:none;">
-                        <div class="size-input-row">
-                            <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="pieceCount" value="1" step="1" placeholder="шт"></div>
-                        </div>
-                        <div class="calc-hint">🔢 Стоимость = Цена × Количество</div>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <label>🔢 Количество единиц</label>
-                    <input type="number" id="materialQuantity" value="1" step="1">
-                </div>
-            </div>
-            
-            <!-- Блок для работ -->
-            <div id="workCalcPanel" style="display:none;">
-                <div class="form-row">
-                    <label>🔢 Количество</label>
-                    <input type="number" id="workQuantity" value="1" step="1">
-                </div>
-                <div class="calc-hint">💰 Стоимость = Цена × Количество</div>
-            </div>
+            <!-- Динамическая карточка расчёта -->
+            <div id="calcCard" class="calc-card" style="display:none;"></div>
             
             <div class="price-preview">
                 <div class="label">ИТОГО ЗА ПОЗИЦИЮ</div>
@@ -167,74 +113,230 @@
         </div>
     </div>
     
-    <div class="estimate-header"><h2>📋 Смета</h2><div class="estimate-total" id="totalEstimate">0 ₽</div></div>
+    <div class="estimate-header">
+        <h2>📋 Смета</h2>
+        <div class="estimate-total" id="totalEstimate">0 ₽</div>
+    </div>
     <div class="table-wrapper">
         <table>
-            <thead><tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr></thead>
-            <tbody id="estimateBody"><tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr></tbody>
+            <thead>
+                <tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
+            </thead>
+            <tbody id="estimateBody">
+                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>
+            </tbody>
         </table>
     </div>
-    <button class="export-btn" onclick="exportEstimate()">📤 Экспорт в CSV</button>
+    <div class="export-buttons">
+        <button class="export-btn" onclick="exportToExcel()">📎 Экспорт в Excel (CSV)</button>
+        <button class="export-btn" onclick="copyEstimate()">📋 Копировать таблицу</button>
+        <button class="export-btn" onclick="clearEstimate()">🗑️ Очистить смету</button>
+    </div>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxqcZfgZ9cyIAnY3u_P0XD5Nv7ZpD4IohzltLtFDOjVhbgeagNgDp0mN0MeHP9dBkm-/exec";
+    const API_URL = "https://script.google.com/macros/s/ТВОЯ_НОВАЯ_ССЫЛКА/exec";
     
     let catalog = { materials: [], works: [] };
     let materialCategories = [], workCategories = [];
     let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
     let estimateItems = [];
-    let currentCalcType = 'area';
-    let parsedSizeData = null; // { width, height, area, original }
-
+    
+    // Определение типа расчёта по единице измерения
+    function getCalcType(unit, size) {
+        const unitLower = (unit || '').toLowerCase();
+        
+        // Площадь
+        if (unitLower.includes('м²') || unitLower.includes('м.кв') || unitLower.includes('кв.м')) {
+            return 'area';
+        }
+        // Длина
+        if (unitLower.includes('м.п') || unitLower === 'м' || unitLower.includes('пог.м')) {
+            return 'length';
+        }
+        // Поштучно / остальное
+        return 'piece';
+    }
+    
+    // Парсинг размера из таблицы
     function parseSize(sizeStr) {
         if (!sizeStr || sizeStr === '') return null;
-        
         const str = String(sizeStr).trim();
         
-        // Формат: 2030х3050 или 2030x3050
+        // Формат: 2030х3050, 2030x3050, 2030×3050
         let match = str.match(/(\d+)[хxX×](\d+)/);
         if (match) {
-            const width_mm = parseFloat(match[1]);
-            const height_mm = parseFloat(match[2]);
-            const width_m = width_mm / 1000;
-            const height_m = height_mm / 1000;
-            return {
-                width: width_m,
-                height: height_m,
-                area: width_m * height_m,
-                original: str,
-                unit: 'м²',
-                type: 'area'
-            };
+            const w = parseFloat(match[1]) / 1000;
+            const h = parseFloat(match[2]) / 1000;
+            return { type: 'area', value: w * h, original: str, width: w, height: h };
         }
         
         // Формат: 6000мм, 6000 мм
         match = str.match(/(\d+)\s*мм/i);
         if (match) {
-            const length_mm = parseFloat(match[1]);
-            const length_m = length_mm / 1000;
-            return {
-                length: length_m,
-                original: str,
-                unit: 'м.п',
-                type: 'length'
-            };
+            return { type: 'length', value: parseFloat(match[1]) / 1000, original: str };
         }
         
         // Формат: 2.7м, 2,7м
         match = str.match(/(\d+[.,]?\d*)\s*м/i);
         if (match) {
-            const length = parseFloat(match[1].replace(',', '.'));
-            return {
-                length: length,
-                original: str,
-                unit: 'м.п',
-                type: 'length'
-            };
+            return { type: 'length', value: parseFloat(match[1].replace(',', '.')), original: str };
         }
         
         return null;
+    }
+    
+    // Построение интерфейса расчёта
+    function buildCalcInterface() {
+        const calcCard = document.getElementById('calcCard');
+        if (!currentItem) return;
+        
+        const calcType = getCalcType(currentItem.unit, currentItem.size);
+        const parsedSize = parseSize(currentItem.size);
+        
+        let html = '';
+        
+        if (calcType === 'area') {
+            if (parsedSize && parsedSize.type === 'area') {
+                // АВТО: размер из таблицы
+                html = `
+                    <div class="parsed-info">
+                        📐 Размер из таблицы: <span class="value">${parsedSize.original}</span><br>
+                        → Площадь одного листа: <span class="value">${parsedSize.value.toFixed(2)} м²</span>
+                    </div>
+                    <div class="form-row">
+                        <label>🔢 Количество листов</label>
+                        <input type="number" id="areaQty" value="1" step="1" min="1">
+                    </div>
+                    <div class="calc-result" id="calcResult"></div>
+                `;
+            } else {
+                // РУЧНОЙ: ввод ширины и высоты
+                html = `
+                    <div class="form-row"><label>📐 Введите размеры</label></div>
+                    <div class="size-row">
+                        <div class="size-field"><label>Ширина (м)</label><input type="number" id="areaWidth" value="1" step="0.01" placeholder="м"></div>
+                        <div class="size-field"><label>Высота (м)</label><input type="number" id="areaHeight" value="1" step="0.01" placeholder="м"></div>
+                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="areaCount" value="1" step="1" placeholder="шт"></div>
+                    </div>
+                    <div class="calc-result" id="calcResult"></div>
+                `;
+            }
+        } 
+        else if (calcType === 'length') {
+            if (parsedSize && parsedSize.type === 'length') {
+                // АВТО: размер из таблицы
+                html = `
+                    <div class="parsed-info">
+                        📏 Размер из таблицы: <span class="value">${parsedSize.original}</span><br>
+                        → Длина одной штуки: <span class="value">${parsedSize.value.toFixed(2)} м</span>
+                    </div>
+                    <div class="form-row">
+                        <label>🔢 Количество штук</label>
+                        <input type="number" id="lengthQty" value="1" step="1" min="1">
+                    </div>
+                    <div class="calc-result" id="calcResult"></div>
+                `;
+            } else {
+                // РУЧНОЙ: ввод длины
+                html = `
+                    <div class="form-row"><label>📏 Введите размеры</label></div>
+                    <div class="size-row">
+                        <div class="size-field"><label>Длина (м)</label><input type="number" id="lengthVal" value="1" step="0.1" placeholder="м"></div>
+                        <div class="size-field"><label>Кол-во (шт)</label><input type="number" id="lengthCount" value="1" step="1" placeholder="шт"></div>
+                    </div>
+                    <div class="calc-result" id="calcResult"></div>
+                `;
+            }
+        } 
+        else {
+            // Поштучно
+            html = `
+                <div class="form-row">
+                    <label>🔢 Количество</label>
+                    <input type="number" id="pieceQty" value="1" step="1" min="1">
+                </div>
+                <div class="calc-result" id="calcResult"></div>
+            `;
+        }
+        
+        calcCard.innerHTML = html;
+        calcCard.style.display = 'block';
+        
+        // Привязываем события
+        if (calcType === 'area') {
+            if (parsedSize && parsedSize.type === 'area') {
+                document.getElementById('areaQty').addEventListener('input', calculateTotal);
+            } else {
+                document.getElementById('areaWidth').addEventListener('input', calculateTotal);
+                document.getElementById('areaHeight').addEventListener('input', calculateTotal);
+                document.getElementById('areaCount').addEventListener('input', calculateTotal);
+            }
+        } else if (calcType === 'length') {
+            if (parsedSize && parsedSize.type === 'length') {
+                document.getElementById('lengthQty').addEventListener('input', calculateTotal);
+            } else {
+                document.getElementById('lengthVal').addEventListener('input', calculateTotal);
+                document.getElementById('lengthCount').addEventListener('input', calculateTotal);
+            }
+        } else {
+            document.getElementById('pieceQty').addEventListener('input', calculateTotal);
+        }
+        
+        calculateTotal();
+    }
+    
+    function calculateTotal() {
+        if (!currentItem) return 0;
+        
+        const calcType = getCalcType(currentItem.unit, currentItem.size);
+        const parsedSize = parseSize(currentItem.size);
+        let total = 0, quantity = 0, calcText = '';
+        
+        if (calcType === 'area') {
+            if (parsedSize && parsedSize.type === 'area') {
+                const qty = parseFloat(document.getElementById('areaQty')?.value) || 0;
+                const areaOne = parsedSize.value;
+                total = areaOne * currentItem.price * qty;
+                quantity = qty;
+                calcText = `${qty} шт × ${areaOne.toFixed(2)}м² × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+            } else {
+                const width = parseFloat(document.getElementById('areaWidth')?.value) || 0;
+                const height = parseFloat(document.getElementById('areaHeight')?.value) || 0;
+                const count = parseFloat(document.getElementById('areaCount')?.value) || 0;
+                const area = width * height;
+                total = area * currentItem.price * count;
+                quantity = count;
+                calcText = `${width}м × ${height}м = ${area.toFixed(2)}м² × ${count}шт × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+            }
+        } 
+        else if (calcType === 'length') {
+            if (parsedSize && parsedSize.type === 'length') {
+                const qty = parseFloat(document.getElementById('lengthQty')?.value) || 0;
+                const lengthOne = parsedSize.value;
+                total = lengthOne * currentItem.price * qty;
+                quantity = qty;
+                calcText = `${qty} шт × ${lengthOne.toFixed(2)}м × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+            } else {
+                const length = parseFloat(document.getElementById('lengthVal')?.value) || 0;
+                const count = parseFloat(document.getElementById('lengthCount')?.value) || 0;
+                total = length * currentItem.price * count;
+                quantity = count;
+                calcText = `${length}м × ${count}шт × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+            }
+        } 
+        else {
+            const qty = parseFloat(document.getElementById('pieceQty')?.value) || 0;
+            total = qty * currentItem.price;
+            quantity = qty;
+            calcText = `${qty} ${currentItem.unit} × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+        }
+        
+        document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
+        const calcResult = document.getElementById('calcResult');
+        if (calcResult) calcResult.innerHTML = calcText;
+        
+        return { total, quantity, calcText };
     }
     
     function loadCatalog() {
@@ -311,11 +413,9 @@
         currentCategory = null;
         currentItems = [];
         currentItem = null;
-        parsedSizeData = null;
         document.getElementById('itemSelect').innerHTML = '<option value="">Сначала выберите категорию</option>';
         document.getElementById('infoPanel').style.display = 'none';
-        document.getElementById('materialCalcPanel').style.display = 'none';
-        document.getElementById('workCalcPanel').style.display = 'none';
+        document.getElementById('calcCard').style.display = 'none';
         document.getElementById('rowTotal').innerHTML = '0 ₽';
     }
     
@@ -331,12 +431,8 @@
         currentItems = [];
         if (type === 'material') {
             catalog.materials.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: 'material' }); });
-            document.getElementById('materialCalcPanel').style.display = 'block';
-            document.getElementById('workCalcPanel').style.display = 'none';
         } else {
             catalog.works.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: 'work' }); });
-            document.getElementById('materialCalcPanel').style.display = 'none';
-            document.getElementById('workCalcPanel').style.display = 'block';
         }
         
         const select = document.getElementById('itemSelect');
@@ -352,22 +448,9 @@
         });
         
         document.getElementById('infoPanel').style.display = 'none';
+        document.getElementById('calcCard').style.display = 'none';
         document.getElementById('rowTotal').innerHTML = '0 ₽';
         currentItem = null;
-    }
-    
-    function setCalcType(type) {
-        currentCalcType = type;
-        document.querySelectorAll('.calc-type-btn').forEach(btn => {
-            if (btn.dataset.calc === type) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-        
-        document.getElementById('areaInputs').style.display = type === 'area' ? 'block' : 'none';
-        document.getElementById('lengthInputs').style.display = type === 'length' ? 'block' : 'none';
-        document.getElementById('pieceInputs').style.display = type === 'piece' ? 'block' : 'none';
-        
-        calculateMaterialTotal();
     }
     
     function fillDetails() {
@@ -383,28 +466,6 @@
         document.getElementById('unitValue').innerHTML = selected.unit || '—';
         document.getElementById('priceValue').innerHTML = selected.price ? selected.price.toLocaleString('ru-RU') + ' ₽' : '—';
         
-        // Парсим размер из таблицы
-        parsedSizeData = parseSize(selected.size);
-        
-        if (currentType === 'material') {
-            if (parsedSizeData) {
-                // Размер найден в таблице — показываем автоматический расчёт
-                document.getElementById('parsedSizePanel').style.display = 'block';
-                document.getElementById('manualSizePanel').style.display = 'none';
-                document.getElementById('parsedSizeText').innerHTML = parsedSizeData.original;
-                if (parsedSizeData.type === 'area') {
-                    document.getElementById('parsedArea').innerHTML = parsedSizeData.area.toFixed(2);
-                } else if (parsedSizeData.type === 'length') {
-                    document.getElementById('parsedArea').innerHTML = parsedSizeData.length.toFixed(2) + ' м';
-                }
-            } else {
-                // Размера нет — показываем поля для ручного ввода
-                document.getElementById('parsedSizePanel').style.display = 'none';
-                document.getElementById('manualSizePanel').style.display = 'block';
-                setCalcType('area');
-            }
-        }
-        
         currentItem = {
             type: currentType === 'material' ? 'Материал' : 'Работа',
             category: currentCategory,
@@ -412,80 +473,59 @@
             unit: selected.unit || '—',
             price: parseFloat(selected.price) || 0,
             size: selected.size || '',
-            parsedSize: parsedSizeData
+            parsedSize: parseSize(selected.size)
         };
         
-        if (currentType === 'material') calculateMaterialTotal();
-        else calculateWorkTotal();
-    }
-    
-    function calculateMaterialTotal() {
-        if (!currentItem) return 0;
-        let total = 0, qty = 0, calcText = '';
-        
-        const unitQty = parseFloat(document.getElementById('materialQuantity').value) || 0;
-        
-        if (parsedSizeData) {
-            // Размер из таблицы — считаем автоматически
-            if (parsedSizeData.type === 'area') {
-                total = parsedSizeData.area * currentItem.price * unitQty;
-                calcText = `${parsedSizeData.original} = ${parsedSizeData.area.toFixed(2)}м² × ${unitQty}шт`;
-                qty = unitQty;
-            } else if (parsedSizeData.type === 'length') {
-                total = parsedSizeData.length * currentItem.price * unitQty;
-                calcText = `${parsedSizeData.original} = ${parsedSizeData.length.toFixed(2)}м × ${unitQty}шт`;
-                qty = unitQty;
-            }
-        } else {
-            // Ручной ввод размеров
-            if (currentCalcType === 'area') {
-                const width = parseFloat(document.getElementById('areaWidth').value) || 0;
-                const height = parseFloat(document.getElementById('areaHeight').value) || 0;
-                const count = parseFloat(document.getElementById('areaCount').value) || 0;
-                const area = width * height;
-                total = area * currentItem.price * count;
-                qty = count;
-                calcText = `${width}×${height}м = ${area.toFixed(2)}м² × ${count}шт`;
-            } else if (currentCalcType === 'length') {
-                const length = parseFloat(document.getElementById('lengthValue').value) || 0;
-                const count = parseFloat(document.getElementById('lengthCount').value) || 0;
-                total = length * currentItem.price * count;
-                qty = count;
-                calcText = `${length}м × ${count}шт`;
-            } else {
-                const count = parseFloat(document.getElementById('pieceCount').value) || 0;
-                total = count * currentItem.price;
-                qty = count;
-                calcText = `${count}шт`;
-            }
-        }
-        
-        document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
-        return { total, qty, calcText };
-    }
-    
-    function calculateWorkTotal() {
-        if (!currentItem) return 0;
-        const qty = parseFloat(document.getElementById('workQuantity').value) || 0;
-        const total = qty * currentItem.price;
-        document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
-        return { total, qty, calcText: `${qty} ${currentItem.unit}` };
+        buildCalcInterface();
     }
     
     function addToEstimate() {
         if (!currentItem || !currentItem.name) { alert('Выберите позицию'); return; }
         
-        let total = 0, qty = 0, calcText = '';
+        const calcType = getCalcType(currentItem.unit, currentItem.size);
+        const parsedSize = parseSize(currentItem.size);
+        let total = 0, quantity = 0, calcText = '';
         
-        if (currentType === 'material') {
-            const result = calculateMaterialTotal();
-            total = result.total; qty = result.qty; calcText = result.calcText;
-        } else {
-            const result = calculateWorkTotal();
-            total = result.total; qty = result.qty; calcText = result.calcText;
+        if (calcType === 'area') {
+            if (parsedSize && parsedSize.type === 'area') {
+                const qty = parseFloat(document.getElementById('areaQty')?.value) || 0;
+                const areaOne = parsedSize.value;
+                total = areaOne * currentItem.price * qty;
+                quantity = qty;
+                calcText = `${qty} шт × ${areaOne.toFixed(2)}м²`;
+            } else {
+                const width = parseFloat(document.getElementById('areaWidth')?.value) || 0;
+                const height = parseFloat(document.getElementById('areaHeight')?.value) || 0;
+                const count = parseFloat(document.getElementById('areaCount')?.value) || 0;
+                const area = width * height;
+                total = area * currentItem.price * count;
+                quantity = count;
+                calcText = `${width}м × ${height}м = ${area.toFixed(2)}м² × ${count}шт`;
+            }
+        } 
+        else if (calcType === 'length') {
+            if (parsedSize && parsedSize.type === 'length') {
+                const qty = parseFloat(document.getElementById('lengthQty')?.value) || 0;
+                const lengthOne = parsedSize.value;
+                total = lengthOne * currentItem.price * qty;
+                quantity = qty;
+                calcText = `${qty} шт × ${lengthOne.toFixed(2)}м`;
+            } else {
+                const length = parseFloat(document.getElementById('lengthVal')?.value) || 0;
+                const count = parseFloat(document.getElementById('lengthCount')?.value) || 0;
+                total = length * currentItem.price * count;
+                quantity = count;
+                calcText = `${length}м × ${count}шт`;
+            }
+        } 
+        else {
+            const qty = parseFloat(document.getElementById('pieceQty')?.value) || 0;
+            total = qty * currentItem.price;
+            quantity = qty;
+            calcText = `${qty} ${currentItem.unit}`;
         }
         
-        if (total === 0) { alert('Укажите размеры или количество'); return; }
+        if (total === 0) { alert('Укажите параметры расчёта'); return; }
         
         estimateItems.push({
             type: currentItem.type,
@@ -493,12 +533,13 @@
             name: currentItem.name,
             calcText: calcText,
             unit: currentItem.unit,
-            quantity: qty,
+            quantity: quantity,
             price: currentItem.price,
             total: total
         });
         
         renderEstimate();
+        document.getElementById('rowTotal').innerHTML = '0 ₽';
     }
     
     function renderEstimate() {
@@ -535,13 +576,37 @@
         localStorage.setItem('estimate', JSON.stringify(estimateItems));
     }
     
-    function exportEstimate() {
+    function exportToExcel() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-        let csv = "Тип,Категория,Наименование,Расчёт,Ед.изм,Кол-во,Цена/ед,Итого\n";
-        estimateItems.forEach(i => {
-            csv += `"${i.type}","${i.category}","${i.name}","${i.calcText}","${i.unit}",${i.quantity},${i.price.toFixed(2)},${i.total.toFixed(2)}\n`;
+        
+        let csvRows = [];
+        
+        // Заголовки
+        csvRows.push(['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед (₽)', 'Итого (₽)'].join(','));
+        
+        // Данные
+        estimateItems.forEach(item => {
+            const row = [
+                `"${item.type}"`,
+                `"${item.category}"`,
+                `"${item.name}"`,
+                `"${item.calcText}"`,
+                `"${item.unit}"`,
+                item.quantity,
+                item.price.toFixed(2).replace('.', ','),
+                item.total.toFixed(2).replace('.', ',')
+            ];
+            csvRows.push(row.join(','));
         });
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        
+        // Пустая строка
+        csvRows.push('');
+        
+        // Итоговая строка
+        const grandTotal = estimateItems.reduce((sum, i) => sum + i.total, 0);
+        csvRows.push([`"ИТОГО"`, '', '', '', '', '', '', `"${grandTotal.toFixed(2).replace('.', ',')} ₽"`].join(','));
+        
+        const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
@@ -549,15 +614,28 @@
         URL.revokeObjectURL(link.href);
     }
     
+    function copyEstimate() {
+        if (estimateItems.length === 0) { alert('Смета пуста'); return; }
+        
+        let text = 'Тип\tКатегория\tНаименование\tРасчёт\tЕд.изм\tКол-во\tЦена/ед (₽)\tИтого (₽)\n';
+        estimateItems.forEach(item => {
+            text += `${item.type}\t${item.category}\t${item.name}\t${item.calcText}\t${item.unit}\t${item.quantity}\t${item.price.toFixed(2)}\t${item.total.toFixed(2)}\n`;
+        });
+        const grandTotal = estimateItems.reduce((sum, i) => sum + i.total, 0);
+        text += `\nИТОГО:\t\t\t\t\t\t\t${grandTotal.toFixed(2)} ₽`;
+        
+        navigator.clipboard.writeText(text);
+        alert('✅ Таблица скопирована в буфер обмена');
+    }
+    
+    function clearEstimate() {
+        if (confirm('Очистить всю смету?')) {
+            estimateItems = [];
+            renderEstimate();
+        }
+    }
+    
     document.getElementById('itemSelect').addEventListener('change', fillDetails);
-    document.getElementById('materialQuantity').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('areaWidth').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('areaHeight').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('areaCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('lengthValue').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('lengthCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('pieceCount').addEventListener('input', () => { if (currentType === 'material') calculateMaterialTotal(); });
-    document.getElementById('workQuantity').addEventListener('input', () => { if (currentType === 'work') calculateWorkTotal(); });
     
     const saved = localStorage.getItem('estimate');
     if (saved) { try { estimateItems = JSON.parse(saved); renderEstimate(); } catch(e) {} }
