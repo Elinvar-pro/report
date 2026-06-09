@@ -74,28 +74,34 @@
             text-transform: uppercase;
             color: #8a99a8;
             letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            margin-top: 16px;
+        }
+        
+        .categories-title:first-of-type {
+            margin-top: 0;
         }
         
         .category-list {
             display: flex;
             flex-direction: column;
             gap: 6px;
+            margin-bottom: 20px;
         }
         
         .category-btn {
             background: #f8f9fc;
             border: none;
             border-radius: 14px;
-            padding: 14px 16px;
+            padding: 12px 16px;
             text-align: left;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: #2c3e50;
             border: 1px solid transparent;
         }
@@ -111,7 +117,13 @@
         }
         
         .category-icon {
-            font-size: 20px;
+            font-size: 18px;
+        }
+        
+        .separator {
+            height: 1px;
+            background: #e8ecf0;
+            margin: 16px 0;
         }
         
         .form-row {
@@ -138,20 +150,33 @@
             font-family: inherit;
         }
         
-        .form-row select:focus, .form-row input:focus {
-            outline: none;
-            border-color: #2e7d32;
-            box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+        .selected-info {
+            background: #f8f9fc;
+            border-radius: 16px;
+            padding: 16px;
+            margin: 16px 0;
         }
         
-        .info-row {
+        .info-line {
             display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e8ecf0;
         }
         
-        .info-field {
-            flex: 1;
+        .info-line:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #6c7a8a;
+            font-size: 13px;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #1a2a3a;
+            font-size: 15px;
         }
         
         .price-preview {
@@ -271,21 +296,12 @@
             border-radius: 30px;
             font-size: 13px;
             cursor: pointer;
-        }
-        
-        .size-badge {
-            display: inline-block;
-            background: #eef2f7;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #4a5a6a;
-            margin-top: 8px;
+            margin-top: 16px;
+            width: 100%;
         }
         
         @media (max-width: 700px) {
             body { padding: 16px; }
-            .info-row { flex-direction: column; }
             .two-columns { flex-direction: column; }
         }
     </style>
@@ -294,36 +310,50 @@
 <div class="container">
     <div class="header">
         <h1>📋 Смета</h1>
-        <p>Выберите категорию и позицию, укажите количество</p>
+        <p>Выберите категорию → выберите позицию → укажите количество</p>
     </div>
     
     <div class="two-columns">
         <div class="left-panel">
-            <div class="categories-title">КАТЕГОРИИ</div>
-            <div class="category-list" id="categoryList">
-                <div style="text-align:center; padding:20px;">Загрузка...</div>
+            <div style="margin-bottom: 16px;">
+                <div class="categories-title">📦 МАТЕРИАЛЫ</div>
+                <div class="category-list" id="materialsList">
+                    <div style="text-align:center; padding:20px;">Загрузка...</div>
+                </div>
             </div>
-            <button class="refresh-btn" onclick="loadCatalog()" style="margin-top: 20px; width:100%;">🔄 Обновить</button>
+            
+            <div class="separator"></div>
+            
+            <div>
+                <div class="categories-title">🔧 РАБОТЫ И УСЛУГИ</div>
+                <div class="category-list" id="worksList">
+                    <div style="text-align:center; padding:20px;">Загрузка...</div>
+                </div>
+            </div>
+            
+            <button class="refresh-btn" onclick="loadCatalog()">🔄 Обновить</button>
         </div>
         
         <div class="right-panel">
             <div class="form-row">
-                <label>📦 Что добавляем?</label>
+                <label>📦 Позиция</label>
                 <select id="itemSelect">
                     <option>Сначала выберите категорию</option>
                 </select>
             </div>
             
-            <div id="sizeContainer" class="size-badge" style="display:none;"></div>
-            
-            <div class="info-row">
-                <div class="info-field">
-                    <label>📏 Ед. измерения</label>
-                    <input type="text" id="unit" readonly placeholder="—">
+            <div id="infoPanel" style="display:none;" class="selected-info">
+                <div class="info-line">
+                    <span class="info-label">📏 Размер</span>
+                    <span class="info-value" id="sizeValue">—</span>
                 </div>
-                <div class="info-field">
-                    <label>💰 Цена за ед.</label>
-                    <input type="text" id="price" readonly placeholder="—">
+                <div class="info-line">
+                    <span class="info-label">📐 Ед. измерения</span>
+                    <span class="info-value" id="unitValue">—</span>
+                </div>
+                <div class="info-line">
+                    <span class="info-label">💰 Цена за единицу</span>
+                    <span class="info-value" id="priceValue">—</span>
                 </div>
             </div>
             
@@ -345,8 +375,8 @@
         <h2>📋 Смета</h2>
         <div class="estimate-total" id="totalEstimate">0 ₽</div>
     </div>
-    <div class="table-wrapper" id="estimateWrapper">
-        <table id="estimateTable">
+    <div class="table-wrapper">
+        <table>
             <thead>
                 <tr><th>Категория</th><th>Наименование</th><th>Размер</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
             </thead>
@@ -362,15 +392,20 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbxhR6KETtE_Qh5P7fJdX4DqtWaup0fxduXIOCkglA0guCGmfnXWCN4152ake19J92O6_w/exec";
     
     let catalog = { materials: [], works: [] };
-    let allCategories = [];
+    let materialCategories = [];
+    let workCategories = [];
+    
+    let currentType = null;      // 'material' или 'work'
     let currentCategory = null;
     let currentItems = [];
     let currentItem = null;
     let estimateItems = [];
 
     function loadCatalog() {
-        const categoryDiv = document.getElementById('categoryList');
-        categoryDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка...</div>';
+        const materialsDiv = document.getElementById('materialsList');
+        const worksDiv = document.getElementById('worksList');
+        materialsDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка...</div>';
+        worksDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка...</div>';
         
         const callbackName = 'jsonp_callback_' + Math.random().toString(36).substr(2);
         window[callbackName] = function(data) {
@@ -378,13 +413,17 @@
             document.body.removeChild(script);
             catalog = data;
             
-            const categoriesSet = new Set();
-            catalog.materials.forEach(item => { if (item.group) categoriesSet.add(item.group); });
-            catalog.works.forEach(item => { if (item.group) categoriesSet.add(item.group); });
-            allCategories = Array.from(categoriesSet).sort();
+            // Собираем категории материалов (из Листа1)
+            const matSet = new Set();
+            catalog.materials.forEach(item => { if (item.group) matSet.add(item.group); });
+            materialCategories = Array.from(matSet).sort();
+            
+            // Собираем категории работ (из Листа2)
+            const workSet = new Set();
+            catalog.works.forEach(item => { if (item.group) workSet.add(item.group); });
+            workCategories = Array.from(workSet).sort();
             
             renderCategories();
-            if (allCategories.length > 0) selectCategory(allCategories[0]);
         };
         
         const script = document.createElement('script');
@@ -392,21 +431,58 @@
         script.onerror = () => {
             delete window[callbackName];
             document.body.removeChild(script);
-            categoryDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки</div>';
+            materialsDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки</div>';
+            worksDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки</div>';
         };
         document.body.appendChild(script);
     }
     
     function renderCategories() {
-        const container = document.getElementById('categoryList');
-        container.innerHTML = '';
-        allCategories.forEach(cat => {
-            const btn = document.createElement('button');
-            btn.className = 'category-btn';
-            btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
-            btn.onclick = () => selectCategory(cat);
-            container.appendChild(btn);
+        // Материалы
+        const materialsDiv = document.getElementById('materialsList');
+        materialsDiv.innerHTML = '';
+        if (materialCategories.length === 0) {
+            materialsDiv.innerHTML = '<div style="color:#8a99a8; text-align:center; padding:20px;">Нет данных</div>';
+        } else {
+            materialCategories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
+                btn.onclick = () => selectCategory('material', cat);
+                materialsDiv.appendChild(btn);
+            });
+        }
+        
+        // Работы и услуги
+        const worksDiv = document.getElementById('worksList');
+        worksDiv.innerHTML = '';
+        if (workCategories.length === 0) {
+            worksDiv.innerHTML = '<div style="color:#8a99a8; text-align:center; padding:20px;">Нет данных</div>';
+        } else {
+            workCategories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn';
+                btn.innerHTML = `<span class="category-icon">${getIcon(cat)}</span><span>${cat}</span>`;
+                btn.onclick = () => selectCategory('work', cat);
+                worksDiv.appendChild(btn);
+            });
+        }
+        
+        // Снимаем активность со всех кнопок
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
+        
+        // Сбрасываем выбор
+        currentType = null;
+        currentCategory = null;
+        currentItems = [];
+        const select = document.getElementById('itemSelect');
+        select.innerHTML = '<option value="">Сначала выберите категорию</option>';
+        document.getElementById('infoPanel').style.display = 'none';
+        document.getElementById('quantity').value = 1;
+        document.getElementById('rowTotal').innerHTML = '0 ₽';
+        currentItem = null;
     }
     
     function getIcon(category) {
@@ -419,17 +495,41 @@
         return icons[category] || '📁';
     }
     
-    function selectCategory(category) {
+    function selectCategory(type, category) {
+        currentType = type;
         currentCategory = category;
+        
+        // Снимаем активность со всех кнопок
         document.querySelectorAll('.category-btn').forEach(btn => {
-            if (btn.innerText.includes(category)) btn.classList.add('active');
-            else btn.classList.remove('active');
+            btn.classList.remove('active');
         });
         
-        currentItems = [];
-        catalog.materials.forEach(item => { if (item.group === category) currentItems.push({ ...item, type: 'material' }); });
-        catalog.works.forEach(item => { if (item.group === category) currentItems.push({ ...item, type: 'work' }); });
+        // Подсвечиваем активную кнопку
+        const btns = document.querySelectorAll('.category-btn');
+        for (let btn of btns) {
+            if (btn.innerText.includes(category)) {
+                btn.classList.add('active');
+                break;
+            }
+        }
         
+        // Собираем позиции
+        currentItems = [];
+        if (type === 'material') {
+            catalog.materials.forEach(item => {
+                if (item.group === category) {
+                    currentItems.push({ ...item, itemType: 'material' });
+                }
+            });
+        } else {
+            catalog.works.forEach(item => {
+                if (item.group === category) {
+                    currentItems.push({ ...item, itemType: 'work' });
+                }
+            });
+        }
+        
+        // Заполняем выпадающий список
         const select = document.getElementById('itemSelect');
         select.innerHTML = '<option value="">Выберите позицию</option>';
         currentItems.forEach(item => {
@@ -439,13 +539,15 @@
             opt.dataset.unit = item.unit || '';
             opt.dataset.price = item.price || 0;
             opt.dataset.size = item.size || '';
-            opt.dataset.notes = item.notes || '';
+            opt.dataset.type = item.itemType;
             select.appendChild(opt);
         });
         
-        document.getElementById('unit').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('sizeContainer').style.display = 'none';
+        // Сбрасываем форму
+        document.getElementById('infoPanel').style.display = 'none';
+        document.getElementById('sizeValue').innerHTML = '—';
+        document.getElementById('unitValue').innerHTML = '—';
+        document.getElementById('priceValue').innerHTML = '—';
         document.getElementById('quantity').value = 1;
         document.getElementById('rowTotal').innerHTML = '0 ₽';
         currentItem = null;
@@ -459,25 +561,20 @@
         const selected = currentItems.find(item => item.name === opt.value);
         if (!selected) return;
         
-        document.getElementById('unit').value = selected.unit || '—';
-        document.getElementById('price').value = selected.price ? selected.price.toLocaleString('ru-RU') + ' ₽' : '—';
-        
-        // Показываем размер, если есть
-        if (selected.size && selected.size !== '') {
-            const sizeDiv = document.getElementById('sizeContainer');
-            sizeDiv.innerHTML = '📏 ' + selected.size;
-            sizeDiv.style.display = 'inline-block';
-        } else {
-            document.getElementById('sizeContainer').style.display = 'none';
-        }
+        // Показываем панель с информацией
+        document.getElementById('infoPanel').style.display = 'block';
+        document.getElementById('sizeValue').innerHTML = selected.size && selected.size !== '' ? selected.size : '—';
+        document.getElementById('unitValue').innerHTML = selected.unit || '—';
+        document.getElementById('priceValue').innerHTML = selected.price ? selected.price.toLocaleString('ru-RU') + ' ₽' : '—';
         
         currentItem = {
+            type: currentType === 'material' ? 'Материал' : 'Работа',
             category: currentCategory,
             name: selected.name,
             unit: selected.unit || '—',
             price: parseFloat(selected.price) || 0,
             size: selected.size || '',
-            type: selected.type
+            itemType: selected.itemType
         };
         calculateRowTotal();
     }
@@ -498,6 +595,7 @@
         }
         
         estimateItems.push({
+            type: currentItem.type,
             category: currentItem.category,
             name: currentItem.name,
             size: currentItem.size || '',
@@ -526,14 +624,15 @@
         estimateItems.forEach((item, idx) => {
             grand += item.total;
             const row = tbody.insertRow();
-            row.insertCell(0).innerHTML = item.category;
-            row.insertCell(1).innerHTML = item.name;
-            row.insertCell(2).innerHTML = item.size || '—';
-            row.insertCell(3).innerHTML = item.unit;
-            row.insertCell(4).innerHTML = item.quantity;
-            row.insertCell(5).innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
-            row.insertCell(6).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
-            const delCell = row.insertCell(7);
+            row.insertCell(0).innerHTML = item.type;
+            row.insertCell(1).innerHTML = item.category;
+            row.insertCell(2).innerHTML = item.name;
+            row.insertCell(3).innerHTML = item.size || '—';
+            row.insertCell(4).innerHTML = item.unit;
+            row.insertCell(5).innerHTML = item.quantity;
+            row.insertCell(6).innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
+            row.insertCell(7).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
+            const delCell = row.insertCell(8);
             const delBtn = document.createElement('button');
             delBtn.innerHTML = '🗑️';
             delBtn.className = 'delete-item';
@@ -547,9 +646,9 @@
     
     function exportEstimate() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-        let csv = "Категория,Наименование,Размер,Ед.изм,Кол-во,Цена/ед,Итого\n";
+        let csv = "Тип,Категория,Наименование,Размер,Ед.изм,Кол-во,Цена/ед,Итого\n";
         estimateItems.forEach(i => {
-            csv += `"${i.category}","${i.name}","${i.size || ''}","${i.unit}",${i.quantity},${i.price.toFixed(2)},${i.total.toFixed(2)}\n`;
+            csv += `"${i.type}","${i.category}","${i.name}","${i.size || ''}","${i.unit}",${i.quantity},${i.price.toFixed(2)},${i.total.toFixed(2)}\n`;
         });
         const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
