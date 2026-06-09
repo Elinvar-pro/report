@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест API</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Тест подключения к Apps Script</h1>
+    <button onclick="testAPI()">Проверить API</button>
+    <div id="result"></div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycby8q420E_z1oAl_tNHvGh_7BTIY25gILMiNfy5Ya2cdITi3JZ8dYBcUkNY1BQAv_I3YgQ/exec";
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Загрузка...';
+            
+            try {
+                const response = await fetch(API_URL);
+                const text = await response.text();
+                resultDiv.innerHTML = '<strong>✅ Успех!</strong><br>Ответ сервера:<br><pre>' + text + '</pre>';
+            } catch (error) {
+                resultDiv.innerHTML = '<strong>❌ Ошибка:</strong><br>' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
