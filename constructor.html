@@ -130,7 +130,7 @@
         </table>
     </div>
     <div class="export-buttons">
-        <button class="export-btn" onclick="exportToXLSX()">📥 Экспорт в Excel</button>
+        <button class="export-btn" onclick="exportToXLSX()">📥 Экспорт в Excel (XLSX)</button>
         <button class="export-btn" onclick="copyEstimate()">📋 Копировать таблицу</button>
         <button class="export-btn" onclick="clearEstimate()">🗑️ Очистить смету</button>
     </div>
@@ -316,130 +316,6 @@
         if (calcResult) calcResult.innerHTML = calcText;
         
         return { total, quantity, calcText };
-    }
-    
-    // XLSX экспорт (HTML-таблица как .xls — мгновенно, с полным форматированием)
-    function exportToXLSX() {
-        if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-        
-        const materials = estimateItems.filter(item => item.type === 'Материал');
-        const works = estimateItems.filter(item => item.type === 'Работа');
-        
-        let materialsSum = 0, worksSum = 0;
-        let materialsRows = '', worksRows = '';
-        
-        const cellBorder = 'border: 1px solid #000000;';
-        const cellPadding = 'padding: 6px 10px;';
-        const headerStyle = cellBorder + cellPadding + 'background: #2e7d32; color: #ffffff; font-weight: bold; text-align: center; font-size: 12px;';
-        const sectionStyle = cellBorder + cellPadding + 'background: #c8e6c9; color: #1a5d2a; font-weight: bold; font-size: 13px;';
-        const evenStyle = cellBorder + cellPadding + 'background: #ffffff;';
-        const oddStyle = cellBorder + cellPadding + 'background: #f5f5f5;';
-        const totalStyle = cellBorder + cellPadding + 'background: #fff9c4; font-weight: bold;';
-        const grandStyle = cellBorder + cellPadding + 'background: #ffcc02; font-weight: bold; font-size: 14px;';
-        const numStyle = 'text-align: right;';
-        const textStyle = 'text-align: left;';
-        
-        materials.forEach((item, idx) => {
-            materialsSum += item.total;
-            const style = idx % 2 === 0 ? evenStyle : oddStyle;
-            materialsRows += `<tr>
-                <td style="${style}${textStyle}">${escapeHtml(item.type)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.category)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.name)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.calcText)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.unit)}</td>
-                <td style="${style}${numStyle}">${item.quantity}</td>
-                <td style="${style}${numStyle}">${item.price.toFixed(2).replace('.', ',')} ₽</td>
-                <td style="${style}${numStyle} font-weight: bold;">${item.total.toFixed(2).replace('.', ',')} ₽</td>
-            </tr>`;
-        });
-        
-        works.forEach((item, idx) => {
-            worksSum += item.total;
-            const style = idx % 2 === 0 ? evenStyle : oddStyle;
-            worksRows += `<tr>
-                <td style="${style}${textStyle}">${escapeHtml(item.type)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.category)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.name)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.calcText)}</td>
-                <td style="${style}${textStyle}">${escapeHtml(item.unit)}</td>
-                <td style="${style}${numStyle}">${item.quantity}</td>
-                <td style="${style}${numStyle}">${item.price.toFixed(2).replace('.', ',')} ₽</td>
-                <td style="${style}${numStyle} font-weight: bold;">${item.total.toFixed(2).replace('.', ',')} ₽</td>
-            </tr>`;
-        });
-        
-        const grandTotal = materialsSum + worksSum;
-        
-        let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-<head>
-    <meta charset="UTF-8">
-    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
-        <x:Name>Смета</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
-    </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
-</head>
-<body>
-    <table cellspacing="0" style="border-collapse: collapse;">
-        <tr>
-            <td colspan="8" style="font-size: 16px; font-weight: bold; color: #1a5d2a; padding: 10px 0; text-align: center;">
-                📋 Смета от ${new Date().toLocaleString('ru-RU')}
-            </td>
-        </tr>
-        <tr>
-            <th style="${headerStyle}">Тип</th>
-            <th style="${headerStyle}">Категория</th>
-            <th style="${headerStyle}">Наименование</th>
-            <th style="${headerStyle}">Расчёт</th>
-            <th style="${headerStyle}">Ед.изм</th>
-            <th style="${headerStyle}">Кол-во</th>
-            <th style="${headerStyle}">Цена/ед</th>
-            <th style="${headerStyle}">Итого</th>
-        </tr>`;
-        
-        // Секция МАТЕРИАЛЫ
-        if (materialsRows.length > 0) {
-            html += `<tr><td colspan="8" style="${sectionStyle}">📦 МАТЕРИАЛЫ</td></tr>`;
-            html += materialsRows;
-            html += `<tr>
-                <td colspan="7" style="${totalStyle}${numStyle}">ИТОГО ПО МАТЕРИАЛАМ:</td>
-                <td style="${totalStyle}${numStyle}">${materialsSum.toFixed(2).replace('.', ',')} ₽</td>
-            </tr>`;
-        }
-        
-        // Секция РАБОТЫ И УСЛУГИ
-        if (worksRows.length > 0) {
-            html += `<tr><td colspan="8" style="${sectionStyle}">🔧 РАБОТЫ И УСЛУГИ</td></tr>`;
-            html += worksRows;
-            html += `<tr>
-                <td colspan="7" style="${totalStyle}${numStyle}">ИТОГО ПО РАБОТАМ:</td>
-                <td style="${totalStyle}${numStyle}">${worksSum.toFixed(2).replace('.', ',')} ₽</td>
-            </tr>`;
-        }
-        
-        // Общий итог
-        html += `<tr>
-            <td colspan="7" style="${grandStyle}${numStyle}">ВСЕГО ПО СМЕТЕ:</td>
-            <td style="${grandStyle}${numStyle}">${grandTotal.toFixed(2).replace('.', ',')} ₽</td>
-        </tr>`;
-        
-        html += `</table></body></html>`;
-        
-        const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
     }
     
     function copyEstimate() {
@@ -709,6 +585,212 @@
         
         document.getElementById('totalEstimate').innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
         localStorage.setItem('estimate', JSON.stringify(estimateItems));
+    }
+    
+    // Вспомогательная функция для ExcelJS
+    function applyBorder(row, fromCol, toCol) {
+        for (let i = fromCol; i <= toCol; i++) {
+            row.getCell(i).border = {
+                top: { style: 'thin' },
+                bottom: { style: 'thin' },
+                left: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        }
+    }
+    
+    // Экспорт в XLSX с полным форматированием (ExcelJS)
+    function exportToXLSX() {
+        if (estimateItems.length === 0) { alert('Смета пуста'); return; }
+        
+        if (typeof ExcelJS === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+            script.onload = () => exportToXLSX_do();
+            document.head.appendChild(script);
+            return;
+        }
+        
+        exportToXLSX_do();
+    }
+    
+    async function exportToXLSX_do() {
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Смета', {
+            views: [{ showGridLines: false }]
+        });
+        
+        sheet.columns = [
+            { width: 12 },
+            { width: 22 },
+            { width: 32 },
+            { width: 36 },
+            { width: 10 },
+            { width: 10 },
+            { width: 14 },
+            { width: 16 },
+        ];
+        
+        const materials = estimateItems.filter(item => item.type === 'Материал');
+        const works = estimateItems.filter(item => item.type === 'Работа');
+        
+        let rowNum = 1;
+        
+        // Заголовок
+        const titleRow = sheet.getRow(rowNum);
+        titleRow.getCell(1).value = 'Смета от ' + new Date().toLocaleString('ru-RU');
+        titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1A5D2A' } };
+        sheet.mergeCells(rowNum, 1, rowNum, 8);
+        titleRow.height = 30;
+        rowNum++;
+        
+        // Шапка таблицы
+        const headers = ['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед', 'Итого'];
+        const headerRow = sheet.getRow(rowNum);
+        headers.forEach((h, i) => {
+            headerRow.getCell(i + 1).value = h;
+            headerRow.getCell(i + 1).font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+            headerRow.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
+            headerRow.getCell(i + 1).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+        });
+        applyBorder(headerRow, 1, 8);
+        headerRow.height = 28;
+        rowNum++;
+        
+        let materialsSum = 0, worksSum = 0;
+        
+        // Секция МАТЕРИАЛЫ
+        if (materials.length > 0) {
+            const sectionRow = sheet.getRow(rowNum);
+            sectionRow.getCell(1).value = 'МАТЕРИАЛЫ';
+            sectionRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1A5D2A' } };
+            sectionRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
+            sheet.mergeCells(rowNum, 1, rowNum, 8);
+            applyBorder(sectionRow, 1, 8);
+            sectionRow.height = 26;
+            rowNum++;
+            
+            materials.forEach((item, idx) => {
+                materialsSum += item.total;
+                const row = sheet.getRow(rowNum);
+                const bgColor = idx % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
+                
+                const values = [
+                    item.type, item.category, item.name, item.calcText,
+                    item.unit, item.quantity,
+                    item.price.toFixed(2).replace('.', ',') + ' ₽',
+                    item.total.toFixed(2).replace('.', ',') + ' ₽'
+                ];
+                
+                values.forEach((v, i) => {
+                    row.getCell(i + 1).value = v;
+                    row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                    row.getCell(i + 1).alignment = {
+                        vertical: 'middle', wrapText: true,
+                        horizontal: (i >= 5) ? 'right' : 'left'
+                    };
+                });
+                
+                row.getCell(8).font = { bold: true };
+                applyBorder(row, 1, 8);
+                row.height = 22;
+                rowNum++;
+            });
+            
+            const totalRow = sheet.getRow(rowNum);
+            sheet.mergeCells(rowNum, 1, rowNum, 6);
+            totalRow.getCell(7).value = 'ИТОГО ПО МАТЕРИАЛАМ:';
+            totalRow.getCell(8).value = materialsSum.toFixed(2).replace('.', ',') + ' ₽';
+            totalRow.getCell(7).font = { bold: true };
+            totalRow.getCell(8).font = { bold: true };
+            totalRow.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+            totalRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+            totalRow.getCell(7).alignment = { horizontal: 'right', vertical: 'middle' };
+            totalRow.getCell(8).alignment = { horizontal: 'right', vertical: 'middle' };
+            applyBorder(totalRow, 1, 8);
+            totalRow.height = 24;
+            rowNum++;
+        }
+        
+        // Секция РАБОТЫ И УСЛУГИ
+        if (works.length > 0) {
+            rowNum++; // пустая строка
+            
+            const sectionRow = sheet.getRow(rowNum);
+            sectionRow.getCell(1).value = 'РАБОТЫ И УСЛУГИ';
+            sectionRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1A5D2A' } };
+            sectionRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
+            sheet.mergeCells(rowNum, 1, rowNum, 8);
+            applyBorder(sectionRow, 1, 8);
+            sectionRow.height = 26;
+            rowNum++;
+            
+            works.forEach((item, idx) => {
+                worksSum += item.total;
+                const row = sheet.getRow(rowNum);
+                const bgColor = idx % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
+                
+                const values = [
+                    item.type, item.category, item.name, item.calcText,
+                    item.unit, item.quantity,
+                    item.price.toFixed(2).replace('.', ',') + ' ₽',
+                    item.total.toFixed(2).replace('.', ',') + ' ₽'
+                ];
+                
+                values.forEach((v, i) => {
+                    row.getCell(i + 1).value = v;
+                    row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                    row.getCell(i + 1).alignment = {
+                        vertical: 'middle', wrapText: true,
+                        horizontal: (i >= 5) ? 'right' : 'left'
+                    };
+                });
+                
+                row.getCell(8).font = { bold: true };
+                applyBorder(row, 1, 8);
+                row.height = 22;
+                rowNum++;
+            });
+            
+            const totalRow = sheet.getRow(rowNum);
+            sheet.mergeCells(rowNum, 1, rowNum, 6);
+            totalRow.getCell(7).value = 'ИТОГО ПО РАБОТАМ:';
+            totalRow.getCell(8).value = worksSum.toFixed(2).replace('.', ',') + ' ₽';
+            totalRow.getCell(7).font = { bold: true };
+            totalRow.getCell(8).font = { bold: true };
+            totalRow.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+            totalRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+            totalRow.getCell(7).alignment = { horizontal: 'right', vertical: 'middle' };
+            totalRow.getCell(8).alignment = { horizontal: 'right', vertical: 'middle' };
+            applyBorder(totalRow, 1, 8);
+            totalRow.height = 24;
+            rowNum++;
+        }
+        
+        // Общий итог
+        rowNum++;
+        const grandTotal = materialsSum + worksSum;
+        const grandRow = sheet.getRow(rowNum);
+        sheet.mergeCells(rowNum, 1, rowNum, 6);
+        grandRow.getCell(7).value = 'ВСЕГО ПО СМЕТЕ:';
+        grandRow.getCell(8).value = grandTotal.toFixed(2).replace('.', ',') + ' ₽';
+        grandRow.getCell(7).font = { bold: true, size: 13 };
+        grandRow.getCell(8).font = { bold: true, size: 13 };
+        grandRow.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFCC02' } };
+        grandRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFCC02' } };
+        grandRow.getCell(7).alignment = { horizontal: 'right', vertical: 'middle' };
+        grandRow.getCell(8).alignment = { horizontal: 'right', vertical: 'middle' };
+        applyBorder(grandRow, 1, 8);
+        grandRow.height = 28;
+        
+        // Генерация файла
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
+        link.click();
+        URL.revokeObjectURL(link.href);
     }
     
     document.getElementById('itemSelect').addEventListener('change', fillDetails);
