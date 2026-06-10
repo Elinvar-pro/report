@@ -68,6 +68,7 @@
         .export-buttons { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
         .export-btn { background: white; border: 1px solid #2e7d32; color: #2e7d32; padding: 10px 20px; border-radius: 40px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
         .export-btn:hover { background: #e8f5e9; }
+        .export-btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .refresh-btn { background: #eef2f7; border: none; padding: 8px 16px; border-radius: 30px; font-size: 13px; cursor: pointer; margin-top: 16px; width: 100%; }
         
         @media (max-width: 700px) {
@@ -318,18 +319,42 @@
         return { total, quantity, calcText };
     }
     
+    // Экранирование HTML-спецсимволов
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Копирование сметы в буфер обмена (с экранированием)
     function copyEstimate() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
         let text = 'Тип\tКатегория\tНаименование\tРасчёт\tЕд.изм\tКол-во\tЦена/ед (₽)\tИтого (₽)\n';
         estimateItems.forEach(item => {
-            text += `${item.type}\t${item.category}\t${item.name}\t${item.calcText}\t${item.unit}\t${item.quantity}\t${item.price.toFixed(2)}\t${item.total.toFixed(2)}\n`;
+            text += [
+                escapeHtml(item.type),
+                escapeHtml(item.category),
+                escapeHtml(item.name),
+                escapeHtml(item.calcText),
+                escapeHtml(item.unit),
+                item.quantity,
+                item.price.toFixed(2),
+                item.total.toFixed(2)
+            ].join('\t') + '\n';
         });
         const grandTotal = estimateItems.reduce((sum, i) => sum + i.total, 0);
         text += `\nИТОГО:\t\t\t\t\t\t\t${grandTotal.toFixed(2)} ₽`;
         
-        navigator.clipboard.writeText(text);
-        alert('✅ Таблица скопирована в буфер обмена');
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Таблица скопирована в буфер обмена');
+        }).catch(() => {
+            alert('❌ Не удалось скопировать. Проверьте разрешения браузера.');
+        });
     }
     
     function clearEstimate() {
@@ -587,7 +612,7 @@
         localStorage.setItem('estimate', JSON.stringify(estimateItems));
     }
     
-    // Вспомогательная функция для ExcelJS
+    // Вспомогательная функция для ExcelJS — границы ячеек
     function applyBorder(row, fromCol, toCol) {
         for (let i = fromCol; i <= toCol; i++) {
             row.getCell(i).border = {
@@ -599,19 +624,112 @@
         }
     }
     
-    // Экспорт в XLSX с полным форматированием (ExcelJS)
+    // Экспорт в XLSX с полным форматированием (ExcelJS) + fallback на CSV при ошибке
     function exportToXLSX() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
         if (typeof ExcelJS === 'undefined') {
+            const exportBtn = document.querySelector('.export-btn');
+            const originalText = exportBtn.textContent;
+            exportBtn.textContent = '⏳ Загрузка библиотеки...';
+            exportBtn.disabled = true;
+            
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
-            script.onload = () => exportToXLSX_do();
+            
+            let timeout;
+            
+            const cleanup = () => {
+                clearTimeout(timeout);
+                exportBtn.textContent = originalText;
+                exportBtn.disabled = false;
+            };
+            
+            script.onload = () => {
+                cleanup();
+                exportToXLSX_do();
+            };
+            
+            script.onerror = () => {
+                cleanup();
+                console.warn('❌ ExcelJS не загрузился с CDN. Использую CSV как запасной вариант.');
+                alert('Не удалось загрузить библиотеку ExcelJS.\nБудет выполнен экспорт в CSV (без форматирования).');
+                exportToCSV_fallback();
+            };
+            
+            // Таймаут 7 секунд
+            timeout = setTimeout(() => {
+                if (typeof ExcelJS === 'undefined') {
+                    cleanup();
+                    script.onerror();
+                }
+            }, 7000);
+            
             document.head.appendChild(script);
             return;
         }
         
         exportToXLSX_do();
+    }
+    
+    // Fallback: экспорт в CSV с BOM (UTF-8), если ExcelJS не загрузился
+    function exportToCSV_fallback() {
+        if (estimateItems.length === 0) return;
+        
+        const materials = estimateItems.filter(item => item.type === 'Материал');
+        const works = estimateItems.filter(item => item.type === 'Работа');
+        
+        let csv = '\uFEFF'; // BOM для корректного UTF-8 в Excel
+        csv += 'Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед;Итого\n';
+        
+        let materialsSum = 0, worksSum = 0;
+        
+        if (materials.length > 0) {
+            csv += 'МАТЕРИАЛЫ;;;;;;;;\n';
+            materials.forEach(item => {
+                materialsSum += item.total;
+                csv += [
+                    escapeHtml(item.type),
+                    escapeHtml(item.category),
+                    escapeHtml(item.name),
+                    escapeHtml(item.calcText),
+                    escapeHtml(item.unit),
+                    item.quantity,
+                    item.price.toFixed(2).replace('.', ','),
+                    item.total.toFixed(2).replace('.', ',')
+                ].join(';') + '\n';
+            });
+            csv += `;;;;;;ИТОГО ПО МАТЕРИАЛАМ:;${materialsSum.toFixed(2).replace('.', ',')}\n`;
+        }
+        
+        if (works.length > 0) {
+            if (materials.length > 0) csv += ';;;;;;;;\n';
+            csv += 'РАБОТЫ И УСЛУГИ;;;;;;;;\n';
+            works.forEach(item => {
+                worksSum += item.total;
+                csv += [
+                    escapeHtml(item.type),
+                    escapeHtml(item.category),
+                    escapeHtml(item.name),
+                    escapeHtml(item.calcText),
+                    escapeHtml(item.unit),
+                    item.quantity,
+                    item.price.toFixed(2).replace('.', ','),
+                    item.total.toFixed(2).replace('.', ',')
+                ].join(';') + '\n';
+            });
+            csv += `;;;;;;ИТОГО ПО РАБОТАМ:;${worksSum.toFixed(2).replace('.', ',')}\n`;
+        }
+        
+        const grandTotal = materialsSum + worksSum;
+        csv += `;;;;;;ВСЕГО ПО СМЕТЕ:;${grandTotal.toFixed(2).replace('.', ',')}\n`;
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
     }
     
     async function exportToXLSX_do() {
