@@ -626,10 +626,6 @@ function parsePrice(value) {
     return isNaN(num) ? 0 : num;
 }
 
-function formatPrice(val) {
-    return val.toFixed(2).replace('.', ',') + ' ₽';
-}
-
 function getIcon(category) {
     const icons = {
         'Листовые материалы': '📄', 'Профиль металлический': '📐',
@@ -666,9 +662,11 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
 });
 
 // ============================================================
-// ЗАГРУЗКА ДАННЫХ (исправленный JSONP)
+// ЗАГРУЗКА ДАННЫХ (Google Visualization API — работает везде)
 // ============================================================
-const API_URL = "https://script.google.com/macros/s/AKfycbxqcZfgZ9cyIAnY3u_P0XD5Nv7ZpD4IohzltLtFDOjVhbgeagNgDp0mN0MeHP9dBkm-/exec";
+const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
+const SHEET1_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Лист1`;
+const SHEET2_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Лист2`;
 
 let catalog = { materials: [], works: [] };
 let allMaterials = [];
@@ -695,84 +693,89 @@ function showLoadError() {
 function loadAllData() {
     setDataStatus('loading', 'Загрузка данных...');
     
-    const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-    
-    window[callbackName] = function(data) {
-        console.log('JSONP данные получены:', data);
+    Promise.all([
+        fetch(SHEET1_URL).then(r => r.text()),
+        fetch(SHEET2_URL).then(r => r.text())
+    ])
+    .then(([text1, text2]) => {
+        // Лист1 — Материалы
+        const json1 = JSON.parse(text1.substring(47, text1.length - 2));
+        const rows1 = json1.table.rows;
         
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        
-        if (!data || (!data.materials && !data.works)) {
-            console.error('Неверная структура данных:', data);
-            setDataStatus('offline', 'Ошибка структуры данных');
-            showLoadError();
-            return;
-        }
-        
-        catalog = data;
-        
+        catalog.materials = [];
         allMaterials = [];
-        if (data.materials && Array.isArray(data.materials)) {
-            data.materials.forEach(item => {
-                allMaterials.push({
-                    group: item.group || '',
-                    name: item.name || '',
-                    supplier: item.supplier || '',
-                    unit: item.unit || '',
-                    pricePerUnit: parsePrice(item.price),
-                    totalPrice: parsePrice(item.price),
-                    hasPrice: parsePrice(item.price) > 0,
-                    size: item.size || '',
-                    site: item.site || ''
-                });
+        
+        for (let i = 0; i < rows1.length; i++) {
+            const row = rows1[i].c;
+            if (!row || !row[0] || !row[0].v) continue;
+            
+            const group = String(row[0]?.v || '').trim();
+            if (!group) continue;
+            
+            const name = String(row[1]?.v || '').trim();
+            const unit = String(row[3]?.v || '').trim();
+            const price = parsePrice(row[4]?.v);
+            const totalPrice = parsePrice(row[6]?.v);
+            const size = String(row[5]?.v || '').trim();
+            const supplier = String(row[7]?.v || '').trim();
+            const site = String(row[8]?.v || '').trim();
+            
+            catalog.materials.push({ group, name, unit, price, size, supplier, site });
+            
+            allMaterials.push({
+                group, name, supplier, unit,
+                pricePerUnit: price,
+                totalPrice: totalPrice || price,
+                hasPrice: (totalPrice || price) > 0,
+                size, site
             });
         }
         
-        console.log('Загружено материалов:', allMaterials.length);
-        console.log('Загружено работ:', (data.works || []).length);
+        // Лист2 — Работы и услуги
+        const json2 = JSON.parse(text2.substring(47, text2.length - 2));
+        const rows2 = json2.table.rows;
+        
+        catalog.works = [];
+        
+        for (let i = 0; i < rows2.length; i++) {
+            const row = rows2[i].c;
+            if (!row || !row[0] || !row[0].v) continue;
+            
+            const group = String(row[0]?.v || '').trim();
+            if (!group) continue;
+            
+            catalog.works.push({
+                group: group,
+                name: String(row[1]?.v || '').trim(),
+                unit: String(row[2]?.v || '').trim(),
+                price: parsePrice(row[3]?.v),
+                note: String(row[4]?.v || '').trim()
+            });
+        }
+        
+        console.log('Загружено материалов:', catalog.materials.length);
+        console.log('Загружено работ:', catalog.works.length);
         
         dataLoaded = true;
         setDataStatus('online', 'Данные загружены');
         
         initAnalytics();
         initConstructor();
-    };
-    
-    const script = document.createElement('script');
-    script.src = API_URL + '?callback=' + callbackName + '&_=' + Date.now();
-    
-    const timeoutId = setTimeout(() => {
-        console.error('JSONP таймаут');
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        setDataStatus('offline', 'Таймаут загрузки');
+        
+        // Предзагрузка ExcelJS в фоне
+        if (typeof ExcelJS === 'undefined' && !document.getElementById('exceljs-script')) {
+            const excelScript = document.createElement('script');
+            excelScript.id = 'exceljs-script';
+            excelScript.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+            excelScript.onload = () => console.log('ExcelJS загружен в фоне');
+            document.head.appendChild(excelScript);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка загрузки:', error);
+        setDataStatus('offline', 'Ошибка загрузки');
         showLoadError();
-    }, 15000);
-    
-    script.onload = () => {
-        clearTimeout(timeoutId);
-        setTimeout(() => {
-            if (window[callbackName]) {
-                console.error('JSONP: скрипт загрузился, но callback не вызван');
-                delete window[callbackName];
-                if (script.parentNode) script.parentNode.removeChild(script);
-                setDataStatus('offline', 'Ошибка формата ответа');
-                showLoadError();
-            }
-        }, 3000);
-    };
-    
-    script.onerror = (e) => {
-        clearTimeout(timeoutId);
-        console.error('JSONP ошибка загрузки скрипта:', e);
-        delete window[callbackName];
-        if (script.parentNode) script.parentNode.removeChild(script);
-        setDataStatus('offline', 'Ошибка сети');
-        showLoadError();
-    };
-    
-    document.body.appendChild(script);
+    });
 }
 
 // ============================================================
@@ -795,9 +798,6 @@ function loadChartJs() {
     script.onload = () => {
         window.chartJsLoaded = true;
         updateCharts(getFilteredMaterials());
-    };
-    script.onerror = () => {
-        console.warn('Не удалось загрузить Chart.js');
     };
     document.head.appendChild(script);
 }
@@ -894,8 +894,6 @@ function renderAnalyticsTable() {
     if (!dataLoaded) return;
     
     let filtered = getFilteredMaterials();
-    
-    console.log('Отфильтровано позиций:', filtered.length);
     
     filtered.sort((a, b) => {
         if (currentSort.column === 'name') return currentSort.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
@@ -1556,7 +1554,7 @@ function clearEstimate() {
 }
 
 // ============================================================
-// ЭКСПОРТ В EXCEL
+// ЭКСПОРТ В EXCEL (ExcelJS с фоном загрузкой)
 // ============================================================
 function applyBorder(row, fromCol, toCol) {
     for (let i = fromCol; i <= toCol; i++) {
@@ -1572,40 +1570,35 @@ function applyBorder(row, fromCol, toCol) {
 function exportToXLSX() {
     if (estimateItems.length === 0) { alert('Смета пуста'); return; }
     
-    if (typeof ExcelJS === 'undefined') {
-        const exportBtns = document.querySelectorAll('#tab-constructor .btn-outline');
-        const exportBtn = exportBtns[0];
-        const originalText = exportBtn.textContent;
-        exportBtn.textContent = '⏳ Загрузка...';
-        exportBtn.disabled = true;
-        
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
-        
-        let timeout;
-        const cleanup = () => {
-            clearTimeout(timeout);
-            exportBtn.textContent = originalText;
-            exportBtn.disabled = false;
-        };
-        
-        script.onload = () => { cleanup(); exportToXLSX_do(); };
-        script.onerror = () => {
-            cleanup();
-            console.warn('ExcelJS не загрузился, fallback на CSV');
-            alert('Не удалось загрузить библиотеку. Будет выполнен экспорт в CSV.');
-            exportToCSV_fallback();
-        };
-        
-        timeout = setTimeout(() => {
-            if (typeof ExcelJS === 'undefined') { cleanup(); script.onerror(); }
-        }, 7000);
-        
-        document.head.appendChild(script);
+    if (typeof ExcelJS !== 'undefined') {
+        exportToXLSX_do();
         return;
     }
     
-    exportToXLSX_do();
+    const exportBtn = document.querySelector('#tab-constructor .btn-outline');
+    const originalText = exportBtn.textContent;
+    exportBtn.textContent = '⏳ Подготовка...';
+    exportBtn.disabled = true;
+    
+    let attempts = 0;
+    const checkInterval = setInterval(() => {
+        attempts++;
+        
+        if (typeof ExcelJS !== 'undefined') {
+            clearInterval(checkInterval);
+            exportBtn.textContent = originalText;
+            exportBtn.disabled = false;
+            exportToXLSX_do();
+            return;
+        }
+        
+        if (attempts >= 30) {
+            clearInterval(checkInterval);
+            exportBtn.textContent = originalText;
+            exportBtn.disabled = false;
+            alert('Не удалось загрузить компонент. Обновите страницу и попробуйте снова.');
+        }
+    }, 500);
 }
 
 async function exportToXLSX_do() {
@@ -1745,48 +1738,6 @@ async function exportToXLSX_do() {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
-    link.click();
-    URL.revokeObjectURL(link.href);
-}
-
-function exportToCSV_fallback() {
-    if (estimateItems.length === 0) return;
-    
-    const materials = estimateItems.filter(i => i.type === 'Материал');
-    const works = estimateItems.filter(i => i.type === 'Работа');
-    
-    let csv = '\uFEFF';
-    csv += 'Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед;Итого\n';
-    
-    let ms = 0, ws = 0;
-    
-    if (materials.length > 0) {
-        csv += 'МАТЕРИАЛЫ;;;;;;;;\n';
-        materials.forEach(item => {
-            ms += item.total;
-            csv += [item.type, item.category, item.name, item.calcText, item.unit,
-                item.quantity, item.price.toFixed(2).replace('.',','), item.total.toFixed(2).replace('.',',')].join(';') + '\n';
-        });
-        csv += `;;;;;;ИТОГО ПО МАТЕРИАЛАМ:;${ms.toFixed(2).replace('.',',')}\n`;
-    }
-    
-    if (works.length > 0) {
-        if (materials.length > 0) csv += ';;;;;;;;\n';
-        csv += 'РАБОТЫ И УСЛУГИ;;;;;;;;\n';
-        works.forEach(item => {
-            ws += item.total;
-            csv += [item.type, item.category, item.name, item.calcText, item.unit,
-                item.quantity, item.price.toFixed(2).replace('.',','), item.total.toFixed(2).replace('.',',')].join(';') + '\n';
-        });
-        csv += `;;;;;;ИТОГО ПО РАБОТАМ:;${ws.toFixed(2).replace('.',',')}\n`;
-    }
-    
-    csv += `;;;;;;ВСЕГО ПО СМЕТЕ:;${(ms+ws).toFixed(2).replace('.',',')}\n`;
-    
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
 }
