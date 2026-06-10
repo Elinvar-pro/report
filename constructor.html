@@ -318,82 +318,48 @@
         return { total, quantity, calcText };
     }
     
-    // ========== ЭКСПОРТ В EXCEL (ЛЕНИВАЯ ЗАГРУЗКА БИБЛИОТЕКИ) ==========
-    async function exportToExcel() {
+    // ========== МГНОВЕННЫЙ ЭКСПОРТ В CSV (без библиотек) ==========
+    function exportToExcel() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
-        // Показываем индикатор загрузки
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '⏳ Загрузка библиотеки...';
-        btn.disabled = true;
+        let rows = [];
+        rows.push('Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед (₽);Итого (₽)');
         
-        try {
-            // Динамически загружаем SheetJS только при экспорте
-            await loadSheetJS();
-            
-            btn.innerHTML = '📊 Формирование файла...';
-            
-            // Подготавливаем данные
-            const data = [];
-            data.push(['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед (₽)', 'Итого (₽)']);
-            
-            const materials = estimateItems.filter(item => item.type === 'Материал');
-            const works = estimateItems.filter(item => item.type === 'Работа');
-            
-            let materialsSum = 0, worksSum = 0;
-            
-            if (materials.length > 0) {
-                data.push(['=== МАТЕРИАЛЫ ===', '', '', '', '', '', '', '']);
-                materials.forEach(item => {
-                    materialsSum += item.total;
-                    data.push([item.type, item.category, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2).replace('.', ','), item.total.toFixed(2).replace('.', ',')]);
-                });
-                data.push(['ИТОГО ПО МАТЕРИАЛАМ', '', '', '', '', '', '', materialsSum.toFixed(2).replace('.', ',')]);
-                data.push(['']);
-            }
-            
-            if (works.length > 0) {
-                data.push(['=== РАБОТЫ И УСЛУГИ ===', '', '', '', '', '', '', '']);
-                works.forEach(item => {
-                    worksSum += item.total;
-                    data.push([item.type, item.category, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2).replace('.', ','), item.total.toFixed(2).replace('.', ',')]);
-                });
-                data.push(['ИТОГО ПО РАБОТАМ', '', '', '', '', '', '', worksSum.toFixed(2).replace('.', ',')]);
-                data.push(['']);
-            }
-            
-            const grandTotal = materialsSum + worksSum;
-            data.push(['ВСЕГО ПО СМЕТЕ', '', '', '', '', '', '', grandTotal.toFixed(2).replace('.', ',')]);
-            
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            ws['!cols'] = [{ wch: 12 }, { wch: 22 }, { wch: 35 }, { wch: 35 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }];
-            
-            XLSX.utils.book_append_sheet(wb, ws, 'Смета');
-            XLSX.writeFile(wb, `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
-            
-        } catch (err) {
-            console.error(err);
-            alert('Ошибка при экспорте: ' + err.message);
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+        const materials = estimateItems.filter(item => item.type === 'Материал');
+        const works = estimateItems.filter(item => item.type === 'Работа');
+        
+        let materialsSum = 0;
+        let worksSum = 0;
+        
+        if (materials.length > 0) {
+            rows.push('=== МАТЕРИАЛЫ ===');
+            materials.forEach(item => {
+                materialsSum += item.total;
+                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
+            });
+            rows.push(`ИТОГО ПО МАТЕРИАЛАМ;;;;;;${materialsSum.toFixed(2).replace('.', ',')}`);
+            rows.push('');
         }
-    }
-    
-    function loadSheetJS() {
-        return new Promise((resolve, reject) => {
-            if (typeof XLSX !== 'undefined') {
-                resolve();
-                return;
-            }
-            const script = document.createElement('script');
-            script.src = 'https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js';
-            script.onload = () => resolve();
-            script.onerror = () => reject(new Error('Не удалось загрузить библиотеку Excel'));
-            document.head.appendChild(script);
-        });
+        
+        if (works.length > 0) {
+            rows.push('=== РАБОТЫ И УСЛУГИ ===');
+            works.forEach(item => {
+                worksSum += item.total;
+                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
+            });
+            rows.push(`ИТОГО ПО РАБОТАМ;;;;;;${worksSum.toFixed(2).replace('.', ',')}`);
+            rows.push('');
+        }
+        
+        const grandTotal = materialsSum + worksSum;
+        rows.push(`ВСЕГО ПО СМЕТЕ;;;;;;${grandTotal.toFixed(2).replace('.', ',')}`);
+        
+        const blob = new Blob(["\uFEFF" + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
     }
     
     function copyEstimate() {
@@ -624,7 +590,7 @@
         let grand = 0;
         
         if (estimateItems.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>';
             document.getElementById('totalEstimate').innerHTML = '0 ₽';
             return;
         }
