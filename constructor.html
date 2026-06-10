@@ -134,14 +134,13 @@
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxqcZfgZ9cyIAnY3u_P0XD5Nv7ZpD4IohzltLtFDOjVhbgeagNgDp0mN0MeHP9dBkm-/exec";
+    const API_URL = "https://script.google.com/macros/s/ТВОЯ_НОВАЯ_ССЫЛКА/exec";
     
     let catalog = { materials: [], works: [] };
     let materialCategories = [], workCategories = [];
     let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
     let estimateItems = [];
     
-    // ОПРЕДЕЛЕНИЕ ТИПА РАСЧЁТА ТОЛЬКО ПО ЕДИНИЦЕ ИЗМЕРЕНИЯ
     function getCalcType(unit) {
         const u = (unit || '').toLowerCase();
         if (u.includes('м²') || u.includes('м.кв') || u.includes('кв.м')) return 'area';
@@ -149,7 +148,6 @@
         return 'piece';
     }
     
-    // ПАРСИНГ РАЗМЕРА ИЗ ТАБЛИЦЫ
     function parseSize(sizeStr, calcType) {
         if (!sizeStr || sizeStr === '') return null;
         const str = String(sizeStr).trim();
@@ -317,12 +315,14 @@
         return { total, quantity, calcText };
     }
     
-    // ========== ЭКСПОРТ В EXCEL С ГРУППИРОВКОЙ ==========
+    // ========== ЭКСПОРТ В EXCEL (С РАЗДЕЛИТЕЛЕМ ;) ==========
     function exportToExcel() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
-        let csvRows = [];
-        csvRows.push(['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед (₽)', 'Итого (₽)'].join(','));
+        let rows = [];
+        
+        // Заголовки
+        rows.push('Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед (₽);Итого (₽)');
         
         const materials = estimateItems.filter(item => item.type === 'Материал');
         const works = estimateItems.filter(item => item.type === 'Работа');
@@ -330,50 +330,33 @@
         let materialsSum = 0;
         let worksSum = 0;
         
+        // МАТЕРИАЛЫ
         if (materials.length > 0) {
-            csvRows.push(['"=== МАТЕРИАЛЫ ==="', '', '', '', '', '', '', ''].join(','));
+            rows.push('=== МАТЕРИАЛЫ ===');
             materials.forEach(item => {
                 materialsSum += item.total;
-                const row = [
-                    `"${item.type}"`,
-                    `"${item.category}"`,
-                    `"${item.name}"`,
-                    `"${item.calcText}"`,
-                    `"${item.unit}"`,
-                    item.quantity,
-                    item.price.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ',')
-                ];
-                csvRows.push(row.join(','));
+                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
             });
-            csvRows.push([`"ИТОГО ПО МАТЕРИАЛАМ"`, '', '', '', '', '', '', `"${materialsSum.toFixed(2).replace('.', ',')} ₽"`].join(','));
-            csvRows.push(['', '', '', '', '', '', '', ''].join(','));
+            rows.push(`ИТОГО ПО МАТЕРИАЛАМ;;;;;;${materialsSum.toFixed(2).replace('.', ',')}`);
+            rows.push('');
         }
         
+        // РАБОТЫ
         if (works.length > 0) {
-            csvRows.push(['"=== РАБОТЫ И УСЛУГИ ==="', '', '', '', '', '', '', ''].join(','));
+            rows.push('=== РАБОТЫ И УСЛУГИ ===');
             works.forEach(item => {
                 worksSum += item.total;
-                const row = [
-                    `"${item.type}"`,
-                    `"${item.category}"`,
-                    `"${item.name}"`,
-                    `"${item.calcText}"`,
-                    `"${item.unit}"`,
-                    item.quantity,
-                    item.price.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ',')
-                ];
-                csvRows.push(row.join(','));
+                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
             });
-            csvRows.push([`"ИТОГО ПО РАБОТАМ"`, '', '', '', '', '', '', `"${worksSum.toFixed(2).replace('.', ',')} ₽"`].join(','));
-            csvRows.push(['', '', '', '', '', '', '', ''].join(','));
+            rows.push(`ИТОГО ПО РАБОТАМ;;;;;;${worksSum.toFixed(2).replace('.', ',')}`);
+            rows.push('');
         }
         
+        // ОБЩИЙ ИТОГ
         const grandTotal = materialsSum + worksSum;
-        csvRows.push([`"ВСЕГО ПО СМЕТЕ"`, '', '', '', '', '', '', `"${grandTotal.toFixed(2).replace('.', ',')} ₽"`].join(','));
+        rows.push(`ВСЕГО ПО СМЕТЕ;;;;;;${grandTotal.toFixed(2).replace('.', ',')}`);
         
-        const blob = new Blob(["\uFEFF" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["\uFEFF" + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
@@ -609,7 +592,7 @@
         let grand = 0;
         
         if (estimateItems.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>';
             document.getElementById('totalEstimate').innerHTML = '0 ₽';
             return;
         }
