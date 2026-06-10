@@ -125,12 +125,12 @@
                 <tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
             </thead>
             <tbody id="estimateBody">
-                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>
+                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>
             </tbody>
         </table>
     </div>
     <div class="export-buttons">
-        <button class="export-btn" onclick="exportToHTML()">📎 Экспорт (HTML)</button>
+        <button class="export-btn" onclick="exportToXLSX()">📥 Экспорт в Excel</button>
         <button class="export-btn" onclick="copyEstimate()">📋 Копировать таблицу</button>
         <button class="export-btn" onclick="clearEstimate()">🗑️ Очистить смету</button>
     </div>
@@ -318,8 +318,8 @@
         return { total, quantity, calcText };
     }
     
-    // HTML экспорт (с линиями, цветами, чередованием строк)
-    function exportToHTML() {
+    // XLSX экспорт (HTML-таблица как .xls — мгновенно, с полным форматированием)
+    function exportToXLSX() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
         const materials = estimateItems.filter(item => item.type === 'Материал');
@@ -328,90 +328,106 @@
         let materialsSum = 0, worksSum = 0;
         let materialsRows = '', worksRows = '';
         
+        const cellBorder = 'border: 1px solid #000000;';
+        const cellPadding = 'padding: 6px 10px;';
+        const headerStyle = cellBorder + cellPadding + 'background: #2e7d32; color: #ffffff; font-weight: bold; text-align: center; font-size: 12px;';
+        const sectionStyle = cellBorder + cellPadding + 'background: #c8e6c9; color: #1a5d2a; font-weight: bold; font-size: 13px;';
+        const evenStyle = cellBorder + cellPadding + 'background: #ffffff;';
+        const oddStyle = cellBorder + cellPadding + 'background: #f5f5f5;';
+        const totalStyle = cellBorder + cellPadding + 'background: #fff9c4; font-weight: bold;';
+        const grandStyle = cellBorder + cellPadding + 'background: #ffcc02; font-weight: bold; font-size: 14px;';
+        const numStyle = 'text-align: right;';
+        const textStyle = 'text-align: left;';
+        
         materials.forEach((item, idx) => {
             materialsSum += item.total;
-            const rowClass = idx % 2 === 0 ? 'even' : 'odd';
-            materialsRows += `<tr class="${rowClass}">
-                <td>${escapeHtml(item.type)}</td>
-                <td>${escapeHtml(item.category)}</td>
-                <td>${escapeHtml(item.name)}</td>
-                <td>${escapeHtml(item.calcText)}</td>
-                <td>${escapeHtml(item.unit)}</td>
-                <td class="num">${item.quantity}</td>
-                <td class="num">${item.price.toFixed(2).replace('.', ',')} ₽</td>
-                <td class="num"><strong>${item.total.toFixed(2).replace('.', ',')} ₽</strong></td>
+            const style = idx % 2 === 0 ? evenStyle : oddStyle;
+            materialsRows += `<tr>
+                <td style="${style}${textStyle}">${escapeHtml(item.type)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.category)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.name)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.calcText)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.unit)}</td>
+                <td style="${style}${numStyle}">${item.quantity}</td>
+                <td style="${style}${numStyle}">${item.price.toFixed(2).replace('.', ',')} ₽</td>
+                <td style="${style}${numStyle} font-weight: bold;">${item.total.toFixed(2).replace('.', ',')} ₽</td>
             </tr>`;
         });
         
         works.forEach((item, idx) => {
             worksSum += item.total;
-            const rowClass = idx % 2 === 0 ? 'even' : 'odd';
-            worksRows += `<tr class="${rowClass}">
-                <td>${escapeHtml(item.type)}</td>
-                <td>${escapeHtml(item.category)}</td>
-                <td>${escapeHtml(item.name)}</td>
-                <td>${escapeHtml(item.calcText)}</td>
-                <td>${escapeHtml(item.unit)}</td>
-                <td class="num">${item.quantity}</td>
-                <td class="num">${item.price.toFixed(2).replace('.', ',')} ₽</td>
-                <td class="num"><strong>${item.total.toFixed(2).replace('.', ',')} ₽</strong></td>
+            const style = idx % 2 === 0 ? evenStyle : oddStyle;
+            worksRows += `<tr>
+                <td style="${style}${textStyle}">${escapeHtml(item.type)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.category)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.name)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.calcText)}</td>
+                <td style="${style}${textStyle}">${escapeHtml(item.unit)}</td>
+                <td style="${style}${numStyle}">${item.quantity}</td>
+                <td style="${style}${numStyle}">${item.price.toFixed(2).replace('.', ',')} ₽</td>
+                <td style="${style}${numStyle} font-weight: bold;">${item.total.toFixed(2).replace('.', ',')} ₽</td>
             </tr>`;
         });
         
         const grandTotal = materialsSum + worksSum;
         
-        const html = `<!DOCTYPE html>
-<html>
+        let html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
 <head>
     <meta charset="UTF-8">
-    <title>Смета</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px auto; max-width: 1400px; padding: 20px; }
-        h1 { color: #1a5d2a; margin-bottom: 10px; }
-        .date { color: #666; margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-        th { background: #f0f2f5; padding: 12px; text-align: left; border-bottom: 2px solid #2e7d32; font-weight: 600; }
-        td { padding: 10px 12px; border-bottom: 1px solid #e0e4e8; }
-        .even { background-color: #ffffff; }
-        .odd { background-color: #f8f9fc; }
-        .num { text-align: right; }
-        .total-row td { background: #fef6e0; font-weight: 700; border-top: 2px solid #ddd; }
-        .section-title td { background: #e8f5e9; font-weight: 700; font-size: 16px; color: #1a5d2a; border-top: 1px solid #c8e6c9; }
-        .grand-total td { background: #fef6e0; font-weight: 800; font-size: 16px; border-top: 2px solid #2e7d32; }
-        @media print {
-            body { margin: 0; padding: 10px; }
-            .no-print { display: none; }
-        }
-    </style>
+    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+        <x:Name>Смета</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+    </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
 </head>
 <body>
-    <h1>📋 Смета</h1>
-    <div class="date">📅 ${new Date().toLocaleString('ru-RU')}</div>
-    <table>
-        <thead>
-            <tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th class="num">Кол-во</th><th class="num">Цена/ед</th><th class="num">Итого</th></tr>
-        </thead>
-        <tbody>
-            ${materialsRows.length > 0 ? '<tr class="section-title"><td colspan="8"><strong>=== МАТЕРИАЛЫ ===</strong></td></tr>' : ''}
-            ${materialsRows}
-            ${materialsRows.length > 0 ? `<tr class="total-row"><td colspan="7" style="text-align:right;"><strong>ИТОГО ПО МАТЕРИАЛАМ:</strong></td><td class="num"><strong>${materialsSum.toFixed(2).replace('.', ',')} ₽</strong></td></tr>` : ''}
-            ${materialsRows.length > 0 && worksRows.length > 0 ? '<tr><td colspan="8" style="height: 10px;"></td></tr>' : ''}
-            ${worksRows.length > 0 ? '<tr class="section-title"><td colspan="8"><strong>=== РАБОТЫ И УСЛУГИ ===</strong></td></tr>' : ''}
-            ${worksRows}
-            ${worksRows.length > 0 ? `<tr class="total-row"><td colspan="7" style="text-align:right;"><strong>ИТОГО ПО РАБОТАМ:</strong></td><td class="num"><strong>${worksSum.toFixed(2).replace('.', ',')} ₽</strong></td></tr>` : ''}
-            <tr class="grand-total"><td colspan="7" style="text-align:right; font-size: 16px;"><strong>ВСЕГО ПО СМЕТЕ:</strong></td><td class="num" style="font-size: 16px;"><strong>${grandTotal.toFixed(2).replace('.', ',')} ₽</strong></td></tr>
-        </tbody>
-    </table>
-    <div class="no-print" style="margin-top: 30px; text-align: center; color: #666;">
-        <button onclick="window.print()">🖨️ Печать</button>
-    </div>
-</body>
-</html>`;
+    <table cellspacing="0" style="border-collapse: collapse;">
+        <tr>
+            <td colspan="8" style="font-size: 16px; font-weight: bold; color: #1a5d2a; padding: 10px 0; text-align: center;">
+                📋 Смета от ${new Date().toLocaleString('ru-RU')}
+            </td>
+        </tr>
+        <tr>
+            <th style="${headerStyle}">Тип</th>
+            <th style="${headerStyle}">Категория</th>
+            <th style="${headerStyle}">Наименование</th>
+            <th style="${headerStyle}">Расчёт</th>
+            <th style="${headerStyle}">Ед.изм</th>
+            <th style="${headerStyle}">Кол-во</th>
+            <th style="${headerStyle}">Цена/ед</th>
+            <th style="${headerStyle}">Итого</th>
+        </tr>`;
         
-        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        // Секция МАТЕРИАЛЫ
+        if (materialsRows.length > 0) {
+            html += `<tr><td colspan="8" style="${sectionStyle}">📦 МАТЕРИАЛЫ</td></tr>`;
+            html += materialsRows;
+            html += `<tr>
+                <td colspan="7" style="${totalStyle}${numStyle}">ИТОГО ПО МАТЕРИАЛАМ:</td>
+                <td style="${totalStyle}${numStyle}">${materialsSum.toFixed(2).replace('.', ',')} ₽</td>
+            </tr>`;
+        }
+        
+        // Секция РАБОТЫ И УСЛУГИ
+        if (worksRows.length > 0) {
+            html += `<tr><td colspan="8" style="${sectionStyle}">🔧 РАБОТЫ И УСЛУГИ</td></tr>`;
+            html += worksRows;
+            html += `<tr>
+                <td colspan="7" style="${totalStyle}${numStyle}">ИТОГО ПО РАБОТАМ:</td>
+                <td style="${totalStyle}${numStyle}">${worksSum.toFixed(2).replace('.', ',')} ₽</td>
+            </tr>`;
+        }
+        
+        // Общий итог
+        html += `<tr>
+            <td colspan="7" style="${grandStyle}${numStyle}">ВСЕГО ПО СМЕТЕ:</td>
+            <td style="${grandStyle}${numStyle}">${grandTotal.toFixed(2).replace('.', ',')} ₽</td>
+        </tr>`;
+        
+        html += `</table></body></html>`;
+        
+        const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.html`;
+        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xls`;
         link.click();
         URL.revokeObjectURL(link.href);
     }
@@ -654,7 +670,7 @@
         let grand = 0;
         
         if (estimateItems.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.</td></tr>';
             document.getElementById('totalEstimate').innerHTML = '0 ₽';
             return;
         }
