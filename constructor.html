@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Смета | Конструктор</title>
+    <!-- SheetJS библиотека для экспорта в Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; padding: 20px; color: #1a2a3a; }
@@ -130,7 +132,7 @@
         </table>
     </div>
     <div class="export-buttons">
-        <button class="export-btn" onclick="exportToExcel()">📎 Экспорт в Excel</button>
+        <button class="export-btn" onclick="exportToExcel()">📎 Экспорт в Excel (XLSX)</button>
         <button class="export-btn" onclick="copyEstimate()">📋 Копировать таблицу</button>
         <button class="export-btn" onclick="clearEstimate()">🗑️ Очистить смету</button>
     </div>
@@ -279,7 +281,7 @@
                 const areaOne = parsedSize.width_m * parsedSize.height_m;
                 total = areaOne * currentItem.price * qty;
                 quantity = qty;
-                calcText = `${qty} шт × ${areaOne.toFixed(2)}м² × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+                calcText = `${qty} шт × ${areaOne.toFixed(2)}м²`;
             } else {
                 const width = parseFloat(document.getElementById('areaWidth')?.value) || 0;
                 const height = parseFloat(document.getElementById('areaHeight')?.value) || 0;
@@ -287,7 +289,7 @@
                 const area = width * height;
                 total = area * currentItem.price * count;
                 quantity = count;
-                calcText = `${width}м × ${height}м = ${area.toFixed(2)}м² × ${count}шт × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+                calcText = `${width}м × ${height}м = ${area.toFixed(2)}м² × ${count}шт`;
             }
         } 
         else if (calcType === 'length') {
@@ -295,20 +297,20 @@
                 const qty = parseFloat(document.getElementById('lengthQty')?.value) || 0;
                 total = parsedSize.length_m * currentItem.price * qty;
                 quantity = qty;
-                calcText = `${qty} шт × ${parsedSize.length_m.toFixed(2)}м × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+                calcText = `${qty} шт × ${parsedSize.length_m.toFixed(2)}м`;
             } else {
                 const length = parseFloat(document.getElementById('lengthVal')?.value) || 0;
                 const count = parseFloat(document.getElementById('lengthCount')?.value) || 0;
                 total = length * currentItem.price * count;
                 quantity = count;
-                calcText = `${length}м × ${count}шт × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+                calcText = `${length}м × ${count}шт`;
             }
         } 
         else {
             const qty = parseFloat(document.getElementById('pieceQty')?.value) || 0;
             total = qty * currentItem.price;
             quantity = qty;
-            calcText = `${qty} ${currentItem.unit} × ${currentItem.price.toFixed(2)}₽ = ${total.toFixed(2)}₽`;
+            calcText = `${qty} ${currentItem.unit}`;
         }
         
         document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
@@ -318,11 +320,15 @@
         return { total, quantity, calcText };
     }
     
+    // ========== ЭКСПОРТ В НАСТОЯЩИЙ EXCEL (XLSX) ==========
     function exportToExcel() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
-        let rows = [];
-        rows.push('Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед (₽);Итого (₽)');
+        // Подготавливаем данные для SheetJS
+        const data = [];
+        
+        // Заголовки
+        data.push(['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед (₽)', 'Итого (₽)']);
         
         const materials = estimateItems.filter(item => item.type === 'Материал');
         const works = estimateItems.filter(item => item.type === 'Работа');
@@ -330,35 +336,71 @@
         let materialsSum = 0;
         let worksSum = 0;
         
+        // МАТЕРИАЛЫ
         if (materials.length > 0) {
-            rows.push('=== МАТЕРИАЛЫ ===');
+            data.push(['=== МАТЕРИАЛЫ ===', '', '', '', '', '', '', '']);
             materials.forEach(item => {
                 materialsSum += item.total;
-                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
+                data.push([
+                    item.type,
+                    item.category,
+                    item.name,
+                    item.calcText,
+                    item.unit,
+                    item.quantity,
+                    item.price.toFixed(2).replace('.', ','),
+                    item.total.toFixed(2).replace('.', ',')
+                ]);
             });
-            rows.push(`ИТОГО ПО МАТЕРИАЛАМ;;;;;;${materialsSum.toFixed(2).replace('.', ',')}`);
-            rows.push('');
+            data.push(['ИТОГО ПО МАТЕРИАЛАМ', '', '', '', '', '', '', materialsSum.toFixed(2).replace('.', ',')]);
+            data.push(['', '', '', '', '', '', '', '']);
         }
         
+        // РАБОТЫ
         if (works.length > 0) {
-            rows.push('=== РАБОТЫ И УСЛУГИ ===');
+            data.push(['=== РАБОТЫ И УСЛУГИ ===', '', '', '', '', '', '', '']);
             works.forEach(item => {
                 worksSum += item.total;
-                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
+                data.push([
+                    item.type,
+                    item.category,
+                    item.name,
+                    item.calcText,
+                    item.unit,
+                    item.quantity,
+                    item.price.toFixed(2).replace('.', ','),
+                    item.total.toFixed(2).replace('.', ',')
+                ]);
             });
-            rows.push(`ИТОГО ПО РАБОТАМ;;;;;;${worksSum.toFixed(2).replace('.', ',')}`);
-            rows.push('');
+            data.push(['ИТОГО ПО РАБОТАМ', '', '', '', '', '', '', worksSum.toFixed(2).replace('.', ',')]);
+            data.push(['', '', '', '', '', '', '', '']);
         }
         
+        // ОБЩИЙ ИТОГ
         const grandTotal = materialsSum + worksSum;
-        rows.push(`ВСЕГО ПО СМЕТЕ;;;;;;${grandTotal.toFixed(2).replace('.', ',')}`);
+        data.push(['ВСЕГО ПО СМЕТЕ', '', '', '', '', '', '', grandTotal.toFixed(2).replace('.', ',')]);
         
-        const blob = new Blob(["\uFEFF" + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-        link.click();
-        URL.revokeObjectURL(link.href);
+        // Создаём workbook и worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        
+        // Настройка ширины колонок
+        ws['!cols'] = [
+            { wch: 10 },  // Тип
+            { wch: 20 },  // Категория
+            { wch: 35 },  // Наименование
+            { wch: 30 },  // Расчёт
+            { wch: 10 },  // Ед.изм
+            { wch: 10 },  // Кол-во
+            { wch: 15 },  // Цена/ед
+            { wch: 15 }   // Итого
+        ];
+        
+        // Добавляем workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Смета');
+        
+        // Скачиваем файл
+        XLSX.writeFile(wb, `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
     }
     
     function copyEstimate() {
@@ -614,7 +656,6 @@
             delCell.appendChild(delBtn);
         });
         
-        // Добавляем итоговую строку
         const totalRow = tbody.insertRow();
         totalRow.classList.add('total-row');
         totalRow.insertCell(0).innerHTML = '<strong>ИТОГО:</strong>';
