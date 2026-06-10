@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Смета | Конструктор</title>
-    <!-- SheetJS библиотека для экспорта в Excel -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fb; padding: 20px; color: #1a2a3a; }
@@ -127,12 +125,12 @@
                 <tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
             </thead>
             <tbody id="estimateBody">
-                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>
+                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解<tr>
             </tbody>
         </table>
     </div>
     <div class="export-buttons">
-        <button class="export-btn" onclick="exportToExcel()">📎 Экспорт в Excel (XLSX)</button>
+        <button class="export-btn" onclick="exportToExcel()">📎 Экспорт в Excel (CSV)</button>
         <button class="export-btn" onclick="copyEstimate()">📋 Копировать таблицу</button>
         <button class="export-btn" onclick="clearEstimate()">🗑️ Очистить смету</button>
     </div>
@@ -320,15 +318,11 @@
         return { total, quantity, calcText };
     }
     
-    // ========== ЭКСПОРТ В НАСТОЯЩИЙ EXCEL (XLSX) ==========
     function exportToExcel() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
-        // Подготавливаем данные для SheetJS
-        const data = [];
-        
-        // Заголовки
-        data.push(['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед (₽)', 'Итого (₽)']);
+        let rows = [];
+        rows.push('Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед (₽);Итого (₽)');
         
         const materials = estimateItems.filter(item => item.type === 'Материал');
         const works = estimateItems.filter(item => item.type === 'Работа');
@@ -336,71 +330,35 @@
         let materialsSum = 0;
         let worksSum = 0;
         
-        // МАТЕРИАЛЫ
         if (materials.length > 0) {
-            data.push(['=== МАТЕРИАЛЫ ===', '', '', '', '', '', '', '']);
+            rows.push('=== МАТЕРИАЛЫ ===');
             materials.forEach(item => {
                 materialsSum += item.total;
-                data.push([
-                    item.type,
-                    item.category,
-                    item.name,
-                    item.calcText,
-                    item.unit,
-                    item.quantity,
-                    item.price.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ',')
-                ]);
+                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
             });
-            data.push(['ИТОГО ПО МАТЕРИАЛАМ', '', '', '', '', '', '', materialsSum.toFixed(2).replace('.', ',')]);
-            data.push(['', '', '', '', '', '', '', '']);
+            rows.push(`ИТОГО ПО МАТЕРИАЛАМ;;;;;;${materialsSum.toFixed(2).replace('.', ',')}`);
+            rows.push('');
         }
         
-        // РАБОТЫ
         if (works.length > 0) {
-            data.push(['=== РАБОТЫ И УСЛУГИ ===', '', '', '', '', '', '', '']);
+            rows.push('=== РАБОТЫ И УСЛУГИ ===');
             works.forEach(item => {
                 worksSum += item.total;
-                data.push([
-                    item.type,
-                    item.category,
-                    item.name,
-                    item.calcText,
-                    item.unit,
-                    item.quantity,
-                    item.price.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ',')
-                ]);
+                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
             });
-            data.push(['ИТОГО ПО РАБОТАМ', '', '', '', '', '', '', worksSum.toFixed(2).replace('.', ',')]);
-            data.push(['', '', '', '', '', '', '', '']);
+            rows.push(`ИТОГО ПО РАБОТАМ;;;;;;${worksSum.toFixed(2).replace('.', ',')}`);
+            rows.push('');
         }
         
-        // ОБЩИЙ ИТОГ
         const grandTotal = materialsSum + worksSum;
-        data.push(['ВСЕГО ПО СМЕТЕ', '', '', '', '', '', '', grandTotal.toFixed(2).replace('.', ',')]);
+        rows.push(`ВСЕГО ПО СМЕТЕ;;;;;;${grandTotal.toFixed(2).replace('.', ',')}`);
         
-        // Создаём workbook и worksheet
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        
-        // Настройка ширины колонок
-        ws['!cols'] = [
-            { wch: 10 },  // Тип
-            { wch: 20 },  // Категория
-            { wch: 35 },  // Наименование
-            { wch: 30 },  // Расчёт
-            { wch: 10 },  // Ед.изм
-            { wch: 10 },  // Кол-во
-            { wch: 15 },  // Цена/ед
-            { wch: 15 }   // Итого
-        ];
-        
-        // Добавляем workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Смета');
-        
-        // Скачиваем файл
-        XLSX.writeFile(wb, `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        const blob = new Blob(["\uFEFF" + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
     }
     
     function copyEstimate() {
