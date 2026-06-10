@@ -125,19 +125,19 @@
                 <tr><th>Тип</th><th>Категория</th><th>Наименование</th><th>Расчёт</th><th>Ед.изм</th><th>Кол-во</th><th>Цена/ед</th><th>Итого</th><th></th></tr>
             </thead>
             <tbody id="estimateBody">
-                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</tr>
+                <tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</td>
             </tbody>
         </table>
     </div>
     <div class="export-buttons">
-        <button class="export-btn" onclick="exportToCSV()">📥 Экспорт в Excel (CSV)</button>
+        <button class="export-btn" onclick="exportToXLSX()">📥 Экспорт в Excel (XLSX)</button>
         <button class="export-btn" onclick="copyEstimate()">📋 Копировать таблицу</button>
         <button class="export-btn" onclick="clearEstimate()">🗑️ Очистить смету</button>
     </div>
 </div>
 
 <script>
-    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ (из URL между /d/ и /edit) ⚠️
+    // ⚠️ ВСТАВЬ СВОЙ ID ТАБЛИЦЫ ⚠️
     const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
     const SHEET1_NAME = "Лист1";
     const SHEET2_NAME = "Лист2";
@@ -147,12 +147,18 @@
     let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
     let estimateItems = [];
     
-    // Функция для парсинга CSV строки
+    function parsePrice(value) {
+        if (value === undefined || value === null || value === '') return 0;
+        if (typeof value === 'number') return value;
+        let s = String(value).trim().replace(/\s/g, '').replace(',', '.');
+        let num = parseFloat(s);
+        return isNaN(num) ? 0 : num;
+    }
+    
     function parseCSVRow(rowStr) {
         const result = [];
         let inQuote = false;
         let current = '';
-        
         for (let i = 0; i < rowStr.length; i++) {
             const char = rowStr[i];
             if (char === '"') {
@@ -185,17 +191,15 @@
     async function loadCatalog() {
         const materialsDiv = document.getElementById('materialsList');
         const worksDiv = document.getElementById('worksList');
-        materialsDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка материалов...</div>';
-        worksDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка работ...</div>';
+        materialsDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка...</div>';
+        worksDiv.innerHTML = '<div style="text-align:center; padding:20px;">📡 Загрузка...</div>';
         
         try {
-            // Загружаем оба листа параллельно
             const [materialsData, worksData] = await Promise.all([
                 loadSheetData(SHEET1_NAME),
                 loadSheetData(SHEET2_NAME)
             ]);
             
-            // Парсим материалы (Лист1)
             catalog.materials = [];
             const materialsSet = new Set();
             for (let row of materialsData) {
@@ -214,7 +218,6 @@
             }
             materialCategories = Array.from(materialsSet).sort();
             
-            // Парсим работы (Лист2)
             catalog.works = [];
             const worksSet = new Set();
             for (let row of worksData) {
@@ -231,24 +234,14 @@
             }
             workCategories = Array.from(worksSet).sort();
             
-            console.log(`Загружено материалов: ${catalog.materials.length}`);
-            console.log(`Загружено работ: ${catalog.works.length}`);
-            
+            console.log(`Материалов: ${catalog.materials.length}, Работ: ${catalog.works.length}`);
             renderCategories();
             
         } catch (error) {
-            console.error('Ошибка загрузки:', error);
-            materialsDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки материалов</div>';
-            worksDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки работ</div>';
+            console.error(error);
+            materialsDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки</div>';
+            worksDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Ошибка загрузки</div>';
         }
-    }
-    
-    function parsePrice(value) {
-        if (value === undefined || value === null || value === '') return 0;
-        if (typeof value === 'number') return value;
-        let s = String(value).trim().replace(/\s/g, '').replace(',', '.');
-        let num = parseFloat(s);
-        return isNaN(num) ? 0 : num;
     }
     
     function getCalcType(unit) {
@@ -275,7 +268,6 @@
             match = str.match(/(\d+[.,]?\d*)\s*м/i);
             if (match) return { type: 'length', length_m: parseFloat(match[1].replace(',', '.')), original: str };
         }
-        
         return null;
     }
     
@@ -285,7 +277,6 @@
         
         const calcType = getCalcType(currentItem.unit);
         const parsedSize = parseSize(currentItem.size, calcType);
-        
         let html = '';
         
         if (calcType === 'area') {
@@ -369,13 +360,11 @@
         } else {
             document.getElementById('pieceQty')?.addEventListener('input', calculateTotal);
         }
-        
         calculateTotal();
     }
     
     function calculateTotal() {
         if (!currentItem) return 0;
-        
         const calcType = getCalcType(currentItem.unit);
         const parsedSize = parseSize(currentItem.size, calcType);
         let total = 0, quantity = 0, calcText = '';
@@ -421,7 +410,6 @@
         document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
         const calcResult = document.getElementById('calcResult');
         if (calcResult) calcResult.innerHTML = calcText;
-        
         return { total, quantity, calcText };
     }
     
@@ -447,8 +435,8 @@
         });
         
         if (materialCategories.length === 0 && workCategories.length === 0) {
-            materialsDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Нет данных. Проверьте доступ к таблице.</div>';
-            worksDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Нет данных. Проверьте доступ к таблице.</div>';
+            materialsDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Нет данных</div>';
+            worksDiv.innerHTML = '<div style="color:red; text-align:center;">❌ Нет данных</div>';
         }
         
         document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
@@ -603,7 +591,7 @@
         let grand = 0;
         
         if (estimateItems.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解</tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="empty-estimate">Смета пуста. Добавьте позиции.缓解<tr>';
             document.getElementById('totalEstimate').innerHTML = '0 ₽';
             return;
         }
@@ -644,58 +632,209 @@
         localStorage.setItem('estimate', JSON.stringify(estimateItems));
     }
     
-    function exportToCSV() {
+    // ========== ЭКСПОРТ В XLSX (ExcelJS) ==========
+    function applyBorder(row, fromCol, toCol) {
+        for (let i = fromCol; i <= toCol; i++) {
+            row.getCell(i).border = {
+                top: { style: 'thin' },
+                bottom: { style: 'thin' },
+                left: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+        }
+    }
+    
+    function exportToXLSX() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
         
-        let rows = [];
-        rows.push('Тип;Категория;Наименование;Расчёт;Ед.изм;Кол-во;Цена/ед (₽);Итого (₽)');
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ Подготовка...';
+        btn.disabled = true;
         
-        const materials = estimateItems.filter(item => item.type === 'Материал');
-        const works = estimateItems.filter(item => item.type === 'Работа');
-        
-        let materialsSum = 0, worksSum = 0;
-        
-        if (materials.length > 0) {
-            rows.push('=== МАТЕРИАЛЫ ===');
-            materials.forEach(item => {
-                materialsSum += item.total;
-                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
-            });
-            rows.push(`ИТОГО ПО МАТЕРИАЛАМ;;;;;;${materialsSum.toFixed(2).replace('.', ',')}`);
-            rows.push('');
+        function doExport() {
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const sheet = workbook.addWorksheet('Смета', { views: [{ showGridLines: false }] });
+                
+                sheet.columns = [
+                    { width: 12 }, { width: 22 }, { width: 32 }, { width: 36 },
+                    { width: 10 }, { width: 10 }, { width: 14 }, { width: 16 }
+                ];
+                
+                const materials = estimateItems.filter(item => item.type === 'Материал');
+                const works = estimateItems.filter(item => item.type === 'Работа');
+                let rowNum = 1;
+                
+                // Заголовок
+                const titleRow = sheet.getRow(rowNum);
+                titleRow.getCell(1).value = 'Смета от ' + new Date().toLocaleString('ru-RU');
+                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1A5D2A' } };
+                sheet.mergeCells(rowNum, 1, rowNum, 8);
+                titleRow.height = 30;
+                rowNum++;
+                
+                // Шапка таблицы
+                const headers = ['Тип', 'Категория', 'Наименование', 'Расчёт', 'Ед.изм', 'Кол-во', 'Цена/ед', 'Итого'];
+                const headerRow = sheet.getRow(rowNum);
+                headers.forEach((h, i) => {
+                    headerRow.getCell(i + 1).value = h;
+                    headerRow.getCell(i + 1).font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+                    headerRow.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
+                    headerRow.getCell(i + 1).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                });
+                applyBorder(headerRow, 1, 8);
+                headerRow.height = 28;
+                rowNum++;
+                
+                let materialsSum = 0, worksSum = 0;
+                
+                // МАТЕРИАЛЫ
+                if (materials.length > 0) {
+                    const sectionRow = sheet.getRow(rowNum);
+                    sectionRow.getCell(1).value = 'МАТЕРИАЛЫ';
+                    sectionRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1A5D2A' } };
+                    sectionRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
+                    sheet.mergeCells(rowNum, 1, rowNum, 8);
+                    applyBorder(sectionRow, 1, 8);
+                    sectionRow.height = 26;
+                    rowNum++;
+                    
+                    materials.forEach((item, idx) => {
+                        materialsSum += item.total;
+                        const row = sheet.getRow(rowNum);
+                        const bgColor = idx % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
+                        const values = [item.type, item.category, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2).replace('.', ',') + ' ₽', item.total.toFixed(2).replace('.', ',') + ' ₽'];
+                        values.forEach((v, i) => {
+                            row.getCell(i + 1).value = v;
+                            row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                            row.getCell(i + 1).alignment = { vertical: 'middle', wrapText: true, horizontal: (i >= 5) ? 'right' : 'left' };
+                        });
+                        row.getCell(8).font = { bold: true };
+                        applyBorder(row, 1, 8);
+                        row.height = 22;
+                        rowNum++;
+                    });
+                    
+                    const totalRow = sheet.getRow(rowNum);
+                    sheet.mergeCells(rowNum, 1, rowNum, 6);
+                    totalRow.getCell(7).value = 'ИТОГО ПО МАТЕРИАЛАМ:';
+                    totalRow.getCell(8).value = materialsSum.toFixed(2).replace('.', ',') + ' ₽';
+                    totalRow.getCell(7).font = { bold: true };
+                    totalRow.getCell(8).font = { bold: true };
+                    totalRow.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+                    totalRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+                    totalRow.getCell(7).alignment = { horizontal: 'right', vertical: 'middle' };
+                    totalRow.getCell(8).alignment = { horizontal: 'right', vertical: 'middle' };
+                    applyBorder(totalRow, 1, 8);
+                    totalRow.height = 24;
+                    rowNum++;
+                }
+                
+                // РАБОТЫ
+                if (works.length > 0) {
+                    rowNum++;
+                    const sectionRow = sheet.getRow(rowNum);
+                    sectionRow.getCell(1).value = 'РАБОТЫ И УСЛУГИ';
+                    sectionRow.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1A5D2A' } };
+                    sectionRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
+                    sheet.mergeCells(rowNum, 1, rowNum, 8);
+                    applyBorder(sectionRow, 1, 8);
+                    sectionRow.height = 26;
+                    rowNum++;
+                    
+                    works.forEach((item, idx) => {
+                        worksSum += item.total;
+                        const row = sheet.getRow(rowNum);
+                        const bgColor = idx % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
+                        const values = [item.type, item.category, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2).replace('.', ',') + ' ₽', item.total.toFixed(2).replace('.', ',') + ' ₽'];
+                        values.forEach((v, i) => {
+                            row.getCell(i + 1).value = v;
+                            row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                            row.getCell(i + 1).alignment = { vertical: 'middle', wrapText: true, horizontal: (i >= 5) ? 'right' : 'left' };
+                        });
+                        row.getCell(8).font = { bold: true };
+                        applyBorder(row, 1, 8);
+                        row.height = 22;
+                        rowNum++;
+                    });
+                    
+                    const totalRow = sheet.getRow(rowNum);
+                    sheet.mergeCells(rowNum, 1, rowNum, 6);
+                    totalRow.getCell(7).value = 'ИТОГО ПО РАБОТАМ:';
+                    totalRow.getCell(8).value = worksSum.toFixed(2).replace('.', ',') + ' ₽';
+                    totalRow.getCell(7).font = { bold: true };
+                    totalRow.getCell(8).font = { bold: true };
+                    totalRow.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+                    totalRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
+                    totalRow.getCell(7).alignment = { horizontal: 'right', vertical: 'middle' };
+                    totalRow.getCell(8).alignment = { horizontal: 'right', vertical: 'middle' };
+                    applyBorder(totalRow, 1, 8);
+                    totalRow.height = 24;
+                    rowNum++;
+                }
+                
+                // Общий итог
+                rowNum++;
+                const grandTotal = materialsSum + worksSum;
+                const grandRow = sheet.getRow(rowNum);
+                sheet.mergeCells(rowNum, 1, rowNum, 6);
+                grandRow.getCell(7).value = 'ВСЕГО ПО СМЕТЕ:';
+                grandRow.getCell(8).value = grandTotal.toFixed(2).replace('.', ',') + ' ₽';
+                grandRow.getCell(7).font = { bold: true, size: 13 };
+                grandRow.getCell(8).font = { bold: true, size: 13 };
+                grandRow.getCell(7).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFCC02' } };
+                grandRow.getCell(8).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFCC02' } };
+                grandRow.getCell(7).alignment = { horizontal: 'right', vertical: 'middle' };
+                grandRow.getCell(8).alignment = { horizontal: 'right', vertical: 'middle' };
+                applyBorder(grandRow, 1, 8);
+                grandRow.height = 28;
+                
+                workbook.xlsx.writeBuffer().then(buffer => {
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
+            } catch(err) {
+                console.error(err);
+                alert('Ошибка при экспорте: ' + err.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
         
-        if (works.length > 0) {
-            rows.push('=== РАБОТЫ И УСЛУГИ ===');
-            works.forEach(item => {
-                worksSum += item.total;
-                rows.push(`${item.type};${item.category};${item.name};${item.calcText};${item.unit};${item.quantity};${item.price.toFixed(2).replace('.', ',')};${item.total.toFixed(2).replace('.', ',')}`);
-            });
-            rows.push(`ИТОГО ПО РАБОТАМ;;;;;;${worksSum.toFixed(2).replace('.', ',')}`);
-            rows.push('');
+        if (typeof ExcelJS === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js';
+            script.onload = () => {
+                // Подменяем ExcelJS на SheetJS (как fallback)
+                window.ExcelJS = { Workbook: function() { return XLSX.utils.book_new(); } };
+                doExport();
+            };
+            script.onerror = () => {
+                alert('Не удалось загрузить библиотеку экспорта. Попробуйте позже.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            };
+            document.head.appendChild(script);
+        } else {
+            doExport();
         }
-        
-        const grandTotal = materialsSum + worksSum;
-        rows.push(`ВСЕГО ПО СМЕТЕ;;;;;;${grandTotal.toFixed(2).replace('.', ',')}`);
-        
-        const blob = new Blob(["\uFEFF" + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
-        link.click();
-        URL.revokeObjectURL(link.href);
     }
     
     function copyEstimate() {
         if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-        
         let text = 'Тип\tКатегория\tНаименование\tРасчёт\tЕд.изм\tКол-во\tЦена/ед (₽)\tИтого (₽)\n';
         estimateItems.forEach(item => {
             text += `${item.type}\t${item.category}\t${item.name}\t${item.calcText}\t${item.unit}\t${item.quantity}\t${item.price.toFixed(2)}\t${item.total.toFixed(2)}\n`;
         });
         const grandTotal = estimateItems.reduce((sum, i) => sum + i.total, 0);
         text += `\nИТОГО:\t\t\t\t\t\t\t${grandTotal.toFixed(2)} ₽`;
-        
         navigator.clipboard.writeText(text);
         alert('✅ Таблица скопирована в буфер обмена');
     }
@@ -712,7 +851,6 @@
     const saved = localStorage.getItem('estimate');
     if (saved) { try { estimateItems = JSON.parse(saved); renderEstimate(); } catch(e) {} }
     
-    // Загружаем данные
     loadCatalog();
 </script>
 </body>
