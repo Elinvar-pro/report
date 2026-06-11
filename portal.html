@@ -80,20 +80,19 @@
             overflow-y: auto;
         }
         .column-catalog {
-            width: 280px;
-            min-width: 240px;
+            width: 260px;
+            min-width: 220px;
             flex-shrink: 0;
             padding: 16px;
         }
         .column-params {
             flex: 1;
-            min-width: 340px;
+            min-width: 320px;
             padding: 20px 24px;
         }
         .column-estimate {
-            width: 420px;
-            min-width: 340px;
-            flex-shrink: 0;
+            flex: 1.5;
+            min-width: 420px;
             display: flex;
             flex-direction: column;
         }
@@ -146,12 +145,6 @@
             border-color: var(--green);
             color: var(--green-dark);
             font-weight: 600;
-        }
-        .category-item .icon {
-            width: 20px;
-            text-align: center;
-            font-size: 14px;
-            flex-shrink: 0;
         }
         
         .divider {
@@ -343,6 +336,7 @@
         .estimate-table td {
             padding: 7px 10px;
             border-bottom: 1px solid #f0f2f5;
+            vertical-align: top;
         }
         .estimate-table .even { background: #f8f9fc; }
         .estimate-table .odd { background: #ffffff; }
@@ -361,10 +355,28 @@
         }
         .estimate-table .del-btn:hover { color: var(--red); }
         
-        .estimate-total-row td {
-            background: var(--yellow);
+        .estimate-table .section-row td {
+            background: #e8f5e9;
             font-weight: 700;
-            border-top: 1px solid var(--gray-border);
+            font-size: 11px;
+            color: #1a5d2a;
+            padding: 6px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .estimate-table .subtotal-row td {
+            background: #fff9c4;
+            font-weight: 700;
+            font-size: 12px;
+            border-top: 1px solid #e0d89c;
+        }
+        
+        .estimate-table .grand-row td {
+            background: #ffcc02;
+            font-weight: 800;
+            font-size: 13px;
+            border-top: 2px solid #e6b800;
         }
         
         .estimate-empty {
@@ -384,11 +396,11 @@
         }
         
         /* АДАПТИВ */
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
             .main-layout { flex-direction: column; }
-            .column-catalog { width: 100%; min-width: 0; max-height: 200px; }
+            .column-catalog { width: 100%; min-width: 0; max-height: 180px; }
             .column-params { min-width: 0; }
-            .column-estimate { width: 100%; min-width: 0; max-height: 400px; }
+            .column-estimate { min-width: 0; flex: 1; }
             .header { padding: 0 12px; }
         }
     </style>
@@ -520,16 +532,6 @@ function parsePrice(value) {
     return isNaN(num) ? 0 : num;
 }
 
-function getCategoryIcon(category) {
-    const icons = {
-        'Листовые материалы': 'L', 'Профиль металлический': 'P',
-        'Профиль алюминиевый': 'A', 'Нержавеющая сталь': 'S',
-        'Пленки': 'F', 'Светотехника': 'Lt', 'Обнарядка': 'O',
-        'Работы': 'W', 'Подряд': 'C', 'Монтаж': 'M', 'Транспорт': 'T'
-    };
-    return icons[category] || '•';
-}
-
 // ============================================================
 // ЗАГРУЗКА ДАННЫХ
 // ============================================================
@@ -647,7 +649,7 @@ function renderCategories() {
     materialCategories.forEach(cat => {
         const div = document.createElement('div');
         div.className = 'category-item';
-        div.innerHTML = `<span class="icon">${getCategoryIcon(cat)}</span>${cat}`;
+        div.textContent = cat;
         div.onclick = () => selectCategory('material', cat);
         mDiv.appendChild(div);
     });
@@ -657,7 +659,7 @@ function renderCategories() {
     workCategories.forEach(cat => {
         const div = document.createElement('div');
         div.className = 'category-item';
-        div.innerHTML = `<span class="icon">${getCategoryIcon(cat)}</span>${cat}`;
+        div.textContent = cat;
         div.onclick = () => selectCategory('work', cat);
         wDiv.appendChild(div);
     });
@@ -824,11 +826,11 @@ function calculateTotal() {
     let calcText = '';
     const calcType = getCalcType(currentItem.unit);
     if (calcType === 'area') {
-        calcText = `${qty.toFixed(2)} м² × ${currentItem.price.toFixed(2)} ₽/м² = ${total.toFixed(2)} ₽`;
+        calcText = `${qty.toFixed(2)} м² x ${currentItem.price.toFixed(2)} ₽/м² = ${total.toFixed(2)} ₽`;
     } else if (calcType === 'length') {
-        calcText = `${qty.toFixed(1)} м × ${currentItem.price.toFixed(2)} ₽/м = ${total.toFixed(2)} ₽`;
+        calcText = `${qty.toFixed(1)} м x ${currentItem.price.toFixed(2)} ₽/м = ${total.toFixed(2)} ₽`;
     } else {
-        calcText = `${qty} ${unitLabel} × ${currentItem.price.toFixed(2)} ₽ = ${total.toFixed(2)} ₽`;
+        calcText = `${qty} ${unitLabel} x ${currentItem.price.toFixed(2)} ₽ = ${total.toFixed(2)} ₽`;
     }
     
     document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
@@ -869,7 +871,6 @@ function addToEstimate() {
 function renderEstimate() {
     const tbody = document.getElementById('estimateBody');
     tbody.innerHTML = '';
-    let grand = 0;
     
     if (estimateItems.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="estimate-empty">Смета пуста. Добавьте позиции.</td></tr>';
@@ -877,17 +878,17 @@ function renderEstimate() {
         return;
     }
     
-    // Группируем
     const materials = estimateItems.filter(i => i.type === 'Материал');
     const works = estimateItems.filter(i => i.type === 'Работа');
     
     let matsSum = 0, worksSum = 0;
     
+    // МАТЕРИАЛЫ
     if (materials.length > 0) {
-        const headerRow = tbody.insertRow();
-        headerRow.insertCell(0).innerHTML = '<strong>МАТЕРИАЛЫ</strong>';
-        headerRow.insertCell(0).colSpan = 8;
-        headerRow.cells[0].style.cssText = 'background:#e8f5e9;font-weight:700;font-size:12px;color:#1a5d2a;padding:8px 10px;';
+        const sectionRow = tbody.insertRow();
+        sectionRow.className = 'section-row';
+        sectionRow.insertCell(0).innerHTML = 'МАТЕРИАЛЫ';
+        sectionRow.insertCell(0).colSpan = 8;
         
         materials.forEach((item, idx) => {
             matsSum += item.total;
@@ -902,39 +903,34 @@ function renderEstimate() {
             row.insertCell(6).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
             row.insertCell(6).className = 'col-sum';
             const delCell = row.insertCell(7);
-            delCell.innerHTML = '<button class="del-btn">×</button>';
+            delCell.innerHTML = '<button class="del-btn">&times;</button>';
             delCell.querySelector('button').onclick = () => {
                 const realIdx = estimateItems.indexOf(item);
                 if (realIdx >= 0) { estimateItems.splice(realIdx, 1); renderEstimate(); }
             };
         });
         
-        const totalRow = tbody.insertRow();
-        totalRow.className = 'estimate-total-row';
-        totalRow.insertCell(0).innerHTML = '';
-        totalRow.insertCell(0).colSpan = 5;
-        totalRow.insertCell(1).innerHTML = '';
-        totalRow.insertCell(2).innerHTML = '';
-        totalRow.insertCell(3).innerHTML = '';
-        totalRow.insertCell(4).innerHTML = '';
-        totalRow.insertCell(5).innerHTML = '<strong>Итого материалы:</strong>';
-        totalRow.insertCell(5).style.textAlign = 'right';
-        totalRow.insertCell(6).innerHTML = '<strong>' + matsSum.toFixed(2).replace('.', ',') + ' ₽</strong>';
-        totalRow.insertCell(6).className = 'col-sum';
-        totalRow.insertCell(7).innerHTML = '';
+        const subtotalRow = tbody.insertRow();
+        subtotalRow.className = 'subtotal-row';
+        subtotalRow.insertCell(0).innerHTML = '';
+        subtotalRow.insertCell(0).colSpan = 5;
+        subtotalRow.insertCell(1).innerHTML = '';
+        subtotalRow.insertCell(2).innerHTML = '';
+        subtotalRow.insertCell(3).innerHTML = '';
+        subtotalRow.insertCell(4).innerHTML = '';
+        subtotalRow.insertCell(5).innerHTML = '<strong>Итого материалы:</strong>';
+        subtotalRow.insertCell(5).style.textAlign = 'right';
+        subtotalRow.insertCell(6).innerHTML = '<strong>' + matsSum.toFixed(2).replace('.', ',') + ' ₽</strong>';
+        subtotalRow.insertCell(6).className = 'col-sum';
+        subtotalRow.insertCell(7).innerHTML = '';
     }
     
+    // РАБОТЫ И УСЛУГИ
     if (works.length > 0) {
-        if (materials.length > 0) {
-            const spacer = tbody.insertRow();
-            spacer.insertCell(0).colSpan = 8;
-            spacer.cells[0].style.height = '8px';
-        }
-        
-        const headerRow = tbody.insertRow();
-        headerRow.insertCell(0).innerHTML = '<strong>РАБОТЫ И УСЛУГИ</strong>';
-        headerRow.insertCell(0).colSpan = 8;
-        headerRow.cells[0].style.cssText = 'background:#e8f5e9;font-weight:700;font-size:12px;color:#1a5d2a;padding:8px 10px;';
+        const sectionRow = tbody.insertRow();
+        sectionRow.className = 'section-row';
+        sectionRow.insertCell(0).innerHTML = 'РАБОТЫ И УСЛУГИ';
+        sectionRow.insertCell(0).colSpan = 8;
         
         works.forEach((item, idx) => {
             worksSum += item.total;
@@ -949,25 +945,36 @@ function renderEstimate() {
             row.insertCell(6).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
             row.insertCell(6).className = 'col-sum';
             const delCell = row.insertCell(7);
-            delCell.innerHTML = '<button class="del-btn">×</button>';
+            delCell.innerHTML = '<button class="del-btn">&times;</button>';
             delCell.querySelector('button').onclick = () => {
                 const realIdx = estimateItems.indexOf(item);
                 if (realIdx >= 0) { estimateItems.splice(realIdx, 1); renderEstimate(); }
             };
         });
         
-        const totalRow = tbody.insertRow();
-        totalRow.className = 'estimate-total-row';
-        totalRow.insertCell(0).innerHTML = '';
-        totalRow.insertCell(0).colSpan = 5;
-        totalRow.insertCell(5).innerHTML = '<strong>Итого работы:</strong>';
-        totalRow.insertCell(5).style.textAlign = 'right';
-        totalRow.insertCell(6).innerHTML = '<strong>' + worksSum.toFixed(2).replace('.', ',') + ' ₽</strong>';
-        totalRow.insertCell(6).className = 'col-sum';
-        totalRow.insertCell(7).innerHTML = '';
+        const subtotalRow = tbody.insertRow();
+        subtotalRow.className = 'subtotal-row';
+        subtotalRow.insertCell(0).innerHTML = '';
+        subtotalRow.insertCell(0).colSpan = 5;
+        subtotalRow.insertCell(5).innerHTML = '<strong>Итого работы:</strong>';
+        subtotalRow.insertCell(5).style.textAlign = 'right';
+        subtotalRow.insertCell(6).innerHTML = '<strong>' + worksSum.toFixed(2).replace('.', ',') + ' ₽</strong>';
+        subtotalRow.insertCell(6).className = 'col-sum';
+        subtotalRow.insertCell(7).innerHTML = '';
     }
     
-    grand = matsSum + worksSum;
+    // ОБЩИЙ ИТОГ
+    const grand = matsSum + worksSum;
+    const grandRow = tbody.insertRow();
+    grandRow.className = 'grand-row';
+    grandRow.insertCell(0).innerHTML = '';
+    grandRow.insertCell(0).colSpan = 5;
+    grandRow.insertCell(5).innerHTML = '<strong>ВСЕГО ПО СМЕТЕ:</strong>';
+    grandRow.insertCell(5).style.textAlign = 'right';
+    grandRow.insertCell(6).innerHTML = '<strong>' + grand.toFixed(2).replace('.', ',') + ' ₽</strong>';
+    grandRow.insertCell(6).className = 'col-sum';
+    grandRow.insertCell(7).innerHTML = '';
+    
     document.getElementById('totalEstimate').innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
     localStorage.setItem('estimate', JSON.stringify(estimateItems));
 }
@@ -1039,7 +1046,6 @@ async function exportToXLSX_do() {
     
     let rowNum = 1;
     
-    // Заголовок
     const titleRow = sheet.getRow(rowNum);
     titleRow.getCell(1).value = 'Смета от ' + new Date().toLocaleString('ru-RU');
     titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1A5D2A' } };
@@ -1047,7 +1053,6 @@ async function exportToXLSX_do() {
     titleRow.height = 28;
     rowNum++;
     
-    // Шапка
     const headers = ['Тип', 'Наименование', 'Расчёт', 'Ед.', 'Кол-во', 'Цена/ед', 'Сумма'];
     const headerRow = sheet.getRow(rowNum);
     headers.forEach((h, i) => {
@@ -1055,10 +1060,7 @@ async function exportToXLSX_do() {
         headerRow.getCell(i + 1).font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
         headerRow.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
         headerRow.getCell(i + 1).alignment = { horizontal: 'center', vertical: 'middle' };
-        headerRow.getCell(i + 1).border = {
-            top: { style: 'thin' }, bottom: { style: 'thin' },
-            left: { style: 'thin' }, right: { style: 'thin' }
-        };
+        headerRow.getCell(i + 1).border = borderAll();
     });
     headerRow.height = 24;
     rowNum++;
@@ -1071,7 +1073,7 @@ async function exportToXLSX_do() {
         sr.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1A5D2A' } };
         sr.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
         sheet.mergeCells(rowNum, 1, rowNum, 7);
-        applyBorder(sr, 1, 7);
+        applyBorderRange(sr, 1, 7);
         sr.height = 22;
         rowNum++;
         
@@ -1085,10 +1087,7 @@ async function exportToXLSX_do() {
                 row.getCell(i + 1).value = v;
                 row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
                 row.getCell(i + 1).alignment = { vertical: 'middle', horizontal: (i >= 4) ? 'right' : 'left' };
-                row.getCell(i + 1).border = {
-                    top: { style: 'thin' }, bottom: { style: 'thin' },
-                    left: { style: 'thin' }, right: { style: 'thin' }
-                };
+                row.getCell(i + 1).border = borderAll();
             });
             row.getCell(7).font = { bold: true };
             row.height = 20;
@@ -1103,12 +1102,9 @@ async function exportToXLSX_do() {
             tr.getCell(i).font = { bold: true };
             tr.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
             tr.getCell(i).alignment = { horizontal: 'right', vertical: 'middle' };
-            tr.getCell(i).border = {
-                top: { style: 'thin' }, bottom: { style: 'thin' },
-                left: { style: 'thin' }, right: { style: 'thin' }
-            };
+            tr.getCell(i).border = borderAll();
         });
-        applyBorder(tr, 1, 5);
+        applyBorderRange(tr, 1, 5);
         tr.height = 22;
         rowNum++;
     }
@@ -1120,7 +1116,7 @@ async function exportToXLSX_do() {
         sr.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1A5D2A' } };
         sr.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
         sheet.mergeCells(rowNum, 1, rowNum, 7);
-        applyBorder(sr, 1, 7);
+        applyBorderRange(sr, 1, 7);
         sr.height = 22;
         rowNum++;
         
@@ -1134,10 +1130,7 @@ async function exportToXLSX_do() {
                 row.getCell(i + 1).value = v;
                 row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
                 row.getCell(i + 1).alignment = { vertical: 'middle', horizontal: (i >= 4) ? 'right' : 'left' };
-                row.getCell(i + 1).border = {
-                    top: { style: 'thin' }, bottom: { style: 'thin' },
-                    left: { style: 'thin' }, right: { style: 'thin' }
-                };
+                row.getCell(i + 1).border = borderAll();
             });
             row.getCell(7).font = { bold: true };
             row.height = 20;
@@ -1152,33 +1145,26 @@ async function exportToXLSX_do() {
             tr.getCell(i).font = { bold: true };
             tr.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
             tr.getCell(i).alignment = { horizontal: 'right', vertical: 'middle' };
-            tr.getCell(i).border = {
-                top: { style: 'thin' }, bottom: { style: 'thin' },
-                left: { style: 'thin' }, right: { style: 'thin' }
-            };
+            tr.getCell(i).border = borderAll();
         });
-        applyBorder(tr, 1, 5);
+        applyBorderRange(tr, 1, 5);
         tr.height = 22;
         rowNum++;
     }
     
-    // Общий итог
     rowNum++;
     const grand = matsSum + worksSum;
     const gr = sheet.getRow(rowNum);
     sheet.mergeCells(rowNum, 1, rowNum, 5);
-    gr.getCell(6).value = 'ВСЕГО:';
+    gr.getCell(6).value = 'ВСЕГО ПО СМЕТЕ:';
     gr.getCell(7).value = grand.toFixed(2).replace('.',',')+' ₽';
     [6,7].forEach(i => {
         gr.getCell(i).font = { bold: true, size: 12 };
         gr.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFCC02' } };
         gr.getCell(i).alignment = { horizontal: 'right', vertical: 'middle' };
-        gr.getCell(i).border = {
-            top: { style: 'medium' }, bottom: { style: 'medium' },
-            left: { style: 'thin' }, right: { style: 'thin' }
-        };
+        gr.getCell(i).border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
     });
-    applyBorder(gr, 1, 5);
+    applyBorderRange(gr, 1, 5);
     gr.height = 26;
     
     const buffer = await workbook.xlsx.writeBuffer();
@@ -1190,12 +1176,13 @@ async function exportToXLSX_do() {
     URL.revokeObjectURL(link.href);
 }
 
-function applyBorder(row, fromCol, toCol) {
+function borderAll() {
+    return { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
+}
+
+function applyBorderRange(row, fromCol, toCol) {
     for (let i = fromCol; i <= toCol; i++) {
-        row.getCell(i).border = {
-            top: { style: 'thin' }, bottom: { style: 'thin' },
-            left: { style: 'thin' }, right: { style: 'thin' }
-        };
+        row.getCell(i).border = borderAll();
     }
 }
 
