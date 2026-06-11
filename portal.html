@@ -109,7 +109,6 @@
         .field-group label { display: block; font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-bottom: 6px; }
         .field-group select, .field-group input { width: 100%; padding: var(--pad-cell); border: 2px solid var(--border); border-radius: 8px; font-size: var(--fs-md); font-family: var(--font); background: var(--surface); color: var(--text); }
         .field-group select:focus, .field-group input:focus { outline: none; border-color: var(--accent); }
-        .field-group input.manual-input { border-style: dashed; border-color: var(--accent); background: var(--green-light); }
         .info-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 18px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: var(--fs-sm); gap: 10px; }
         .info-row .label { color: var(--text-secondary); font-weight: 500; white-space: nowrap; }
@@ -206,6 +205,10 @@
                 <span class="label">Размер</span>
                 <span id="sizeContainer"><span class="value size-hint" id="sizeValue">—</span></span>
             </div>
+            <div class="info-row" id="attrRow" style="display:none;">
+                <span class="label">Характеристики</span>
+                <span id="attrContainer"><span class="value" id="attrValue">—</span></span>
+            </div>
             <div class="info-row">
                 <span class="label">Ед. измерения</span>
                 <span id="unitContainer"><span class="value" id="unitValue">—</span></span>
@@ -292,13 +295,13 @@ function showHelp() {
     overlay.innerHTML = `<div class="modal-dialog">
         <h2>Как работать с конструктором</h2>
         <ol>
-            <li><strong>Выберите категорию</strong> в левой колонке (Материалы или Работы и услуги).</li>
+            <li><strong>Выберите категорию</strong> в левой колонке.</li>
             <li><strong>Выберите позицию</strong> из выпадающего списка.</li>
-            <li>Если данных нет в таблице — <strong>введите их вручную</strong> в появившихся полях.</li>
-            <li><strong>Укажите количество</strong> (метры, м², штуки) и нажмите «Добавить в смету».</li>
+            <li>Если данных нет в таблице — <strong>введите их вручную</strong>.</li>
+            <li><strong>Укажите количество</strong> и нажмите «Добавить в смету».</li>
             <li>Готовую смету можно <strong>скопировать</strong> или <strong>экспортировать в Excel</strong>.</li>
         </ol>
-        <div class="modal-hint">Подсказка: используйте кнопку <strong>Тема</strong> для переключения на контрастный режим, и кнопку <strong>AA</strong> для увеличения шрифта.</div>
+        <div class="modal-hint">Кнопка <strong>Тема</strong> — контрастный режим, <strong>AA</strong> — крупный шрифт.</div>
         <div class="modal-actions">
             <label style="display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);cursor:pointer;flex:1;">
                 <input type="checkbox" id="dontShowHelp"> Больше не показывать
@@ -351,14 +354,31 @@ function loadAllData() {
         for (let r of j1.table.rows) {
             const c = r.c; if (!c||!c[0]||!c[0].v) continue;
             const g = String(c[0]?.v||'').trim(); if (!g) continue;
-            catalog.materials.push({group:g, name:String(c[1]?.v||'').trim(), unit:String(c[3]?.v||'').trim(), price:parsePrice(c[4]?.v), size:String(c[5]?.v||'').trim(), supplier:String(c[7]?.v||'').trim(), site:String(c[8]?.v||'').trim()});
+            catalog.materials.push({
+                group: g,
+                name: String(c[1]?.v||'').trim(),
+                attribute: String(c[2]?.v||'').trim(),  // колонка C — Признак
+                unit: String(c[3]?.v||'').trim(),
+                price: parsePrice(c[4]?.v),
+                size: String(c[5]?.v||'').trim(),
+                supplier: String(c[7]?.v||'').trim(),
+                site: String(c[8]?.v||'').trim()
+            });
         }
         const j2 = JSON.parse(t2.substring(47, t2.length-2));
         catalog.works = [];
         for (let r of j2.table.rows) {
             const c = r.c; if (!c||!c[0]||!c[0].v) continue;
             const g = String(c[0]?.v||'').trim(); if (!g) continue;
-            catalog.works.push({group:g, name:String(c[1]?.v||'').trim(), unit:String(c[2]?.v||'').trim(), price:parsePrice(c[3]?.v), note:String(c[4]?.v||'').trim(), size:'', supplier:'', site:''});
+            catalog.works.push({
+                group: g,
+                name: String(c[1]?.v||'').trim(),
+                attribute: '',
+                unit: String(c[2]?.v||'').trim(),
+                price: parsePrice(c[3]?.v),
+                note: String(c[4]?.v||'').trim(),
+                size: '', supplier: '', site: ''
+            });
         }
         dataLoaded = true; setDataStatus('online', 'Готово');
         initConstructor(); preloadExcelJS();
@@ -379,7 +399,7 @@ function preloadExcelJS() {
 let materialCategories = [], workCategories = [];
 let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
 let estimateItems = [];
-let manualOverrides = {}; // { size, unit, price }
+let manualOverrides = {};
 
 function initConstructor() {
     materialCategories = [...new Set(catalog.materials.map(i=>i.group).filter(Boolean))].sort();
@@ -413,7 +433,7 @@ function selectCategory(type, cat) {
     src.forEach(i=>{if(i.group===cat)currentItems.push({...i,itemType:type})});
     const s=document.getElementById('itemSelect');
     s.innerHTML='<option value="">Выберите позицию</option>';
-    currentItems.forEach(i=>{const o=document.createElement('option');o.value=i.name;o.textContent=i.name;o.dataset.unit=i.unit||'';o.dataset.price=i.price||0;o.dataset.size=i.size||'';o.dataset.supplier=i.supplier||'';o.dataset.site=i.site||'';s.appendChild(o);});
+    currentItems.forEach(i=>{const o=document.createElement('option');o.value=i.name;o.textContent=i.name;o.dataset.unit=i.unit||'';o.dataset.price=i.price||0;o.dataset.size=i.size||'';o.dataset.attribute=i.attribute||'';o.dataset.supplier=i.supplier||'';o.dataset.site=i.site||'';s.appendChild(o);});
     document.getElementById('infoBlock').style.display='none';
     document.getElementById('calcBlock').style.display='none';
     document.getElementById('rowTotal').innerHTML='0 ₽'; currentItem=null;
@@ -426,23 +446,29 @@ function fillDetails() {
     document.getElementById('infoBlock').style.display='block';
     
     // Размер
-    renderInfoField('sizeValue', 'sizeContainer', sel.size, 'Размер', 'size');
+    renderInfoField('sizeValue', 'sizeContainer', sel.size, 'size');
+    // Характеристики (Признак)
+    const attrVal = sel.attribute || '';
+    document.getElementById('attrRow').style.display = attrVal ? 'flex' : 'none';
+    if (attrVal) {
+        document.getElementById('attrContainer').innerHTML = `<span class="value">${attrVal}</span>`;
+    }
     // Ед. измерения
-    renderInfoField('unitValue', 'unitContainer', sel.unit, 'Ед. измерения', 'unit');
+    renderInfoField('unitValue', 'unitContainer', sel.unit, 'unit');
     // Цена
     const priceStr = sel.price ? sel.price.toLocaleString('ru-RU')+' ₽/'+(sel.unit||'ед.') : '';
-    renderInfoField('priceValue', 'priceContainer', priceStr, 'Цена за ед.', 'price');
+    renderInfoField('priceValue', 'priceContainer', priceStr, 'price');
     
     document.getElementById('supplierRow').style.display=sel.supplier?'flex':'none';
     if(sel.supplier)document.getElementById('supplierValue').innerHTML=sel.supplier;
     document.getElementById('siteRow').style.display=sel.site?'flex':'none';
     if(sel.site)document.getElementById('siteValue').innerHTML=sel.site.startsWith('http')?`<a href="${sel.site}" target="_blank" style="color:var(--accent);">открыть</a>`:sel.site;
     
-    currentItem={type:currentType==='material'?'Материал':'Работа',category:currentCategory,name:sel.name,unit:sel.unit||'',price:parseFloat(sel.price)||0,size:sel.size||'',supplier:sel.supplier||'',site:sel.site||''};
+    currentItem={type:currentType==='material'?'Материал':'Работа',category:currentCategory,name:sel.name,unit:sel.unit||'',price:parseFloat(sel.price)||0,size:sel.size||'',attribute:sel.attribute||'',supplier:sel.supplier||'',site:sel.site||''};
     buildCalcInterface();
 }
 
-function renderInfoField(valueId, containerId, tableValue, label, field) {
+function renderInfoField(valueId, containerId, tableValue, field) {
     const container = document.getElementById(containerId);
     if (tableValue && tableValue !== '0' && tableValue !== '') {
         container.innerHTML = `<span class="value${field==='size'?' size-hint':''}" id="${valueId}">${tableValue}</span>`;
@@ -458,7 +484,6 @@ function onManualChange(field, value) {
     if (field === 'price') currentItem.price = parseFloat(value) || 0;
     if (field === 'unit') currentItem.unit = value || 'ед.';
     if (field === 'size') currentItem.size = value;
-    // Обновить цену в инфо-блоке
     if (field === 'price' || field === 'unit') {
         const priceVal = currentItem.price;
         document.getElementById('priceValue').innerHTML = priceVal ? priceVal.toLocaleString('ru-RU')+' ₽/'+(currentItem.unit||'ед.') : '—';
@@ -480,6 +505,7 @@ function buildCalcInterface() {
     else if(ct==='length')h=`<div class="field-group"><label>Длина (м)</label><input type="number" id="calcQty" value="1" step="0.1" min="0.1"><div class="calc-hint">Введите нужную длину</div></div>`;
     else h=`<div class="field-group"><label>Количество (${ul})</label><input type="number" id="calcQty" value="1" step="1" min="1"><div class="calc-hint">Введите нужное количество</div></div>`;
     if(currentItem.size)h+=`<div style="font-size:var(--fs-xs);color:var(--text-secondary);margin-top:6px;">Размер единицы: ${currentItem.size}</div>`;
+    if(currentItem.attribute)h+=`<div style="font-size:var(--fs-xs);color:var(--text-secondary);margin-top:2px;">Характеристики: ${currentItem.attribute}</div>`;
     document.getElementById('calcFields').innerHTML=h;
     document.getElementById('calcBlock').style.display='block';
     document.getElementById('calcQty')?.addEventListener('input', calculateTotal);
