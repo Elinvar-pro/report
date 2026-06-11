@@ -29,7 +29,6 @@
             flex-direction: column;
         }
         
-        /* ШАПКА */
         .header {
             background: var(--white);
             border-bottom: 1px solid var(--gray-border);
@@ -65,7 +64,6 @@
         .status-dot.loading { background: #ff9800; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         
-        /* ОСНОВНОЙ БЛОК */
         .main-layout {
             display: flex;
             flex: 1;
@@ -74,7 +72,6 @@
             overflow: hidden;
         }
         
-        /* КОЛОНКИ */
         .column {
             background: var(--white);
             overflow-y: auto;
@@ -92,12 +89,11 @@
         }
         .column-estimate {
             flex: 1.5;
-            min-width: 420px;
+            min-width: 450px;
             display: flex;
             flex-direction: column;
         }
         
-        /* ЗАГОЛОВКИ КОЛОНОК */
         .column-header {
             font-size: 11px;
             font-weight: 700;
@@ -109,7 +105,6 @@
             border-bottom: 2px solid var(--gray-border);
         }
         
-        /* КАТАЛОГ */
         .section-label {
             font-size: 10px;
             font-weight: 700;
@@ -153,7 +148,6 @@
             margin: 12px 0;
         }
         
-        /* ВЫБОР ПОЗИЦИИ */
         .field-group {
             margin-bottom: 16px;
         }
@@ -183,7 +177,6 @@
             box-shadow: 0 0 0 2px rgba(46,125,50,0.1);
         }
         
-        /* ИНФО-БЛОК */
         .info-block {
             background: #f8f9fc;
             border: 1px solid var(--gray-border);
@@ -207,7 +200,6 @@
             font-size: 12px;
         }
         
-        /* РАСЧЁТ */
         .calc-block {
             background: #f8f9fc;
             border: 1px solid var(--gray-border);
@@ -240,7 +232,6 @@
             color: var(--green-dark);
         }
         
-        /* ИТОГО ЗА ПОЗИЦИЮ */
         .position-total {
             background: #f0fdf4;
             border: 1px solid #c8e6c9;
@@ -261,7 +252,6 @@
             color: var(--green-dark);
         }
         
-        /* КНОПКИ */
         .btn {
             padding: 10px 20px;
             border-radius: 6px;
@@ -289,7 +279,6 @@
         .btn-danger { color: var(--red); border-color: var(--red); background: white; }
         .btn-danger:hover { background: #ffebee; }
         
-        /* СМЕТА */
         .estimate-header-row {
             display: flex;
             justify-content: space-between;
@@ -333,17 +322,21 @@
             text-transform: uppercase;
             letter-spacing: 0.3px;
         }
+        .estimate-table th.col-right { text-align: right; }
+        
         .estimate-table td {
-            padding: 7px 10px;
+            padding: 6px 10px;
             border-bottom: 1px solid #f0f2f5;
-            vertical-align: top;
+            vertical-align: middle;
         }
         .estimate-table .even { background: #f8f9fc; }
         .estimate-table .odd { background: #ffffff; }
-        .estimate-table .col-sum {
+        .estimate-table .col-right {
             text-align: right;
-            font-weight: 600;
             white-space: nowrap;
+        }
+        .estimate-table .col-bold {
+            font-weight: 600;
         }
         .estimate-table .del-btn {
             background: none;
@@ -352,6 +345,7 @@
             color: #999;
             font-size: 16px;
             padding: 0 4px;
+            line-height: 1;
         }
         .estimate-table .del-btn:hover { color: var(--red); }
         
@@ -360,9 +354,10 @@
             font-weight: 700;
             font-size: 11px;
             color: #1a5d2a;
-            padding: 6px 10px;
+            padding: 5px 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-bottom: 1px solid #c8e6c9;
         }
         
         .estimate-table .subtotal-row td {
@@ -370,6 +365,7 @@
             font-weight: 700;
             font-size: 12px;
             border-top: 1px solid #e0d89c;
+            border-bottom: 1px solid #e0d89c;
         }
         
         .estimate-table .grand-row td {
@@ -395,7 +391,6 @@
             flex-shrink: 0;
         }
         
-        /* АДАПТИВ */
         @media (max-width: 1000px) {
             .main-layout { flex-direction: column; }
             .column-catalog { width: 100%; min-width: 0; max-height: 180px; }
@@ -490,9 +485,9 @@
                         <th>Наименование</th>
                         <th>Расчёт</th>
                         <th>Ед.</th>
-                        <th>Кол-во</th>
-                        <th>Цена/ед</th>
-                        <th>Сумма</th>
+                        <th class="col-right">Кол-во</th>
+                        <th class="col-right">Цена/ед</th>
+                        <th class="col-right">Сумма</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -555,7 +550,6 @@ function loadAllData() {
         fetch(SHEET2_URL).then(r => r.text())
     ])
     .then(([text1, text2]) => {
-        // Лист1 — Материалы
         const json1 = JSON.parse(text1.substring(47, text1.length - 2));
         const rows1 = json1.table.rows;
         catalog.materials = [];
@@ -577,7 +571,6 @@ function loadAllData() {
             });
         }
         
-        // Лист2 — Работы и услуги
         const json2 = JSON.parse(text2.substring(47, text2.length - 2));
         const rows2 = json2.table.rows;
         catalog.works = [];
@@ -881,27 +874,40 @@ function renderEstimate() {
     const materials = estimateItems.filter(i => i.type === 'Материал');
     const works = estimateItems.filter(i => i.type === 'Работа');
     
-    let matsSum = 0, worksSum = 0;
+    let matsSum = 0, worksSum = 0, rowIdx = 0;
     
     // МАТЕРИАЛЫ
     if (materials.length > 0) {
+        // Заголовок секции
         const sectionRow = tbody.insertRow();
         sectionRow.className = 'section-row';
-        sectionRow.insertCell(0).innerHTML = 'МАТЕРИАЛЫ';
-        sectionRow.insertCell(0).colSpan = 8;
+        const secCell = sectionRow.insertCell(0);
+        secCell.colSpan = 8;
+        secCell.innerHTML = 'МАТЕРИАЛЫ';
         
-        materials.forEach((item, idx) => {
+        materials.forEach((item) => {
             matsSum += item.total;
             const row = tbody.insertRow();
-            row.className = idx % 2 === 0 ? 'even' : 'odd';
+            row.className = rowIdx % 2 === 0 ? 'even' : 'odd';
+            rowIdx++;
+            
             row.insertCell(0).innerHTML = item.type;
             row.insertCell(1).innerHTML = item.name;
             row.insertCell(2).innerHTML = item.calcText;
             row.insertCell(3).innerHTML = item.unit;
-            row.insertCell(4).innerHTML = item.quantity;
-            row.insertCell(5).innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
-            row.insertCell(6).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
-            row.insertCell(6).className = 'col-sum';
+            
+            const qtyCell = row.insertCell(4);
+            qtyCell.className = 'col-right';
+            qtyCell.innerHTML = item.quantity;
+            
+            const priceCell = row.insertCell(5);
+            priceCell.className = 'col-right';
+            priceCell.innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
+            
+            const sumCell = row.insertCell(6);
+            sumCell.className = 'col-right col-bold';
+            sumCell.innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
+            
             const delCell = row.insertCell(7);
             delCell.innerHTML = '<button class="del-btn">&times;</button>';
             delCell.querySelector('button').onclick = () => {
@@ -910,40 +916,54 @@ function renderEstimate() {
             };
         });
         
-        const subtotalRow = tbody.insertRow();
-        subtotalRow.className = 'subtotal-row';
-        subtotalRow.insertCell(0).innerHTML = '';
-        subtotalRow.insertCell(0).colSpan = 5;
-        subtotalRow.insertCell(1).innerHTML = '';
-        subtotalRow.insertCell(2).innerHTML = '';
-        subtotalRow.insertCell(3).innerHTML = '';
-        subtotalRow.insertCell(4).innerHTML = '';
-        subtotalRow.insertCell(5).innerHTML = '<strong>Итого материалы:</strong>';
-        subtotalRow.insertCell(5).style.textAlign = 'right';
-        subtotalRow.insertCell(6).innerHTML = '<strong>' + matsSum.toFixed(2).replace('.', ',') + ' ₽</strong>';
-        subtotalRow.insertCell(6).className = 'col-sum';
-        subtotalRow.insertCell(7).innerHTML = '';
+        // Итого материалы
+        const subRow = tbody.insertRow();
+        subRow.className = 'subtotal-row';
+        subRow.insertCell(0).colSpan = 6;
+        const subLabel = subRow.insertCell(1);
+        subLabel.innerHTML = 'Итого материалы:';
+        subLabel.style.textAlign = 'right';
+        subLabel.style.fontWeight = '700';
+        
+        const subVal = subRow.insertCell(2);
+        subVal.className = 'col-right';
+        subVal.innerHTML = matsSum.toFixed(2).replace('.', ',') + ' ₽';
+        subVal.style.fontWeight = '700';
+        
+        subRow.insertCell(3).innerHTML = '';
     }
     
     // РАБОТЫ И УСЛУГИ
     if (works.length > 0) {
         const sectionRow = tbody.insertRow();
         sectionRow.className = 'section-row';
-        sectionRow.insertCell(0).innerHTML = 'РАБОТЫ И УСЛУГИ';
-        sectionRow.insertCell(0).colSpan = 8;
+        const secCell = sectionRow.insertCell(0);
+        secCell.colSpan = 8;
+        secCell.innerHTML = 'РАБОТЫ И УСЛУГИ';
         
-        works.forEach((item, idx) => {
+        works.forEach((item) => {
             worksSum += item.total;
             const row = tbody.insertRow();
-            row.className = idx % 2 === 0 ? 'even' : 'odd';
+            row.className = rowIdx % 2 === 0 ? 'even' : 'odd';
+            rowIdx++;
+            
             row.insertCell(0).innerHTML = item.type;
             row.insertCell(1).innerHTML = item.name;
             row.insertCell(2).innerHTML = item.calcText;
             row.insertCell(3).innerHTML = item.unit;
-            row.insertCell(4).innerHTML = item.quantity;
-            row.insertCell(5).innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
-            row.insertCell(6).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
-            row.insertCell(6).className = 'col-sum';
+            
+            const qtyCell = row.insertCell(4);
+            qtyCell.className = 'col-right';
+            qtyCell.innerHTML = item.quantity;
+            
+            const priceCell = row.insertCell(5);
+            priceCell.className = 'col-right';
+            priceCell.innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
+            
+            const sumCell = row.insertCell(6);
+            sumCell.className = 'col-right col-bold';
+            sumCell.innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
+            
             const delCell = row.insertCell(7);
             delCell.innerHTML = '<button class="del-btn">&times;</button>';
             delCell.querySelector('button').onclick = () => {
@@ -952,29 +972,41 @@ function renderEstimate() {
             };
         });
         
-        const subtotalRow = tbody.insertRow();
-        subtotalRow.className = 'subtotal-row';
-        subtotalRow.insertCell(0).innerHTML = '';
-        subtotalRow.insertCell(0).colSpan = 5;
-        subtotalRow.insertCell(5).innerHTML = '<strong>Итого работы:</strong>';
-        subtotalRow.insertCell(5).style.textAlign = 'right';
-        subtotalRow.insertCell(6).innerHTML = '<strong>' + worksSum.toFixed(2).replace('.', ',') + ' ₽</strong>';
-        subtotalRow.insertCell(6).className = 'col-sum';
-        subtotalRow.insertCell(7).innerHTML = '';
+        // Итого работы
+        const subRow = tbody.insertRow();
+        subRow.className = 'subtotal-row';
+        subRow.insertCell(0).colSpan = 6;
+        const subLabel = subRow.insertCell(1);
+        subLabel.innerHTML = 'Итого работы:';
+        subLabel.style.textAlign = 'right';
+        subLabel.style.fontWeight = '700';
+        
+        const subVal = subRow.insertCell(2);
+        subVal.className = 'col-right';
+        subVal.innerHTML = worksSum.toFixed(2).replace('.', ',') + ' ₽';
+        subVal.style.fontWeight = '700';
+        
+        subRow.insertCell(3).innerHTML = '';
     }
     
     // ОБЩИЙ ИТОГ
     const grand = matsSum + worksSum;
     const grandRow = tbody.insertRow();
     grandRow.className = 'grand-row';
-    grandRow.insertCell(0).innerHTML = '';
-    grandRow.insertCell(0).colSpan = 5;
-    grandRow.insertCell(5).innerHTML = '<strong>ВСЕГО ПО СМЕТЕ:</strong>';
-    grandRow.insertCell(5).style.textAlign = 'right';
-    grandRow.insertCell(6).innerHTML = '<strong>' + grand.toFixed(2).replace('.', ',') + ' ₽</strong>';
-    grandRow.insertCell(6).className = 'col-sum';
-    grandRow.insertCell(7).innerHTML = '';
+    grandRow.insertCell(0).colSpan = 6;
+    const grandLabel = grandRow.insertCell(1);
+    grandLabel.innerHTML = 'ВСЕГО ПО СМЕТЕ:';
+    grandLabel.style.textAlign = 'right';
+    grandLabel.style.fontWeight = '800';
     
+    const grandVal = grandRow.insertCell(2);
+    grandVal.className = 'col-right';
+    grandVal.innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
+    grandVal.style.fontWeight = '800';
+    
+    grandRow.insertCell(3).innerHTML = '';
+    
+    // Обновляем сумму в шапке
     document.getElementById('totalEstimate').innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
     localStorage.setItem('estimate', JSON.stringify(estimateItems));
 }
@@ -993,19 +1025,29 @@ function copyEstimate() {
     if (estimateItems.length === 0) { alert('Смета пуста'); return; }
     
     let text = 'Тип\tНаименование\tРасчёт\tЕд.изм\tКол-во\tЦена/ед\tСумма\n';
-    estimateItems.forEach(item => {
-        text += [
-            item.type,
-            item.name,
-            item.calcText,
-            item.unit,
-            item.quantity,
-            item.price.toFixed(2),
-            item.total.toFixed(2)
-        ].join('\t') + '\n';
-    });
+    const materials = estimateItems.filter(i => i.type === 'Материал');
+    const works = estimateItems.filter(i => i.type === 'Работа');
+    
+    if (materials.length > 0) {
+        text += 'МАТЕРИАЛЫ\n';
+        materials.forEach(item => {
+            text += [item.type, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2), item.total.toFixed(2)].join('\t') + '\n';
+        });
+        const ms = materials.reduce((s, i) => s + i.total, 0);
+        text += `\t\t\t\t\tИтого материалы:\t${ms.toFixed(2)} ₽\n`;
+    }
+    
+    if (works.length > 0) {
+        text += '\nРАБОТЫ И УСЛУГИ\n';
+        works.forEach(item => {
+            text += [item.type, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2), item.total.toFixed(2)].join('\t') + '\n';
+        });
+        const ws = works.reduce((s, i) => s + i.total, 0);
+        text += `\t\t\t\t\tИтого работы:\t${ws.toFixed(2)} ₽\n`;
+    }
+    
     const grand = estimateItems.reduce((s, i) => s + i.total, 0);
-    text += `\nИТОГО:\t\t\t\t\t${grand.toFixed(2)} ₽`;
+    text += `\n\t\t\t\t\tВСЕГО:\t${grand.toFixed(2)} ₽`;
     
     navigator.clipboard.writeText(text).then(() => {
         alert('Смета скопирована в буфер');
