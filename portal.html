@@ -357,7 +357,7 @@ function loadAllData() {
             catalog.materials.push({
                 group: g,
                 name: String(c[1]?.v||'').trim(),
-                attribute: String(c[2]?.v||'').trim(),  // колонка C — Признак
+                attribute: String(c[2]?.v||'').trim(),
                 unit: String(c[3]?.v||'').trim(),
                 price: parsePrice(c[4]?.v),
                 size: String(c[5]?.v||'').trim(),
@@ -433,7 +433,32 @@ function selectCategory(type, cat) {
     src.forEach(i=>{if(i.group===cat)currentItems.push({...i,itemType:type})});
     const s=document.getElementById('itemSelect');
     s.innerHTML='<option value="">Выберите позицию</option>';
-    currentItems.forEach(i=>{const o=document.createElement('option');o.value=i.name;o.textContent=i.name;o.dataset.unit=i.unit||'';o.dataset.price=i.price||0;o.dataset.size=i.size||'';o.dataset.attribute=i.attribute||'';o.dataset.supplier=i.supplier||'';o.dataset.site=i.site||'';s.appendChild(o);});
+    
+    // Группируем по названиям — если есть дубли, добавляем характеристику
+    const nameCount = {};
+    currentItems.forEach(i => {
+        if (!nameCount[i.name]) nameCount[i.name] = [];
+        nameCount[i.name].push(i);
+    });
+    
+    currentItems.forEach((i, idx) => {
+        const o = document.createElement('option');
+        o.value = i.name;
+        o.dataset.idx = idx; // индекс в currentItems для точного поиска
+        if (nameCount[i.name].length > 1 && i.attribute) {
+            o.textContent = i.name + ' (' + i.attribute + ')';
+        } else {
+            o.textContent = i.name;
+        }
+        o.dataset.unit=i.unit||'';
+        o.dataset.price=i.price||0;
+        o.dataset.size=i.size||'';
+        o.dataset.attribute=i.attribute||'';
+        o.dataset.supplier=i.supplier||'';
+        o.dataset.site=i.site||'';
+        s.appendChild(o);
+    });
+    
     document.getElementById('infoBlock').style.display='none';
     document.getElementById('calcBlock').style.display='none';
     document.getElementById('rowTotal').innerHTML='0 ₽'; currentItem=null;
@@ -441,21 +466,37 @@ function selectCategory(type, cat) {
 
 function fillDetails() {
     const s=document.getElementById('itemSelect'); const o=s.options[s.selectedIndex];
-    if(!o||!o.value)return; const sel=currentItems.find(i=>i.name===o.value); if(!sel)return;
+    if(!o||!o.value)return;
+    
+    // Точный поиск: по индексу или по названию + характеристике
+    const idx = parseInt(o.dataset.idx);
+    let sel;
+    if (!isNaN(idx) && idx >= 0 && idx < currentItems.length) {
+        sel = currentItems[idx];
+    } else {
+        const selAttr = o.dataset.attribute || '';
+        sel = currentItems.find(i => {
+            if (i.name === o.value) {
+                if (selAttr) return i.attribute === selAttr;
+                return true;
+            }
+            return false;
+        });
+    }
+    if(!sel)return;
+    
     manualOverrides = {};
     document.getElementById('infoBlock').style.display='block';
     
-    // Размер
     renderInfoField('sizeValue', 'sizeContainer', sel.size, 'size');
-    // Характеристики (Признак)
+    
     const attrVal = sel.attribute || '';
     document.getElementById('attrRow').style.display = attrVal ? 'flex' : 'none';
     if (attrVal) {
         document.getElementById('attrContainer').innerHTML = `<span class="value">${attrVal}</span>`;
     }
-    // Ед. измерения
+    
     renderInfoField('unitValue', 'unitContainer', sel.unit, 'unit');
-    // Цена
     const priceStr = sel.price ? sel.price.toLocaleString('ru-RU')+' ₽/'+(sel.unit||'ед.') : '';
     renderInfoField('priceValue', 'priceContainer', priceStr, 'price');
     
