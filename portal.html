@@ -45,7 +45,6 @@
             font-size: 18px;
             font-weight: 700;
             color: var(--green-dark);
-            letter-spacing: -0.3px;
         }
         .header-status {
             font-size: 12px;
@@ -77,19 +76,19 @@
             overflow-y: auto;
         }
         .column-catalog {
-            width: 260px;
-            min-width: 220px;
+            width: 250px;
+            min-width: 200px;
             flex-shrink: 0;
             padding: 16px;
         }
         .column-params {
             flex: 1;
-            min-width: 320px;
+            min-width: 300px;
             padding: 20px 24px;
         }
         .column-estimate {
-            flex: 1.5;
-            min-width: 450px;
+            flex: 1.8;
+            min-width: 400px;
             display: flex;
             flex-direction: column;
         }
@@ -119,8 +118,6 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
-            max-height: 240px;
-            overflow-y: auto;
         }
         .category-item {
             display: flex;
@@ -207,196 +204,126 @@
             padding: 14px;
             margin-bottom: 16px;
         }
-        .calc-row {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-        .calc-row .field-group {
-            flex: 1;
-            min-width: 100px;
-            margin-bottom: 0;
-        }
-        .calc-hint {
-            font-size: 11px;
-            color: var(--gray-text);
-            margin-top: 4px;
-        }
+        .calc-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .calc-row .field-group { flex: 1; min-width: 100px; margin-bottom: 0; }
+        .calc-hint { font-size: 11px; color: var(--gray-text); margin-top: 4px; }
         .calc-result {
-            margin-top: 12px;
-            padding-top: 10px;
+            margin-top: 12px; padding-top: 10px;
             border-top: 1px solid #e0e4e8;
-            text-align: right;
-            font-size: 13px;
-            color: var(--green-dark);
+            text-align: right; font-size: 13px; color: var(--green-dark);
         }
         
         .position-total {
-            background: #f0fdf4;
-            border: 1px solid #c8e6c9;
-            border-radius: 8px;
-            padding: 14px;
-            text-align: center;
-            margin-bottom: 12px;
+            background: #f0fdf4; border: 1px solid #c8e6c9;
+            border-radius: 8px; padding: 14px; text-align: center; margin-bottom: 12px;
         }
-        .position-total .pt-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--green);
-        }
-        .position-total .pt-value {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--green-dark);
-        }
+        .position-total .pt-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--green); }
+        .position-total .pt-value { font-size: 26px; font-weight: 700; color: var(--green-dark); }
         
         .btn {
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: var(--font);
-            font-size: 14px;
-            border: none;
-            transition: all 0.15s;
-            white-space: nowrap;
+            padding: 10px 20px; border-radius: 6px; font-weight: 600;
+            cursor: pointer; font-family: var(--font); font-size: 14px;
+            border: none; transition: all 0.15s; white-space: nowrap;
         }
-        .btn-primary {
-            background: var(--green);
-            color: white;
-            width: 100%;
-        }
+        .btn-primary { background: var(--green); color: white; width: 100%; }
         .btn-primary:hover { background: #1b5e20; }
-        .btn-outline {
-            background: white;
-            border: 1px solid var(--green);
-            color: var(--green);
-        }
+        .btn-outline { background: white; border: 1px solid var(--green); color: var(--green); }
         .btn-outline:hover { background: var(--green-light); }
         .btn-sm { padding: 5px 12px; font-size: 12px; }
         .btn-danger { color: var(--red); border-color: var(--red); background: white; }
         .btn-danger:hover { background: #ffebee; }
         
         .estimate-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 16px;
-            border-bottom: 2px solid var(--gray-border);
-            flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 16px; border-bottom: 2px solid var(--gray-border); flex-shrink: 0;
         }
-        .estimate-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #1a2a3a;
-        }
-        .estimate-grand {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--green-dark);
-        }
+        .estimate-title { font-size: 15px; font-weight: 700; color: #1a2a3a; }
+        .estimate-grand { font-size: 18px; font-weight: 700; color: var(--green-dark); }
         
         .estimate-table-wrap {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0;
+            flex: 1; overflow-y: auto; padding: 0;
         }
         .estimate-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
+            width: 100%; border-collapse: collapse; font-size: 12px;
         }
         .estimate-table th {
-            text-align: left;
-            padding: 8px 10px;
-            background: #f8fafc;
-            font-weight: 600;
-            color: var(--green-dark);
+            text-align: left; padding: 8px 10px; background: #f8fafc;
+            font-weight: 600; color: var(--green-dark);
             border-bottom: 1px solid var(--gray-border);
-            position: sticky;
-            top: 0;
-            z-index: 1;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            position: sticky; top: 0; z-index: 1;
+            font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px;
         }
         .estimate-table th.col-right { text-align: right; }
         
         .estimate-table td {
-            padding: 6px 10px;
-            border-bottom: 1px solid #f0f2f5;
-            vertical-align: middle;
+            padding: 6px 10px; border-bottom: 1px solid #f0f2f5; vertical-align: middle;
         }
         .estimate-table .even { background: #f8f9fc; }
         .estimate-table .odd { background: #ffffff; }
-        .estimate-table .col-right {
-            text-align: right;
-            white-space: nowrap;
-        }
-        .estimate-table .col-bold {
-            font-weight: 600;
-        }
+        .estimate-table .col-right { text-align: right; white-space: nowrap; }
+        .estimate-table .col-bold { font-weight: 600; }
         .estimate-table .del-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #999;
-            font-size: 16px;
-            padding: 0 4px;
-            line-height: 1;
+            background: none; border: none; cursor: pointer;
+            color: #999; font-size: 16px; padding: 0 4px; line-height: 1;
         }
         .estimate-table .del-btn:hover { color: var(--red); }
         
-        .estimate-table .section-row td {
-            background: #e8f5e9;
-            font-weight: 700;
-            font-size: 11px;
-            color: #1a5d2a;
-            padding: 5px 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #c8e6c9;
+        /* Секции и итоги */
+        .section-row td {
+            background: #e8f5e9; font-weight: 700; font-size: 11px;
+            color: #1a5d2a; padding: 5px 10px; text-transform: uppercase;
+            letter-spacing: 0.5px; border-bottom: 1px solid #c8e6c9;
         }
-        
-        .estimate-table .subtotal-row td {
-            background: #fff9c4;
-            font-weight: 700;
-            font-size: 12px;
-            border-top: 1px solid #e0d89c;
-            border-bottom: 1px solid #e0d89c;
+        .subtotal-row td {
+            background: #fff9c4; font-weight: 700; font-size: 12px;
+            border-top: 1px solid #e0d89c; border-bottom: 1px solid #e0d89c;
         }
-        
-        .estimate-table .grand-row td {
-            background: #ffcc02;
-            font-weight: 800;
-            font-size: 13px;
+        .grand-row td {
+            background: #ffcc02; font-weight: 800; font-size: 13px;
             border-top: 2px solid #e6b800;
         }
         
-        .estimate-empty {
-            text-align: center;
-            padding: 40px;
-            color: #8a99a8;
-            font-size: 13px;
-        }
+        .estimate-empty { text-align: center; padding: 40px; color: #8a99a8; font-size: 13px; }
         
         .estimate-actions {
-            padding: 12px 16px;
-            border-top: 1px solid var(--gray-border);
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            flex-shrink: 0;
+            padding: 12px 16px; border-top: 1px solid var(--gray-border);
+            display: flex; gap: 8px; flex-wrap: wrap; flex-shrink: 0;
         }
         
-        @media (max-width: 1000px) {
-            .main-layout { flex-direction: column; }
-            .column-catalog { width: 100%; min-width: 0; max-height: 180px; }
-            .column-params { min-width: 0; }
-            .column-estimate { min-width: 0; flex: 1; }
-            .header { padding: 0 12px; }
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
+        @media (max-width: 900px) {
+            .main-layout {
+                flex-direction: column;
+                overflow: visible;
+            }
+            .column-catalog {
+                width: 100%; min-width: 0; max-height: none;
+                padding: 12px;
+            }
+            .category-list {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 4px;
+                max-height: none;
+            }
+            .category-item {
+                font-size: 12px; padding: 6px 10px;
+                white-space: nowrap;
+            }
+            .column-params {
+                min-width: 0; padding: 12px;
+            }
+            .column-estimate {
+                min-width: 0; flex: 1;
+            }
+            .header {
+                padding: 0 12px; height: 48px;
+            }
+            .header-title { font-size: 16px; }
+            .estimate-table { font-size: 11px; }
+            .estimate-table th, .estimate-table td { padding: 4px 6px; }
+            .estimate-actions { flex-direction: column; }
+            .btn-sm { width: 100%; text-align: center; }
         }
     </style>
 </head>
@@ -411,7 +338,7 @@
 
 <div class="main-layout">
 
-    <!-- КОЛОНКА 1: КАТАЛОГ -->
+    <!-- КАТАЛОГ -->
     <div class="column column-catalog">
         <div class="section-label">Материалы</div>
         <div class="category-list" id="materialsList">
@@ -424,7 +351,7 @@
         </div>
     </div>
 
-    <!-- КОЛОНКА 2: ПАРАМЕТРЫ -->
+    <!-- ПАРАМЕТРЫ -->
     <div class="column column-params">
         <div class="column-header">Параметры позиции</div>
 
@@ -471,7 +398,7 @@
         <button class="btn btn-primary" onclick="addToEstimate()">Добавить в смету</button>
     </div>
 
-    <!-- КОЛОНКА 3: СМЕТА -->
+    <!-- СМЕТА -->
     <div class="column column-estimate">
         <div class="estimate-header-row">
             <span class="estimate-title">Смета</span>
@@ -509,16 +436,6 @@
 // ============================================================
 // УТИЛИТЫ
 // ============================================================
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
-}
-
 function parsePrice(value) {
     if (value === undefined || value === null || value === '') return 0;
     if (typeof value === 'number') return value;
@@ -538,8 +455,7 @@ let catalog = { materials: [], works: [] };
 let dataLoaded = false;
 
 function setDataStatus(status, text) {
-    const el = document.getElementById('dataStatus');
-    el.innerHTML = `<span class="status-dot ${status}"></span> ${text}`;
+    document.getElementById('dataStatus').innerHTML = `<span class="status-dot ${status}"></span> ${text}`;
 }
 
 function loadAllData() {
@@ -551,59 +467,42 @@ function loadAllData() {
     ])
     .then(([text1, text2]) => {
         const json1 = JSON.parse(text1.substring(47, text1.length - 2));
-        const rows1 = json1.table.rows;
         catalog.materials = [];
-        
-        for (let i = 0; i < rows1.length; i++) {
-            const row = rows1[i].c;
+        for (let i = 0; i < json1.table.rows.length; i++) {
+            const row = json1.table.rows[i].c;
             if (!row || !row[0] || !row[0].v) continue;
             const group = String(row[0]?.v || '').trim();
             if (!group) continue;
-            
             catalog.materials.push({
-                group: group,
-                name: String(row[1]?.v || '').trim(),
-                unit: String(row[3]?.v || '').trim(),
-                price: parsePrice(row[4]?.v),
-                size: String(row[5]?.v || '').trim(),
-                supplier: String(row[7]?.v || '').trim(),
+                group, name: String(row[1]?.v || '').trim(),
+                unit: String(row[3]?.v || '').trim(), price: parsePrice(row[4]?.v),
+                size: String(row[5]?.v || '').trim(), supplier: String(row[7]?.v || '').trim(),
                 site: String(row[8]?.v || '').trim()
             });
         }
         
         const json2 = JSON.parse(text2.substring(47, text2.length - 2));
-        const rows2 = json2.table.rows;
         catalog.works = [];
-        
-        for (let i = 0; i < rows2.length; i++) {
-            const row = rows2[i].c;
+        for (let i = 0; i < json2.table.rows.length; i++) {
+            const row = json2.table.rows[i].c;
             if (!row || !row[0] || !row[0].v) continue;
             const group = String(row[0]?.v || '').trim();
             if (!group) continue;
-            
             catalog.works.push({
-                group: group,
-                name: String(row[1]?.v || '').trim(),
-                unit: String(row[2]?.v || '').trim(),
-                price: parsePrice(row[3]?.v),
-                note: String(row[4]?.v || '').trim(),
-                size: '',
-                supplier: '',
-                site: ''
+                group, name: String(row[1]?.v || '').trim(),
+                unit: String(row[2]?.v || '').trim(), price: parsePrice(row[3]?.v),
+                note: String(row[4]?.v || '').trim(), size: '', supplier: '', site: ''
             });
         }
         
-        console.log('Загружено: материалов', catalog.materials.length, ', работ', catalog.works.length);
         dataLoaded = true;
         setDataStatus('online', 'Готово');
         initConstructor();
         preloadExcelJS();
     })
     .catch(error => {
-        console.error('Ошибка загрузки:', error);
+        console.error(error);
         setDataStatus('offline', 'Ошибка загрузки');
-        document.getElementById('materialsList').innerHTML = '<div style="color:red;font-size:12px;padding:8px;">Ошибка</div>';
-        document.getElementById('worksList').innerHTML = '<div style="color:red;font-size:12px;padding:8px;">Ошибка</div>';
     });
 }
 
@@ -624,14 +523,8 @@ let currentType = null, currentCategory = null, currentItems = [], currentItem =
 let estimateItems = [];
 
 function initConstructor() {
-    const matSet = new Set();
-    catalog.materials.forEach(i => { if (i.group) matSet.add(i.group); });
-    materialCategories = Array.from(matSet).sort();
-    
-    const workSet = new Set();
-    catalog.works.forEach(i => { if (i.group) workSet.add(i.group); });
-    workCategories = Array.from(workSet).sort();
-    
+    materialCategories = [...new Set(catalog.materials.map(i => i.group).filter(Boolean))].sort();
+    workCategories = [...new Set(catalog.works.map(i => i.group).filter(Boolean))].sort();
     renderCategories();
     loadEstimateFromStorage();
 }
@@ -661,10 +554,7 @@ function renderCategories() {
 }
 
 function resetForm() {
-    currentType = null;
-    currentCategory = null;
-    currentItems = [];
-    currentItem = null;
+    currentType = null; currentCategory = null; currentItems = []; currentItem = null;
     document.getElementById('itemSelect').innerHTML = '<option value="">Сначала выберите категорию</option>';
     document.getElementById('infoBlock').style.display = 'none';
     document.getElementById('calcBlock').style.display = 'none';
@@ -673,31 +563,24 @@ function resetForm() {
 }
 
 function selectCategory(type, category) {
-    currentType = type;
-    currentCategory = category;
-    
+    currentType = type; currentCategory = category;
     document.querySelectorAll('.category-item').forEach(el => el.classList.remove('active'));
-    const allItems = document.querySelectorAll(type === 'material' ? '#materialsList .category-item' : '#worksList .category-item');
-    allItems.forEach(el => {
+    const selector = type === 'material' ? '#materialsList .category-item' : '#worksList .category-item';
+    document.querySelectorAll(selector).forEach(el => {
         if (el.textContent.trim() === category) el.classList.add('active');
     });
     
     currentItems = [];
     const source = type === 'material' ? catalog.materials : catalog.works;
-    source.forEach(item => {
-        if (item.group === category) currentItems.push({ ...item, itemType: type });
-    });
+    source.forEach(item => { if (item.group === category) currentItems.push({ ...item, itemType: type }); });
     
     const select = document.getElementById('itemSelect');
     select.innerHTML = '<option value="">Выберите позицию</option>';
     currentItems.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = item.name;
-        opt.textContent = item.name;
-        opt.dataset.unit = item.unit || '';
-        opt.dataset.price = item.price || 0;
-        opt.dataset.size = item.size || '';
-        opt.dataset.supplier = item.supplier || '';
+        opt.value = item.name; opt.textContent = item.name;
+        opt.dataset.unit = item.unit || ''; opt.dataset.price = item.price || 0;
+        opt.dataset.size = item.size || ''; opt.dataset.supplier = item.supplier || '';
         opt.dataset.site = item.site || '';
         select.appendChild(opt);
     });
@@ -712,7 +595,6 @@ function fillDetails() {
     const select = document.getElementById('itemSelect');
     const opt = select.options[select.selectedIndex];
     if (!opt || !opt.value) return;
-    
     const selected = currentItems.find(item => item.name === opt.value);
     if (!selected) return;
     
@@ -722,37 +604,23 @@ function fillDetails() {
     document.getElementById('priceValue').innerHTML = selected.price
         ? selected.price.toLocaleString('ru-RU') + ' ₽/' + (selected.unit || 'ед.') : '—';
     
-    const suppRow = document.getElementById('supplierRow');
-    const siteRow = document.getElementById('siteRow');
-    if (selected.supplier) {
-        suppRow.style.display = 'flex';
-        document.getElementById('supplierValue').innerHTML = selected.supplier;
-    } else {
-        suppRow.style.display = 'none';
-    }
+    document.getElementById('supplierRow').style.display = selected.supplier ? 'flex' : 'none';
+    if (selected.supplier) document.getElementById('supplierValue').innerHTML = selected.supplier;
+    
+    document.getElementById('siteRow').style.display = selected.site ? 'flex' : 'none';
     if (selected.site) {
-        siteRow.style.display = 'flex';
-        const siteVal = document.getElementById('siteValue');
-        if (selected.site.startsWith('http')) {
-            siteVal.innerHTML = `<a href="${selected.site}" target="_blank" style="color:#2e7d32;">открыть</a>`;
-        } else {
-            siteVal.innerHTML = selected.site;
-        }
-    } else {
-        siteRow.style.display = 'none';
+        const sv = document.getElementById('siteValue');
+        sv.innerHTML = selected.site.startsWith('http')
+            ? `<a href="${selected.site}" target="_blank" style="color:#2e7d32;">открыть</a>`
+            : selected.site;
     }
     
     currentItem = {
         type: currentType === 'material' ? 'Материал' : 'Работа',
-        category: currentCategory,
-        name: selected.name,
-        unit: selected.unit || 'ед.',
-        price: parseFloat(selected.price) || 0,
-        size: selected.size || '',
-        supplier: selected.supplier || '',
-        site: selected.site || ''
+        category: currentCategory, name: selected.name,
+        unit: selected.unit || 'ед.', price: parseFloat(selected.price) || 0,
+        size: selected.size || '', supplier: selected.supplier || '', site: selected.site || ''
     };
-    
     buildCalcInterface();
 }
 
@@ -764,78 +632,50 @@ function getCalcType(unit) {
 }
 
 function buildCalcInterface() {
-    const calcBlock = document.getElementById('calcBlock');
-    const calcFields = document.getElementById('calcFields');
     if (!currentItem) return;
-    
     const calcType = getCalcType(currentItem.unit);
-    let html = '';
     const unitLabel = currentItem.unit || 'ед.';
+    let html = '';
     
     if (calcType === 'area') {
-        html = `
-            <div class="field-group">
-                <label>Площадь (м²)</label>
-                <input type="number" id="calcQty" value="1" step="0.01" min="0.01" placeholder="Сколько м² нужно">
-                <div class="calc-hint">Введите нужную площадь в м²</div>
-            </div>
-        `;
+        html = `<div class="field-group"><label>Площадь (м²)</label>
+            <input type="number" id="calcQty" value="1" step="0.01" min="0.01" placeholder="Сколько м² нужно">
+            <div class="calc-hint">Введите нужную площадь</div></div>`;
     } else if (calcType === 'length') {
-        html = `
-            <div class="field-group">
-                <label>Длина (м)</label>
-                <input type="number" id="calcQty" value="1" step="0.1" min="0.1" placeholder="Сколько метров нужно">
-                <div class="calc-hint">Введите нужную длину в метрах</div>
-            </div>
-        `;
+        html = `<div class="field-group"><label>Длина (м)</label>
+            <input type="number" id="calcQty" value="1" step="0.1" min="0.1" placeholder="Сколько метров нужно">
+            <div class="calc-hint">Введите нужную длину</div></div>`;
     } else {
-        html = `
-            <div class="field-group">
-                <label>Количество (${unitLabel})</label>
-                <input type="number" id="calcQty" value="1" step="1" min="1" placeholder="Сколько нужно">
-                <div class="calc-hint">Введите нужное количество</div>
-            </div>
-        `;
+        html = `<div class="field-group"><label>Количество (${unitLabel})</label>
+            <input type="number" id="calcQty" value="1" step="1" min="1" placeholder="Сколько нужно">
+            <div class="calc-hint">Введите нужное количество</div></div>`;
     }
+    if (currentItem.size) html += `<div style="font-size:11px;color:#6c7a8a;margin-top:6px;">Размер единицы: ${currentItem.size}</div>`;
     
-    if (currentItem.size) {
-        html += `<div style="font-size:11px;color:#6c7a8a;margin-top:6px;">Размер единицы: ${currentItem.size}</div>`;
-    }
-    
-    calcFields.innerHTML = html;
-    calcBlock.style.display = 'block';
-    
+    document.getElementById('calcFields').innerHTML = html;
+    document.getElementById('calcBlock').style.display = 'block';
     document.getElementById('calcQty')?.addEventListener('input', calculateTotal);
     calculateTotal();
 }
 
 function calculateTotal() {
     if (!currentItem) return 0;
-    
     const qty = parseFloat(document.getElementById('calcQty')?.value) || 0;
     const total = qty * currentItem.price;
-    const unitLabel = currentItem.unit || 'ед.';
     
     let calcText = '';
     const calcType = getCalcType(currentItem.unit);
-    if (calcType === 'area') {
-        calcText = `${qty.toFixed(2)} м² x ${currentItem.price.toFixed(2)} ₽/м² = ${total.toFixed(2)} ₽`;
-    } else if (calcType === 'length') {
-        calcText = `${qty.toFixed(1)} м x ${currentItem.price.toFixed(2)} ₽/м = ${total.toFixed(2)} ₽`;
-    } else {
-        calcText = `${qty} ${unitLabel} x ${currentItem.price.toFixed(2)} ₽ = ${total.toFixed(2)} ₽`;
-    }
+    if (calcType === 'area') calcText = `${qty.toFixed(2)} м² x ${currentItem.price.toFixed(2)} ₽/м² = ${total.toFixed(2)} ₽`;
+    else if (calcType === 'length') calcText = `${qty.toFixed(1)} м x ${currentItem.price.toFixed(2)} ₽/м = ${total.toFixed(2)} ₽`;
+    else calcText = `${qty} ${currentItem.unit||'ед.'} x ${currentItem.price.toFixed(2)} ₽ = ${total.toFixed(2)} ₽`;
     
     document.getElementById('rowTotal').innerHTML = total.toFixed(2).replace('.', ',') + ' ₽';
-    const calcResult = document.getElementById('calcResult');
-    if (calcResult) calcResult.innerHTML = calcText;
-    
+    document.getElementById('calcResult').innerHTML = calcText;
     return { total, quantity: qty, calcText };
 }
 
 function addToEstimate() {
     if (!currentItem || !currentItem.name) { alert('Выберите позицию'); return; }
-    
     const calc = calculateTotal();
     if (calc.total === 0) { alert('Укажите количество'); return; }
     
@@ -847,16 +687,11 @@ function addToEstimate() {
     else calcTextShort = `${qty} ${currentItem.unit || 'ед.'}`;
     
     estimateItems.push({
-        type: currentItem.type,
-        category: currentItem.category,
-        name: currentItem.name,
-        calcText: calcTextShort,
-        unit: currentItem.unit || 'ед.',
-        quantity: qty,
-        price: currentItem.price,
-        total: calc.total
+        type: currentItem.type, category: currentItem.category,
+        name: currentItem.name, calcText: calcTextShort,
+        unit: currentItem.unit || 'ед.', quantity: qty,
+        price: currentItem.price, total: calc.total
     });
-    
     renderEstimate();
     document.getElementById('rowTotal').innerHTML = '0 ₽';
 }
@@ -873,367 +708,205 @@ function renderEstimate() {
     
     const materials = estimateItems.filter(i => i.type === 'Материал');
     const works = estimateItems.filter(i => i.type === 'Работа');
-    
     let matsSum = 0, worksSum = 0, rowIdx = 0;
     
-    // МАТЕРИАЛЫ
+    function addRow(item) {
+        const row = tbody.insertRow();
+        row.className = rowIdx % 2 === 0 ? 'even' : 'odd';
+        rowIdx++;
+        row.insertCell(0).innerHTML = item.type;
+        row.insertCell(1).innerHTML = item.name;
+        row.insertCell(2).innerHTML = item.calcText;
+        row.insertCell(3).innerHTML = item.unit;
+        row.insertCell(4).innerHTML = item.quantity; row.cells[4].className = 'col-right';
+        row.insertCell(5).innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽'; row.cells[5].className = 'col-right';
+        row.insertCell(6).innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽'; row.cells[6].className = 'col-right col-bold';
+        const del = row.insertCell(7);
+        del.innerHTML = '<button class="del-btn">&times;</button>';
+        del.querySelector('button').onclick = () => {
+            const idx = estimateItems.indexOf(item);
+            if (idx >= 0) { estimateItems.splice(idx, 1); renderEstimate(); }
+        };
+    }
+    
+    function addSubtotal(label, sum) {
+        const row = tbody.insertRow();
+        row.className = 'subtotal-row';
+        row.insertCell(0).colSpan = 6;
+        row.cells[0].innerHTML = label;
+        row.cells[0].style.textAlign = 'right';
+        row.cells[0].style.fontWeight = '700';
+        const val = row.insertCell(1);
+        val.innerHTML = sum.toFixed(2).replace('.', ',') + ' ₽';
+        val.className = 'col-right'; val.style.fontWeight = '700';
+        row.insertCell(2).innerHTML = '';
+    }
+    
     if (materials.length > 0) {
-        // Заголовок секции
-        const sectionRow = tbody.insertRow();
-        sectionRow.className = 'section-row';
-        const secCell = sectionRow.insertCell(0);
-        secCell.colSpan = 8;
-        secCell.innerHTML = 'МАТЕРИАЛЫ';
-        
-        materials.forEach((item) => {
-            matsSum += item.total;
-            const row = tbody.insertRow();
-            row.className = rowIdx % 2 === 0 ? 'even' : 'odd';
-            rowIdx++;
-            
-            row.insertCell(0).innerHTML = item.type;
-            row.insertCell(1).innerHTML = item.name;
-            row.insertCell(2).innerHTML = item.calcText;
-            row.insertCell(3).innerHTML = item.unit;
-            
-            const qtyCell = row.insertCell(4);
-            qtyCell.className = 'col-right';
-            qtyCell.innerHTML = item.quantity;
-            
-            const priceCell = row.insertCell(5);
-            priceCell.className = 'col-right';
-            priceCell.innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
-            
-            const sumCell = row.insertCell(6);
-            sumCell.className = 'col-right col-bold';
-            sumCell.innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
-            
-            const delCell = row.insertCell(7);
-            delCell.innerHTML = '<button class="del-btn">&times;</button>';
-            delCell.querySelector('button').onclick = () => {
-                const realIdx = estimateItems.indexOf(item);
-                if (realIdx >= 0) { estimateItems.splice(realIdx, 1); renderEstimate(); }
-            };
-        });
-        
-        // Итого материалы
-        const subRow = tbody.insertRow();
-        subRow.className = 'subtotal-row';
-        subRow.insertCell(0).colSpan = 6;
-        const subLabel = subRow.insertCell(1);
-        subLabel.innerHTML = 'Итого материалы:';
-        subLabel.style.textAlign = 'right';
-        subLabel.style.fontWeight = '700';
-        
-        const subVal = subRow.insertCell(2);
-        subVal.className = 'col-right';
-        subVal.innerHTML = matsSum.toFixed(2).replace('.', ',') + ' ₽';
-        subVal.style.fontWeight = '700';
-        
-        subRow.insertCell(3).innerHTML = '';
+        const sr = tbody.insertRow(); sr.className = 'section-row';
+        sr.insertCell(0).colSpan = 8; sr.cells[0].innerHTML = 'МАТЕРИАЛЫ';
+        materials.forEach(item => { matsSum += item.total; addRow(item); });
+        addSubtotal('Итого материалы:', matsSum);
     }
     
-    // РАБОТЫ И УСЛУГИ
     if (works.length > 0) {
-        const sectionRow = tbody.insertRow();
-        sectionRow.className = 'section-row';
-        const secCell = sectionRow.insertCell(0);
-        secCell.colSpan = 8;
-        secCell.innerHTML = 'РАБОТЫ И УСЛУГИ';
-        
-        works.forEach((item) => {
-            worksSum += item.total;
-            const row = tbody.insertRow();
-            row.className = rowIdx % 2 === 0 ? 'even' : 'odd';
-            rowIdx++;
-            
-            row.insertCell(0).innerHTML = item.type;
-            row.insertCell(1).innerHTML = item.name;
-            row.insertCell(2).innerHTML = item.calcText;
-            row.insertCell(3).innerHTML = item.unit;
-            
-            const qtyCell = row.insertCell(4);
-            qtyCell.className = 'col-right';
-            qtyCell.innerHTML = item.quantity;
-            
-            const priceCell = row.insertCell(5);
-            priceCell.className = 'col-right';
-            priceCell.innerHTML = item.price.toFixed(2).replace('.', ',') + ' ₽';
-            
-            const sumCell = row.insertCell(6);
-            sumCell.className = 'col-right col-bold';
-            sumCell.innerHTML = item.total.toFixed(2).replace('.', ',') + ' ₽';
-            
-            const delCell = row.insertCell(7);
-            delCell.innerHTML = '<button class="del-btn">&times;</button>';
-            delCell.querySelector('button').onclick = () => {
-                const realIdx = estimateItems.indexOf(item);
-                if (realIdx >= 0) { estimateItems.splice(realIdx, 1); renderEstimate(); }
-            };
-        });
-        
-        // Итого работы
-        const subRow = tbody.insertRow();
-        subRow.className = 'subtotal-row';
-        subRow.insertCell(0).colSpan = 6;
-        const subLabel = subRow.insertCell(1);
-        subLabel.innerHTML = 'Итого работы:';
-        subLabel.style.textAlign = 'right';
-        subLabel.style.fontWeight = '700';
-        
-        const subVal = subRow.insertCell(2);
-        subVal.className = 'col-right';
-        subVal.innerHTML = worksSum.toFixed(2).replace('.', ',') + ' ₽';
-        subVal.style.fontWeight = '700';
-        
-        subRow.insertCell(3).innerHTML = '';
+        const sr = tbody.insertRow(); sr.className = 'section-row';
+        sr.insertCell(0).colSpan = 8; sr.cells[0].innerHTML = 'РАБОТЫ И УСЛУГИ';
+        works.forEach(item => { worksSum += item.total; addRow(item); });
+        addSubtotal('Итого работы:', worksSum);
     }
     
-    // ОБЩИЙ ИТОГ
     const grand = matsSum + worksSum;
-    const grandRow = tbody.insertRow();
-    grandRow.className = 'grand-row';
-    grandRow.insertCell(0).colSpan = 6;
-    const grandLabel = grandRow.insertCell(1);
-    grandLabel.innerHTML = 'ВСЕГО ПО СМЕТЕ:';
-    grandLabel.style.textAlign = 'right';
-    grandLabel.style.fontWeight = '800';
+    const gr = tbody.insertRow(); gr.className = 'grand-row';
+    gr.insertCell(0).colSpan = 6;
+    gr.cells[0].innerHTML = 'ВСЕГО ПО СМЕТЕ:';
+    gr.cells[0].style.textAlign = 'right'; gr.cells[0].style.fontWeight = '800';
+    const gv = gr.insertCell(1);
+    gv.innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
+    gv.className = 'col-right'; gv.style.fontWeight = '800';
+    gr.insertCell(2).innerHTML = '';
     
-    const grandVal = grandRow.insertCell(2);
-    grandVal.className = 'col-right';
-    grandVal.innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
-    grandVal.style.fontWeight = '800';
-    
-    grandRow.insertCell(3).innerHTML = '';
-    
-    // Обновляем сумму в шапке
     document.getElementById('totalEstimate').innerHTML = grand.toFixed(2).replace('.', ',') + ' ₽';
     localStorage.setItem('estimate', JSON.stringify(estimateItems));
 }
 
 function loadEstimateFromStorage() {
-    const saved = localStorage.getItem('estimate');
-    if (saved) {
-        try { estimateItems = JSON.parse(saved); renderEstimate(); } catch(e) {}
-    }
+    try {
+        const saved = localStorage.getItem('estimate');
+        if (saved) { estimateItems = JSON.parse(saved); renderEstimate(); }
+    } catch(e) {}
 }
 
 // ============================================================
 // ЭКСПОРТ
 // ============================================================
 function copyEstimate() {
-    if (estimateItems.length === 0) { alert('Смета пуста'); return; }
+    if (!estimateItems.length) { alert('Смета пуста'); return; }
+    let text = 'Тип\tНаименование\tРасчёт\tЕд.\tКол-во\tЦена/ед\tСумма\n';
+    const mats = estimateItems.filter(i => i.type === 'Материал');
+    const wrk = estimateItems.filter(i => i.type === 'Работа');
+    let ms = 0, ws = 0;
     
-    let text = 'Тип\tНаименование\tРасчёт\tЕд.изм\tКол-во\tЦена/ед\tСумма\n';
-    const materials = estimateItems.filter(i => i.type === 'Материал');
-    const works = estimateItems.filter(i => i.type === 'Работа');
-    
-    if (materials.length > 0) {
-        text += 'МАТЕРИАЛЫ\n';
-        materials.forEach(item => {
-            text += [item.type, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2), item.total.toFixed(2)].join('\t') + '\n';
+    if (mats.length) {
+        text += '\nМАТЕРИАЛЫ\n';
+        mats.forEach(i => {
+            ms += i.total;
+            text += [i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2)].join('\t')+'\n';
         });
-        const ms = materials.reduce((s, i) => s + i.total, 0);
         text += `\t\t\t\t\tИтого материалы:\t${ms.toFixed(2)} ₽\n`;
     }
-    
-    if (works.length > 0) {
+    if (wrk.length) {
         text += '\nРАБОТЫ И УСЛУГИ\n';
-        works.forEach(item => {
-            text += [item.type, item.name, item.calcText, item.unit, item.quantity, item.price.toFixed(2), item.total.toFixed(2)].join('\t') + '\n';
+        wrk.forEach(i => {
+            ws += i.total;
+            text += [i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2)].join('\t')+'\n';
         });
-        const ws = works.reduce((s, i) => s + i.total, 0);
         text += `\t\t\t\t\tИтого работы:\t${ws.toFixed(2)} ₽\n`;
     }
-    
-    const grand = estimateItems.reduce((s, i) => s + i.total, 0);
-    text += `\n\t\t\t\t\tВСЕГО:\t${grand.toFixed(2)} ₽`;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Смета скопирована в буфер');
-    }).catch(() => {
-        alert('Не удалось скопировать');
-    });
+    text += `\n\t\t\t\t\tВСЕГО:\t${(ms+ws).toFixed(2)} ₽`;
+    navigator.clipboard.writeText(text).then(() => alert('Смета скопирована')).catch(() => alert('Не удалось'));
 }
 
 function clearEstimate() {
-    if (confirm('Очистить смету?')) {
-        estimateItems = [];
-        renderEstimate();
-    }
+    if (confirm('Очистить смету?')) { estimateItems = []; renderEstimate(); }
 }
 
 function exportToXLSX() {
-    if (estimateItems.length === 0) { alert('Смета пуста'); return; }
-    
-    if (typeof ExcelJS === 'undefined') {
-        alert('Компонент экспорта загружается. Попробуйте через пару секунд.');
-        return;
-    }
-    
+    if (!estimateItems.length) { alert('Смета пуста'); return; }
+    if (typeof ExcelJS === 'undefined') { alert('Подождите загрузки компонента...'); return; }
     exportToXLSX_do();
 }
 
 async function exportToXLSX_do() {
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Смета', { views: [{ showGridLines: false }] });
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('Смета', { views: [{ showGridLines: false }] });
+    ws.columns = [{w:12},{w:30},{w:20},{w:10},{w:10},{w:14},{w:16}];
     
-    sheet.columns = [
-        { width: 12 }, { width: 30 }, { width: 20 },
-        { width: 10 }, { width: 10 }, { width: 14 }, { width: 16 }
-    ];
+    const mats = estimateItems.filter(i => i.type === 'Материал');
+    const wrk = estimateItems.filter(i => i.type === 'Работа');
+    let r = 1;
     
-    const materials = estimateItems.filter(i => i.type === 'Материал');
-    const works = estimateItems.filter(i => i.type === 'Работа');
+    const t = ws.getRow(r); t.getCell(1).value = 'Смета от '+new Date().toLocaleString('ru-RU');
+    t.getCell(1).font = {bold:true,size:14,color:{argb:'FF1A5D2A'}};
+    ws.mergeCells(r,1,r,7); t.height=28; r++;
     
-    let rowNum = 1;
-    
-    const titleRow = sheet.getRow(rowNum);
-    titleRow.getCell(1).value = 'Смета от ' + new Date().toLocaleString('ru-RU');
-    titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1A5D2A' } };
-    sheet.mergeCells(rowNum, 1, rowNum, 7);
-    titleRow.height = 28;
-    rowNum++;
-    
-    const headers = ['Тип', 'Наименование', 'Расчёт', 'Ед.', 'Кол-во', 'Цена/ед', 'Сумма'];
-    const headerRow = sheet.getRow(rowNum);
-    headers.forEach((h, i) => {
-        headerRow.getCell(i + 1).value = h;
-        headerRow.getCell(i + 1).font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
-        headerRow.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2E7D32' } };
-        headerRow.getCell(i + 1).alignment = { horizontal: 'center', vertical: 'middle' };
-        headerRow.getCell(i + 1).border = borderAll();
+    ['Тип','Наименование','Расчёт','Ед.','Кол-во','Цена/ед','Сумма'].forEach((h,i) => {
+        const c = ws.getRow(r).getCell(i+1);
+        c.value=h; c.font={bold:true,color:{argb:'FFFFFFFF'},size:10};
+        c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2E7D32'}};
+        c.alignment={horizontal:'center',vertical:'middle'};
+        c.border=bd();
     });
-    headerRow.height = 24;
-    rowNum++;
+    ws.getRow(r).height=24; r++;
     
-    let matsSum = 0, worksSum = 0;
+    let ms=0,ws2=0;
     
-    if (materials.length > 0) {
-        const sr = sheet.getRow(rowNum);
-        sr.getCell(1).value = 'МАТЕРИАЛЫ';
-        sr.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1A5D2A' } };
-        sr.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
-        sheet.mergeCells(rowNum, 1, rowNum, 7);
-        applyBorderRange(sr, 1, 7);
-        sr.height = 22;
-        rowNum++;
-        
-        materials.forEach((item, idx) => {
-            matsSum += item.total;
-            const row = sheet.getRow(rowNum);
-            const bg = idx % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
-            const vals = [item.type, item.name, item.calcText, item.unit, item.quantity,
-                item.price.toFixed(2).replace('.',',')+' ₽', item.total.toFixed(2).replace('.',',')+' ₽'];
-            vals.forEach((v, i) => {
-                row.getCell(i + 1).value = v;
-                row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                row.getCell(i + 1).alignment = { vertical: 'middle', horizontal: (i >= 4) ? 'right' : 'left' };
-                row.getCell(i + 1).border = borderAll();
+    if (mats.length) {
+        const sr = ws.getRow(r); sr.getCell(1).value='МАТЕРИАЛЫ';
+        sr.getCell(1).font={bold:true,size:11,color:{argb:'FF1A5D2A'}};
+        sr.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFC8E6C9'}};
+        ws.mergeCells(r,1,r,7); applyB(sr,1,7); sr.height=22; r++;
+        mats.forEach((it,i) => {
+            ms+=it.total; const row=ws.getRow(r);
+            const bg=i%2===0?'FFFFFFFF':'FFF5F5F5';
+            [it.type,it.name,it.calcText,it.unit,it.quantity,it.price.toFixed(2).replace('.',',')+' ₽',it.total.toFixed(2).replace('.',',')+' ₽'].forEach((v,j) => {
+                const c=row.getCell(j+1); c.value=v;
+                c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+                c.alignment={vertical:'middle',horizontal:j>=4?'right':'left'};
+                c.border=bd();
             });
-            row.getCell(7).font = { bold: true };
-            row.height = 20;
-            rowNum++;
+            row.getCell(7).font={bold:true}; row.height=20; r++;
         });
-        
-        const tr = sheet.getRow(rowNum);
-        sheet.mergeCells(rowNum, 1, rowNum, 5);
-        tr.getCell(6).value = 'Итого материалы:';
-        tr.getCell(7).value = matsSum.toFixed(2).replace('.',',')+' ₽';
-        [6,7].forEach(i => {
-            tr.getCell(i).font = { bold: true };
-            tr.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
-            tr.getCell(i).alignment = { horizontal: 'right', vertical: 'middle' };
-            tr.getCell(i).border = borderAll();
-        });
-        applyBorderRange(tr, 1, 5);
-        tr.height = 22;
-        rowNum++;
+        const tr=ws.getRow(r); ws.mergeCells(r,1,r,5);
+        tr.getCell(6).value='Итого материалы:'; tr.getCell(7).value=ms.toFixed(2).replace('.',',')+' ₽';
+        [6,7].forEach(j=>{tr.getCell(j).font={bold:true};tr.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF9C4'}};tr.getCell(j).alignment={horizontal:'right',vertical:'middle'};tr.getCell(j).border=bd();});
+        applyB(tr,1,5); tr.height=22; r++;
     }
     
-    if (works.length > 0) {
-        rowNum++;
-        const sr = sheet.getRow(rowNum);
-        sr.getCell(1).value = 'РАБОТЫ И УСЛУГИ';
-        sr.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1A5D2A' } };
-        sr.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC8E6C9' } };
-        sheet.mergeCells(rowNum, 1, rowNum, 7);
-        applyBorderRange(sr, 1, 7);
-        sr.height = 22;
-        rowNum++;
-        
-        works.forEach((item, idx) => {
-            worksSum += item.total;
-            const row = sheet.getRow(rowNum);
-            const bg = idx % 2 === 0 ? 'FFFFFFFF' : 'FFF5F5F5';
-            const vals = [item.type, item.name, item.calcText, item.unit, item.quantity,
-                item.price.toFixed(2).replace('.',',')+' ₽', item.total.toFixed(2).replace('.',',')+' ₽'];
-            vals.forEach((v, i) => {
-                row.getCell(i + 1).value = v;
-                row.getCell(i + 1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
-                row.getCell(i + 1).alignment = { vertical: 'middle', horizontal: (i >= 4) ? 'right' : 'left' };
-                row.getCell(i + 1).border = borderAll();
+    if (wrk.length) {
+        r++; const sr=ws.getRow(r); sr.getCell(1).value='РАБОТЫ И УСЛУГИ';
+        sr.getCell(1).font={bold:true,size:11,color:{argb:'FF1A5D2A'}};
+        sr.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFC8E6C9'}};
+        ws.mergeCells(r,1,r,7); applyB(sr,1,7); sr.height=22; r++;
+        wrk.forEach((it,i) => {
+            ws2+=it.total; const row=ws.getRow(r);
+            const bg=i%2===0?'FFFFFFFF':'FFF5F5F5';
+            [it.type,it.name,it.calcText,it.unit,it.quantity,it.price.toFixed(2).replace('.',',')+' ₽',it.total.toFixed(2).replace('.',',')+' ₽'].forEach((v,j) => {
+                const c=row.getCell(j+1); c.value=v;
+                c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+                c.alignment={vertical:'middle',horizontal:j>=4?'right':'left'};
+                c.border=bd();
             });
-            row.getCell(7).font = { bold: true };
-            row.height = 20;
-            rowNum++;
+            row.getCell(7).font={bold:true}; row.height=20; r++;
         });
-        
-        const tr = sheet.getRow(rowNum);
-        sheet.mergeCells(rowNum, 1, rowNum, 5);
-        tr.getCell(6).value = 'Итого работы:';
-        tr.getCell(7).value = worksSum.toFixed(2).replace('.',',')+' ₽';
-        [6,7].forEach(i => {
-            tr.getCell(i).font = { bold: true };
-            tr.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF9C4' } };
-            tr.getCell(i).alignment = { horizontal: 'right', vertical: 'middle' };
-            tr.getCell(i).border = borderAll();
-        });
-        applyBorderRange(tr, 1, 5);
-        tr.height = 22;
-        rowNum++;
+        const tr=ws.getRow(r); ws.mergeCells(r,1,r,5);
+        tr.getCell(6).value='Итого работы:'; tr.getCell(7).value=ws2.toFixed(2).replace('.',',')+' ₽';
+        [6,7].forEach(j=>{tr.getCell(j).font={bold:true};tr.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF9C4'}};tr.getCell(j).alignment={horizontal:'right',vertical:'middle'};tr.getCell(j).border=bd();});
+        applyB(tr,1,5); tr.height=22; r++;
     }
     
-    rowNum++;
-    const grand = matsSum + worksSum;
-    const gr = sheet.getRow(rowNum);
-    sheet.mergeCells(rowNum, 1, rowNum, 5);
-    gr.getCell(6).value = 'ВСЕГО ПО СМЕТЕ:';
-    gr.getCell(7).value = grand.toFixed(2).replace('.',',')+' ₽';
-    [6,7].forEach(i => {
-        gr.getCell(i).font = { bold: true, size: 12 };
-        gr.getCell(i).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFCC02' } };
-        gr.getCell(i).alignment = { horizontal: 'right', vertical: 'middle' };
-        gr.getCell(i).border = { top: { style: 'medium' }, bottom: { style: 'medium' }, left: { style: 'thin' }, right: { style: 'thin' } };
-    });
-    applyBorderRange(gr, 1, 5);
-    gr.height = 26;
+    r++; const grand=ms+ws2; const gr=ws.getRow(r);
+    ws.mergeCells(r,1,r,5);
+    gr.getCell(6).value='ВСЕГО ПО СМЕТЕ:'; gr.getCell(7).value=grand.toFixed(2).replace('.',',')+' ₽';
+    [6,7].forEach(j=>{gr.getCell(j).font={bold:true,size:12};gr.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFCC02'}};gr.getCell(j).alignment={horizontal:'right',vertical:'middle'};gr.getCell(j).border={top:{style:'medium'},bottom:{style:'medium'},left:{style:'thin'},right:{style:'thin'}};});
+    applyB(gr,1,5); gr.height=26;
     
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `smeta_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xlsx`;
+    a.click(); URL.revokeObjectURL(a.href);
 }
 
-function borderAll() {
-    return { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } };
-}
-
-function applyBorderRange(row, fromCol, toCol) {
-    for (let i = fromCol; i <= toCol; i++) {
-        row.getCell(i).border = borderAll();
-    }
-}
+function bd() { return {top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}}; }
+function applyB(row,f,t) { for(let i=f;i<=t;i++) row.getCell(i).border=bd(); }
 
 // ============================================================
 // ЗАПУСК
 // ============================================================
 document.getElementById('itemSelect').addEventListener('change', fillDetails);
 loadAllData();
-
 window.addToEstimate = addToEstimate;
 window.exportToXLSX = exportToXLSX;
 window.copyEstimate = copyEstimate;
