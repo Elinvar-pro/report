@@ -355,14 +355,10 @@ function loadAllData() {
             const c = r.c; if (!c||!c[0]||!c[0].v) continue;
             const g = String(c[0]?.v||'').trim(); if (!g) continue;
             catalog.materials.push({
-                group: g,
-                name: String(c[1]?.v||'').trim(),
-                attribute: String(c[2]?.v||'').trim(),
-                unit: String(c[3]?.v||'').trim(),
-                price: parsePrice(c[4]?.v),
-                size: String(c[5]?.v||'').trim(),
-                supplier: String(c[7]?.v||'').trim(),
-                site: String(c[8]?.v||'').trim()
+                group: g, name: String(c[1]?.v||'').trim(),
+                attribute: String(c[2]?.v||'').trim(), unit: String(c[3]?.v||'').trim(),
+                price: parsePrice(c[4]?.v), size: String(c[5]?.v||'').trim(),
+                supplier: String(c[7]?.v||'').trim(), site: String(c[8]?.v||'').trim()
             });
         }
         const j2 = JSON.parse(t2.substring(47, t2.length-2));
@@ -371,13 +367,9 @@ function loadAllData() {
             const c = r.c; if (!c||!c[0]||!c[0].v) continue;
             const g = String(c[0]?.v||'').trim(); if (!g) continue;
             catalog.works.push({
-                group: g,
-                name: String(c[1]?.v||'').trim(),
-                attribute: '',
-                unit: String(c[2]?.v||'').trim(),
-                price: parsePrice(c[3]?.v),
-                note: String(c[4]?.v||'').trim(),
-                size: '', supplier: '', site: ''
+                group: g, name: String(c[1]?.v||'').trim(), attribute: '',
+                unit: String(c[2]?.v||'').trim(), price: parsePrice(c[3]?.v),
+                note: String(c[4]?.v||'').trim(), size: '', supplier: '', site: ''
             });
         }
         dataLoaded = true; setDataStatus('online', 'Готово');
@@ -433,32 +425,16 @@ function selectCategory(type, cat) {
     src.forEach(i=>{if(i.group===cat)currentItems.push({...i,itemType:type})});
     const s=document.getElementById('itemSelect');
     s.innerHTML='<option value="">Выберите позицию</option>';
-    
-    // Группируем по названиям — если есть дубли, добавляем характеристику
     const nameCount = {};
-    currentItems.forEach(i => {
-        if (!nameCount[i.name]) nameCount[i.name] = [];
-        nameCount[i.name].push(i);
-    });
-    
+    currentItems.forEach(i => { if (!nameCount[i.name]) nameCount[i.name] = []; nameCount[i.name].push(i); });
     currentItems.forEach((i, idx) => {
         const o = document.createElement('option');
-        o.value = i.name;
-        o.dataset.idx = idx; // индекс в currentItems для точного поиска
-        if (nameCount[i.name].length > 1 && i.attribute) {
-            o.textContent = i.name + ' (' + i.attribute + ')';
-        } else {
-            o.textContent = i.name;
-        }
-        o.dataset.unit=i.unit||'';
-        o.dataset.price=i.price||0;
-        o.dataset.size=i.size||'';
-        o.dataset.attribute=i.attribute||'';
-        o.dataset.supplier=i.supplier||'';
-        o.dataset.site=i.site||'';
+        o.value = i.name; o.dataset.idx = idx;
+        o.textContent = (nameCount[i.name].length > 1 && i.attribute) ? i.name + ' (' + i.attribute + ')' : i.name;
+        o.dataset.unit=i.unit||''; o.dataset.price=i.price||0; o.dataset.size=i.size||'';
+        o.dataset.attribute=i.attribute||''; o.dataset.supplier=i.supplier||''; o.dataset.site=i.site||'';
         s.appendChild(o);
     });
-    
     document.getElementById('infoBlock').style.display='none';
     document.getElementById('calcBlock').style.display='none';
     document.getElementById('rowTotal').innerHTML='0 ₽'; currentItem=null;
@@ -467,44 +443,27 @@ function selectCategory(type, cat) {
 function fillDetails() {
     const s=document.getElementById('itemSelect'); const o=s.options[s.selectedIndex];
     if(!o||!o.value)return;
-    
-    // Точный поиск: по индексу или по названию + характеристике
     const idx = parseInt(o.dataset.idx);
     let sel;
     if (!isNaN(idx) && idx >= 0 && idx < currentItems.length) {
         sel = currentItems[idx];
     } else {
-        const selAttr = o.dataset.attribute || '';
-        sel = currentItems.find(i => {
-            if (i.name === o.value) {
-                if (selAttr) return i.attribute === selAttr;
-                return true;
-            }
-            return false;
-        });
+        sel = currentItems.find(i => i.name === o.value && (!o.dataset.attribute || i.attribute === o.dataset.attribute));
     }
     if(!sel)return;
-    
     manualOverrides = {};
     document.getElementById('infoBlock').style.display='block';
-    
     renderInfoField('sizeValue', 'sizeContainer', sel.size, 'size');
-    
     const attrVal = sel.attribute || '';
     document.getElementById('attrRow').style.display = attrVal ? 'flex' : 'none';
-    if (attrVal) {
-        document.getElementById('attrContainer').innerHTML = `<span class="value">${attrVal}</span>`;
-    }
-    
+    if (attrVal) document.getElementById('attrContainer').innerHTML = `<span class="value">${attrVal}</span>`;
     renderInfoField('unitValue', 'unitContainer', sel.unit, 'unit');
     const priceStr = sel.price ? sel.price.toLocaleString('ru-RU')+' ₽/'+(sel.unit||'ед.') : '';
     renderInfoField('priceValue', 'priceContainer', priceStr, 'price');
-    
     document.getElementById('supplierRow').style.display=sel.supplier?'flex':'none';
     if(sel.supplier)document.getElementById('supplierValue').innerHTML=sel.supplier;
     document.getElementById('siteRow').style.display=sel.site?'flex':'none';
     if(sel.site)document.getElementById('siteValue').innerHTML=sel.site.startsWith('http')?`<a href="${sel.site}" target="_blank" style="color:var(--accent);">открыть</a>`:sel.site;
-    
     currentItem={type:currentType==='material'?'Материал':'Работа',category:currentCategory,name:sel.name,unit:sel.unit||'',price:parseFloat(sel.price)||0,size:sel.size||'',attribute:sel.attribute||'',supplier:sel.supplier||'',site:sel.site||''};
     buildCalcInterface();
 }
@@ -523,13 +482,30 @@ function renderInfoField(valueId, containerId, tableValue, field) {
 function onManualChange(field, value) {
     manualOverrides[field] = value;
     if (field === 'price') currentItem.price = parseFloat(value) || 0;
-    if (field === 'unit') currentItem.unit = value || 'ед.';
+    if (field === 'unit') currentItem.unit = value || '';
     if (field === 'size') currentItem.size = value;
     if (field === 'price' || field === 'unit') {
-        const priceVal = currentItem.price;
-        document.getElementById('priceValue').innerHTML = priceVal ? priceVal.toLocaleString('ru-RU')+' ₽/'+(currentItem.unit||'ед.') : '—';
+        const priceVal = field === 'price' ? (parseFloat(value) || 0) : currentItem.price;
+        const unitVal = field === 'unit' ? value : currentItem.unit;
+        const priceEl = document.getElementById('priceValue');
+        if (priceEl) priceEl.innerHTML = priceVal ? priceVal.toLocaleString('ru-RU') + ' ₽/' + (unitVal || 'ед.') : '—';
     }
-    calculateTotal();
+    // Принудительный пересчёт
+    const qtyEl = document.getElementById('calcQty');
+    if (qtyEl) {
+        const q = parseFloat(qtyEl.value) || 0;
+        const price = manualOverrides.price !== undefined ? (parseFloat(manualOverrides.price) || 0) : currentItem.price;
+        const unit = manualOverrides.unit || currentItem.unit || 'ед.';
+        const t = q * price;
+        document.getElementById('rowTotal').innerHTML = t.toFixed(2).replace('.', ',') + ' ₽';
+        const ct = getCalcType(unit);
+        let txt = '';
+        if (ct === 'area') txt = `${q.toFixed(2)} м² x ${price.toFixed(2)} ₽/м² = ${t.toFixed(2)} ₽`;
+        else if (ct === 'length') txt = `${q.toFixed(1)} м x ${price.toFixed(2)} ₽/м = ${t.toFixed(2)} ₽`;
+        else txt = `${q} ${unit} x ${price.toFixed(2)} ₽ = ${t.toFixed(2)} ₽`;
+        document.getElementById('calcResult').innerHTML = txt;
+        lastCalcResult = { total: t, quantity: q, calcText: txt };
+    }
 }
 
 function getCalcType(u) {
@@ -572,12 +548,21 @@ function calculateTotal() {
 
 function addToEstimate() {
     if(!currentItem||!currentItem.name){alert('Выберите позицию');return;}
-    const c=lastCalcResult; if(!c||c.total===0){alert('Укажите количество');return;}
-    const ct=getCalcType(currentItem.unit); const ul=currentItem.unit||'ед.';
-    let s=''; if(ct==='area')s=`${c.quantity.toFixed(2)} м²`; else if(ct==='length')s=`${c.quantity.toFixed(1)} м`; else s=`${c.quantity} ${ul}`;
     const finalPrice = manualOverrides.price ? parseFloat(manualOverrides.price)||0 : currentItem.price;
     const finalUnit = manualOverrides.unit || currentItem.unit || 'ед.';
-    estimateItems.push({type:currentItem.type,category:currentItem.category,name:currentItem.name,calcText:s,unit:finalUnit,quantity:c.quantity,price:finalPrice,total:c.total});
+    if (!finalPrice || finalPrice === 0) {
+        alert('Не указана цена. Введите цену вручную в поле «Цена за ед.»');
+        return;
+    }
+    const q = parseFloat(document.getElementById('calcQty')?.value) || 0;
+    if (q <= 0) { alert('Укажите количество'); return; }
+    const t = q * finalPrice;
+    const ct = getCalcType(finalUnit);
+    let s = '';
+    if (ct === 'area') s = `${q.toFixed(2)} м²`;
+    else if (ct === 'length') s = `${q.toFixed(1)} м`;
+    else s = `${q} ${finalUnit}`;
+    estimateItems.push({type:currentItem.type,category:currentItem.category,name:currentItem.name,calcText:s,unit:finalUnit,quantity:q,price:finalPrice,total:t});
     renderEstimate();
 }
 
