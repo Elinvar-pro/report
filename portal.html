@@ -6,36 +6,17 @@
     <title>Конструктор сметы</title>
     <style>
         :root {
-            --bg: #f5f7fb;
-            --surface: #ffffff;
-            --surface2: #f8f9fc;
-            --border: #dce2e8;
-            --border-strong: #b0b8c0;
-            --text: #1a2a3a;
-            --text-secondary: #6c7a8a;
-            --green: #2e7d32;
-            --green-dark: #1a5d2a;
-            --green-light: #e8f5e9;
-            --section-bg: #e8f5e9;
-            --section-text: #1a5d2a;
-            --subtotal-bg: #fff9c4;
-            --grand-bg: #ffcc02;
-            --header-table-bg: #f8fafc;
-            --btn-primary-bg: #2e7d32;
-            --btn-primary-text: #ffffff;
-            --btn-outline-border: #2e7d32;
-            --btn-outline-text: #2e7d32;
-            --accent: #2e7d32;
-            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --fs-xs: 12px;
-            --fs-sm: 14px;
-            --fs-md: 16px;
-            --fs-lg: 20px;
-            --fs-xl: 28px;
-            --fs-title: 20px;
-            --pad-cell: 10px 14px;
-            --pad-btn: 12px 24px;
-            --gap: 12px;
+            --bg: #f5f7fb; --surface: #ffffff; --surface2: #f8f9fc;
+            --border: #dce2e8; --border-strong: #b0b8c0; --text: #1a2a3a;
+            --text-secondary: #6c7a8a; --green: #2e7d32; --green-dark: #1a5d2a;
+            --green-light: #e8f5e9; --section-bg: #e8f5e9; --section-text: #1a5d2a;
+            --subtotal-bg: #fff9c4; --grand-bg: #ffcc02; --header-table-bg: #f8fafc;
+            --btn-primary-bg: #2e7d32; --btn-primary-text: #ffffff;
+            --btn-outline-border: #2e7d32; --btn-outline-text: #2e7d32;
+            --accent: #2e7d32; --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --fs-xs: 12px; --fs-sm: 14px; --fs-md: 16px; --fs-lg: 20px;
+            --fs-xl: 28px; --fs-title: 20px; --pad-cell: 10px 14px;
+            --pad-btn: 12px 24px; --gap: 12px;
         }
         body.contrast-theme {
             --bg: #e8e8e8; --surface: #f5f5f5; --surface2: #e8e8e8;
@@ -48,19 +29,12 @@
         }
         body.large-mode {
             --fs-xs: 15px; --fs-sm: 17px; --fs-md: 19px; --fs-lg: 24px;
-            --fs-xl: 34px; --fs-title: 24px;
-            --pad-cell: 14px 18px; --pad-btn: 16px 28px; --gap: 16px;
+            --fs-xl: 34px; --fs-title: 24px; --pad-cell: 14px 18px;
+            --pad-btn: 16px 28px; --gap: 16px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font); background: var(--bg); color: var(--text);
-            min-height: 100vh; display: flex; flex-direction: column; font-size: var(--fs-sm);
-        }
-        .header {
-            background: var(--surface); border-bottom: 2px solid var(--border-strong);
-            padding: 0 24px; height: 60px; display: flex; align-items: center;
-            justify-content: space-between; position: sticky; top: 0; z-index: 100;
-        }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; font-size: var(--fs-sm); }
+        .header { background: var(--surface); border-bottom: 2px solid var(--border-strong); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
         .header-left { display: flex; align-items: center; gap: 16px; }
         .header-title { font-size: var(--fs-title); font-weight: 700; }
         .header-status { font-size: var(--fs-xs); color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
@@ -69,34 +43,29 @@
         .status-dot.online { background: #4caf50; } .status-dot.offline { background: #f44336; }
         .status-dot.loading { background: #ff9800; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .btn-icon {
-            background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
-            padding: 6px 12px; cursor: pointer; font-size: var(--fs-xs); font-family: var(--font);
-            white-space: nowrap; transition: all 0.15s; color: var(--text);
-        }
+        .btn-icon { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: var(--fs-xs); font-family: var(--font); white-space: nowrap; transition: all 0.15s; color: var(--text); }
         .btn-icon:hover { background: var(--border); }
         .btn-icon.active { background: var(--btn-primary-bg); color: var(--btn-primary-text); border-color: var(--btn-primary-bg); }
         .btn-icon.help-btn { font-weight: 700; font-size: 16px; padding: 6px 10px; }
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 999; display: flex;
-            align-items: center; justify-content: center; animation: fadeIn 0.2s;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-dialog {
-            background: var(--surface); border-radius: 12px; padding: 28px 32px;
-            max-width: 520px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
+        .modal-dialog { background: var(--surface); border-radius: 12px; padding: 28px 32px; max-width: 600px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; }
         .modal-dialog h2 { font-size: var(--fs-lg); margin-bottom: 16px; }
         .modal-dialog ol { margin: 0 0 20px 20px; font-size: var(--fs-sm); line-height: 1.8; }
         .modal-dialog ol li { margin-bottom: 6px; }
         .modal-dialog .modal-hint { font-size: var(--fs-xs); color: var(--text-secondary); margin-bottom: 20px; padding: 10px; background: var(--surface2); border-radius: 6px; }
         .modal-dialog .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .history-list { max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; cursor: pointer; transition: background 0.15s; }
+        .history-item:hover { background: var(--surface2); }
+        .history-item .h-date { font-size: var(--fs-xs); color: var(--text-secondary); }
+        .history-item .h-total { font-weight: 700; }
+        .history-item .h-del { color: #c62828; cursor: pointer; padding: 4px 8px; }
         .main-layout { display: flex; flex: 1; gap: 2px; background: var(--border-strong); overflow: hidden; }
         .column { background: var(--surface); overflow-y: auto; }
         .column-catalog { width: 270px; min-width: 220px; flex-shrink: 0; padding: 16px var(--gap); }
         .column-params { flex: 1; min-width: 320px; padding: 20px 24px; }
-        .column-estimate { flex: 1.8; min-width: 440px; display: flex; flex-direction: column; }
+        .column-estimate { flex: 1.8; min-width: 500px; display: flex; flex-direction: column; }
         .column-header { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
         .section-label { font-size: var(--fs-xs); font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin: 16px 0 8px; }
         .section-label:first-child { margin-top: 0; }
@@ -131,21 +100,31 @@
         .btn-sm { padding: 8px 16px; font-size: var(--fs-sm); }
         .btn-danger { color: #c62828; border-color: #c62828; background: var(--surface); }
         .btn-danger:hover { background: #ffebee; }
-        .estimate-header-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 2px solid var(--border); flex-shrink: 0; }
+        .estimate-header-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 2px solid var(--border); flex-shrink: 0; flex-wrap: wrap; gap: 10px; }
         .estimate-title { font-size: var(--fs-lg); font-weight: 700; }
         .estimate-grand { font-size: var(--fs-lg); font-weight: 800; }
+        .markup-row { display: flex; align-items: center; gap: 8px; font-size: var(--fs-xs); }
+        .markup-row input { width: 60px; padding: 4px 6px; border: 1px solid var(--border); border-radius: 4px; text-align: center; font-family: var(--font); font-size: var(--fs-xs); }
         .estimate-table-wrap { flex: 1; overflow-y: auto; padding: 0; }
         .estimate-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
-        .estimate-table th { text-align: left; padding: var(--pad-cell); background: var(--header-table-bg); font-weight: 700; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 1; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.5px; }
+        .estimate-table th { text-align: left; padding: 8px 8px; background: var(--header-table-bg); font-weight: 700; border-bottom: 2px solid var(--border); position: sticky; top: 0; z-index: 1; font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
         .estimate-table th.col-right { text-align: right; }
-        .estimate-table td { padding: var(--pad-cell); border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .estimate-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
         .estimate-table .even { background: var(--surface2); } .estimate-table .odd { background: var(--surface); }
         .estimate-table .col-right { text-align: right; white-space: nowrap; } .estimate-table .col-bold { font-weight: 700; }
-        .estimate-table .del-btn { background: none; border: none; cursor: pointer; color: #999; font-size: 18px; padding: 0 6px; line-height: 1; font-weight: 700; }
+        .estimate-table .col-center { text-align: center; }
+        .estimate-table .row-num { color: var(--text-secondary); font-size: var(--fs-xs); text-align: center; width: 30px; }
+        .estimate-table .comment-cell { max-width: 120px; }
+        .estimate-table .comment-cell input { width: 100%; border: 1px solid transparent; background: transparent; font-family: var(--font); font-size: var(--fs-xs); padding: 2px 4px; }
+        .estimate-table .comment-cell input:hover, .estimate-table .comment-cell input:focus { border-color: var(--border); background: var(--surface); outline: none; }
+        .estimate-table .action-btns { display: flex; gap: 2px; }
+        .estimate-table .del-btn, .estimate-table .dup-btn { background: none; border: none; cursor: pointer; color: #999; font-size: 16px; padding: 0 4px; line-height: 1; font-weight: 700; }
         .estimate-table .del-btn:hover { color: #c62828; }
-        .section-row td { background: var(--section-bg); font-weight: 700; font-size: var(--fs-xs); padding: 8px var(--pad-cell); text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 2px solid var(--border-strong); color: var(--section-text); }
+        .estimate-table .dup-btn:hover { color: var(--accent); }
+        .section-row td { background: var(--section-bg); font-weight: 700; font-size: var(--fs-xs); padding: 8px 8px; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 2px solid var(--border-strong); color: var(--section-text); }
         .subtotal-row td { background: var(--subtotal-bg); font-weight: 700; font-size: var(--fs-sm); border-top: 1px solid var(--border-strong); border-bottom: 1px solid var(--border-strong); }
         .grand-row td { background: var(--grand-bg); font-weight: 800; font-size: var(--fs-md); border-top: 2px solid var(--border-strong); border-bottom: 2px solid var(--border-strong); }
+        .markup-row-display td { background: #e3f2fd; font-weight: 700; font-size: var(--fs-sm); }
         .estimate-empty { text-align: center; padding: 40px; color: var(--text-secondary); font-size: var(--fs-sm); }
         .estimate-actions { padding: 14px 20px; border-top: 2px solid var(--border); display: flex; gap: var(--gap); flex-wrap: wrap; flex-shrink: 0; }
         @media (max-width: 900px) {
@@ -160,6 +139,14 @@
             .estimate-actions { flex-direction: column; }
             .btn-sm { width: 100%; text-align: center; }
         }
+        @media print {
+            body { background: white; }
+            .header, .column-catalog, .column-params, .estimate-actions, .markup-row, .action-btns, .del-btn, .dup-btn, .comment-cell input { display: none !important; }
+            .main-layout { display: block; }
+            .column-estimate { width: 100%; overflow: visible; }
+            .estimate-table-wrap { overflow: visible; }
+            .estimate-table th, .estimate-table td { border: 1px solid #000; }
+        }
     </style>
 </head>
 <body>
@@ -167,24 +154,16 @@
 <header class="header">
     <div class="header-left">
         <span class="header-title">Конструктор сметы</span>
-        <span class="header-status" id="dataStatus">
-            <span class="status-dot loading"></span> Загрузка...
-        </span>
+        <span class="header-status" id="dataStatus"><span class="status-dot loading"></span> Загрузка...</span>
     </div>
     <div class="header-right">
-        <button class="btn-icon help-btn" id="btnHelp" onclick="showHelp()" title="Помощь">?</button>
-        <button class="btn-icon" id="btnTheme" onclick="toggleTheme()" title="Тема">
-            <span id="themeIcon">◐</span> Тема
-        </button>
-        <button class="btn-icon" id="btnLarge" onclick="toggleLargeMode()" title="Крупный шрифт">
-            A<span style="font-size:1.3em;">A</span>
-        </button>
+        <button class="btn-icon help-btn" onclick="showHelp()" title="Помощь">?</button>
+        <button class="btn-icon" id="btnTheme" onclick="toggleTheme()">Тема</button>
+        <button class="btn-icon" id="btnLarge" onclick="toggleLargeMode()">AA</button>
     </div>
 </header>
 
 <div class="main-layout">
-
-    <!-- КАТАЛОГ -->
     <div class="column column-catalog">
         <div class="section-label">Материалы</div>
         <div class="category-list" id="materialsList"><div style="color:var(--text-secondary);padding:8px;">Загрузка...</div></div>
@@ -193,65 +172,42 @@
         <div class="category-list" id="worksList"><div style="color:var(--text-secondary);padding:8px;">Загрузка...</div></div>
     </div>
 
-    <!-- ПАРАМЕТРЫ -->
     <div class="column column-params">
         <div class="column-header">Параметры позиции</div>
-        <div class="field-group">
-            <label>Позиция</label>
-            <select id="itemSelect"><option value="">Сначала выберите категорию</option></select>
-        </div>
+        <div class="field-group"><label>Позиция</label><select id="itemSelect"><option value="">Сначала выберите категорию</option></select></div>
         <div id="infoBlock" class="info-block" style="display:none;">
-            <div class="info-row">
-                <span class="label">Размер</span>
-                <span id="sizeContainer"><span class="value size-hint" id="sizeValue">—</span></span>
-            </div>
-            <div class="info-row" id="attrRow" style="display:none;">
-                <span class="label">Характеристики</span>
-                <span id="attrContainer"><span class="value" id="attrValue">—</span></span>
-            </div>
-            <div class="info-row">
-                <span class="label">Ед. измерения</span>
-                <span id="unitContainer"><span class="value" id="unitValue">—</span></span>
-            </div>
-            <div class="info-row">
-                <span class="label">Цена за ед.</span>
-                <span id="priceContainer"><span class="value" id="priceValue">—</span></span>
-            </div>
-            <div class="info-row" id="supplierRow" style="display:none;">
-                <span class="label">Поставщик</span>
-                <span class="value" id="supplierValue">—</span>
-            </div>
-            <div class="info-row" id="siteRow" style="display:none;">
-                <span class="label">Сайт</span>
-                <span class="value" id="siteValue">—</span>
-            </div>
+            <div class="info-row"><span class="label">Размер</span><span id="sizeContainer"><span class="value size-hint" id="sizeValue">—</span></span></div>
+            <div class="info-row" id="attrRow" style="display:none;"><span class="label">Характеристики</span><span id="attrContainer"><span class="value" id="attrValue">—</span></span></div>
+            <div class="info-row"><span class="label">Ед. измерения</span><span id="unitContainer"><span class="value" id="unitValue">—</span></span></div>
+            <div class="info-row"><span class="label">Цена за ед.</span><span id="priceContainer"><span class="value" id="priceValue">—</span></span></div>
+            <div class="info-row" id="supplierRow" style="display:none;"><span class="label">Поставщик</span><span class="value" id="supplierValue">—</span></div>
+            <div class="info-row" id="siteRow" style="display:none;"><span class="label">Сайт</span><span class="value" id="siteValue">—</span></div>
         </div>
         <div id="calcBlock" class="calc-block" style="display:none;">
             <div class="calc-row" id="calcFields"></div>
             <div class="calc-result" id="calcResult"></div>
         </div>
-        <div class="position-total">
-            <div class="pt-label">Сумма за позицию</div>
-            <div class="pt-value" id="rowTotal">0 ₽</div>
-        </div>
+        <div class="position-total"><div class="pt-label">Сумма за позицию</div><div class="pt-value" id="rowTotal">0 ₽</div></div>
         <button class="btn btn-primary" onclick="addToEstimate()">Добавить в смету</button>
     </div>
 
-    <!-- СМЕТА -->
     <div class="column column-estimate">
         <div class="estimate-header-row">
             <span class="estimate-title">Смета</span>
+            <div class="markup-row">Наценка: <input type="number" id="markupPercent" value="0" step="1" min="0" max="1000" oninput="renderEstimate()"> %</div>
             <span class="estimate-grand" id="totalEstimate">0 ₽</span>
         </div>
         <div class="estimate-table-wrap">
             <table class="estimate-table">
-                <thead><tr><th>Тип</th><th>Наименование</th><th>Расчёт</th><th>Ед.</th><th class="col-right">Кол-во</th><th class="col-right">Цена/ед</th><th class="col-right">Сумма</th><th></th></tr></thead>
-                <tbody id="estimateBody"><tr><td colspan="8" class="estimate-empty">Смета пуста</td></tr></tbody>
+                <thead><tr><th>№</th><th>Тип</th><th>Наименование</th><th>Расчёт</th><th>Ед.</th><th class="col-right">Кол-во</th><th class="col-right">Цена/ед</th><th class="col-right">Сумма</th><th>Комментарий</th><th></th></tr></thead>
+                <tbody id="estimateBody"><tr><td colspan="10" class="estimate-empty">Смета пуста</td></tr></tbody>
             </table>
         </div>
         <div class="estimate-actions">
             <button class="btn btn-outline btn-sm" onclick="exportToXLSX()">Экспорт в Excel</button>
             <button class="btn btn-outline btn-sm" onclick="copyEstimate()">Копировать</button>
+            <button class="btn btn-outline btn-sm" onclick="printEstimate()">Печать</button>
+            <button class="btn btn-outline btn-sm" onclick="showHistory()">История</button>
             <button class="btn btn-danger btn-sm" onclick="clearEstimate()">Очистить</button>
         </div>
     </div>
@@ -261,344 +217,84 @@
 // ============================================================
 // ТЕМА И РЕЖИМЫ
 // ============================================================
-function toggleTheme() {
-    document.body.classList.toggle('contrast-theme');
-    const isContrast = document.body.classList.contains('contrast-theme');
-    document.getElementById('btnTheme').classList.toggle('active', isContrast);
-    document.getElementById('themeIcon').textContent = isContrast ? '◑' : '◐';
-    localStorage.setItem('contrastTheme', isContrast ? '1' : '0');
-}
-function toggleLargeMode() {
-    document.body.classList.toggle('large-mode');
-    const isLarge = document.body.classList.contains('large-mode');
-    document.getElementById('btnLarge').classList.toggle('active', isLarge);
-    localStorage.setItem('largeMode', isLarge ? '1' : '0');
-}
-if (localStorage.getItem('contrastTheme') === '1') {
-    document.body.classList.add('contrast-theme');
-    document.getElementById('btnTheme').classList.add('active');
-    document.getElementById('themeIcon').textContent = '◑';
-}
-if (localStorage.getItem('largeMode') === '1') {
-    document.body.classList.add('large-mode');
-    document.getElementById('btnLarge').classList.add('active');
-}
+function toggleTheme(){document.body.classList.toggle('contrast-theme');const c=document.body.classList.contains('contrast-theme');document.getElementById('btnTheme').classList.toggle('active',c);localStorage.setItem('contrastTheme',c?'1':'0');}
+function toggleLargeMode(){document.body.classList.toggle('large-mode');const c=document.body.classList.contains('large-mode');document.getElementById('btnLarge').classList.toggle('active',c);localStorage.setItem('largeMode',c?'1':'0');}
+if(localStorage.getItem('contrastTheme')==='1'){document.body.classList.add('contrast-theme');document.getElementById('btnTheme').classList.add('active');}
+if(localStorage.getItem('largeMode')==='1'){document.body.classList.add('large-mode');document.getElementById('btnLarge').classList.add('active');}
 
 // ============================================================
 // ПОМОЩЬ
 // ============================================================
-function showHelp() {
-    const existing = document.querySelector('.modal-overlay');
-    if (existing) existing.remove();
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `<div class="modal-dialog">
-        <h2>Как работать с конструктором</h2>
-        <ol>
-            <li><strong>Выберите категорию</strong> в левой колонке.</li>
-            <li><strong>Выберите позицию</strong> из выпадающего списка.</li>
-            <li>Если данных нет в таблице — <strong>введите их вручную</strong>.</li>
-            <li><strong>Укажите количество</strong> и нажмите «Добавить в смету».</li>
-            <li>Готовую смету можно <strong>скопировать</strong> или <strong>экспортировать в Excel</strong>.</li>
-        </ol>
-        <div class="modal-hint">Кнопка <strong>Тема</strong> — контрастный режим, <strong>AA</strong> — крупный шрифт.</div>
-        <div class="modal-actions">
-            <label style="display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);cursor:pointer;flex:1;">
-                <input type="checkbox" id="dontShowHelp"> Больше не показывать
-            </label>
-            <button class="btn btn-primary btn-sm" onclick="closeHelp()">Понятно</button>
-        </div>
-    </div>`;
-    overlay.addEventListener('click', function(e) { if (e.target === overlay) closeHelp(); });
-    document.body.appendChild(overlay);
-}
-function closeHelp() {
-    const overlay = document.querySelector('.modal-overlay');
-    const dontShow = document.getElementById('dontShowHelp')?.checked;
-    if (dontShow) localStorage.setItem('hideHelp', '1');
-    if (overlay) overlay.remove();
-}
-if (localStorage.getItem('hideHelp') !== '1') {
-    setTimeout(showHelp, 800);
-}
+function showHelp(){const ex=document.querySelector('.modal-overlay');if(ex)ex.remove();const ov=document.createElement('div');ov.className='modal-overlay';ov.innerHTML=`<div class="modal-dialog"><h2>Как работать</h2><ol><li>Выберите категорию слева</li><li>Выберите позицию из списка</li><li>Введите количество</li><li>Нажмите «Добавить в смету»</li><li>Экспортируйте или распечатайте</li></ol><div class="modal-hint">Наценка применяется ко всем позициям. Комментарии сохраняются в смете. История хранит предыдущие сметы.</div><div class="modal-actions"><label style="display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);cursor:pointer;flex:1;"><input type="checkbox" id="dontShowHelp"> Больше не показывать</label><button class="btn btn-primary btn-sm" onclick="closeHelp()">Понятно</button></div></div>`;ov.addEventListener('click',e=>{if(e.target===ov)closeHelp();});document.body.appendChild(ov);}
+function closeHelp(){const ov=document.querySelector('.modal-overlay');if(document.getElementById('dontShowHelp')?.checked)localStorage.setItem('hideHelp','1');if(ov)ov.remove();}
+if(localStorage.getItem('hideHelp')!=='1')setTimeout(showHelp,800);
 
 // ============================================================
 // УТИЛИТЫ
 // ============================================================
-function parsePrice(value) {
-    if (value === undefined || value === null || value === '') return 0;
-    if (typeof value === 'number') return value;
-    let s = String(value).trim().replace(/\s/g, '').replace(',', '.');
-    return isNaN(parseFloat(s)) ? 0 : parseFloat(s);
-}
+function parsePrice(v){if(v===undefined||v===null||v==='')return 0;if(typeof v==='number')return v;let s=String(v).trim().replace(/\s/g,'').replace(',','.');return isNaN(parseFloat(s))?0:parseFloat(s);}
 
 // ============================================================
 // ЗАГРУЗКА ДАННЫХ
 // ============================================================
-const SPREADSHEET_ID = "1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
-const SHEET1_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Лист1`;
-const SHEET2_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Лист2`;
-let catalog = { materials: [], works: [] };
-let dataLoaded = false;
-
-function setDataStatus(status, text) {
-    document.getElementById('dataStatus').innerHTML = `<span class="status-dot ${status}"></span> ${text}`;
-}
-
-function loadAllData() {
-    setDataStatus('loading', 'Загрузка...');
-    Promise.all([fetch(SHEET1_URL).then(r=>r.text()), fetch(SHEET2_URL).then(r=>r.text())])
-    .then(([t1,t2]) => {
-        const j1 = JSON.parse(t1.substring(47, t1.length-2));
-        catalog.materials = [];
-        for (let r of j1.table.rows) {
-            const c = r.c; if (!c||!c[0]||!c[0].v) continue;
-            const g = String(c[0]?.v||'').trim(); if (!g) continue;
-            catalog.materials.push({
-                group: g, name: String(c[1]?.v||'').trim(),
-                attribute: String(c[2]?.v||'').trim(), unit: String(c[3]?.v||'').trim(),
-                price: parsePrice(c[4]?.v), size: String(c[5]?.v||'').trim(),
-                supplier: String(c[7]?.v||'').trim(), site: String(c[8]?.v||'').trim()
-            });
-        }
-        const j2 = JSON.parse(t2.substring(47, t2.length-2));
-        catalog.works = [];
-        for (let r of j2.table.rows) {
-            const c = r.c; if (!c||!c[0]||!c[0].v) continue;
-            const g = String(c[0]?.v||'').trim(); if (!g) continue;
-            catalog.works.push({
-                group: g, name: String(c[1]?.v||'').trim(), attribute: '',
-                unit: String(c[2]?.v||'').trim(), price: parsePrice(c[3]?.v),
-                note: String(c[4]?.v||'').trim(), size: '', supplier: '', site: ''
-            });
-        }
-        dataLoaded = true; setDataStatus('online', 'Готово');
-        initConstructor(); preloadExcelJS();
-    }).catch(e => { console.error(e); setDataStatus('offline', 'Ошибка'); });
-}
-
-function preloadExcelJS() {
-    if (typeof ExcelJS === 'undefined' && !document.getElementById('exceljs-script')) {
-        const s = document.createElement('script'); s.id = 'exceljs-script';
-        s.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
-        document.head.appendChild(s);
-    }
-}
+const SPREADSHEET_ID="1OhoJYlXsYiJDdCF_ET7gkNKg21juUI5ENo-haz6wcR4";
+function getSheetUrl(n){return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${n}`;}
+let catalog={materials:[],works:[]},dataLoaded=false;
+function setDataStatus(s,t){document.getElementById('dataStatus').innerHTML=`<span class="status-dot ${s}"></span> ${t}`;}
+function loadAllData(){setDataStatus('loading','Загрузка...');Promise.all([fetch(getSheetUrl('Лист1')).then(r=>r.text()),fetch(getSheetUrl('Лист2')).then(r=>r.text())]).then(([t1,t2])=>{const j1=JSON.parse(t1.substring(47,t1.length-2));catalog.materials=[];for(let r of j1.table.rows){const c=r.c;if(!c||!c[0]||!c[0].v)continue;const g=String(c[0]?.v||'').trim();if(!g)continue;catalog.materials.push({group:g,name:String(c[1]?.v||'').trim(),attribute:String(c[2]?.v||'').trim(),unit:String(c[3]?.v||'').trim(),price:parsePrice(c[4]?.v),size:String(c[5]?.v||'').trim(),supplier:String(c[7]?.v||'').trim(),site:String(c[8]?.v||'').trim()});}const j2=JSON.parse(t2.substring(47,t2.length-2));catalog.works=[];for(let r of j2.table.rows){const c=r.c;if(!c||!c[0]||!c[0].v)continue;const g=String(c[0]?.v||'').trim();if(!g)continue;catalog.works.push({group:g,name:String(c[1]?.v||'').trim(),attribute:'',unit:String(c[2]?.v||'').trim(),price:parsePrice(c[3]?.v),note:String(c[4]?.v||'').trim(),size:'',supplier:'',site:''});}dataLoaded=true;setDataStatus('online','Готово');initConstructor();preloadExcelJS();}).catch(e=>{console.error(e);setDataStatus('offline','Ошибка');});}
+function preloadExcelJS(){if(typeof ExcelJS==='undefined'&&!document.getElementById('exceljs-script')){const s=document.createElement('script');s.id='exceljs-script';s.src='https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';document.head.appendChild(s);}}
 
 // ============================================================
 // КОНСТРУКТОР
 // ============================================================
-let materialCategories = [], workCategories = [];
-let currentType = null, currentCategory = null, currentItems = [], currentItem = null;
-let estimateItems = [];
-let manualOverrides = {};
-
-function initConstructor() {
-    materialCategories = [...new Set(catalog.materials.map(i=>i.group).filter(Boolean))].sort();
-    workCategories = [...new Set(catalog.works.map(i=>i.group).filter(Boolean))].sort();
-    renderCategories(); loadEstimateFromStorage();
-}
-
-function renderCategories() {
-    const md = document.getElementById('materialsList'); md.innerHTML = '';
-    materialCategories.forEach(c => { const d = document.createElement('div'); d.className='category-item'; d.textContent=c; d.onclick=()=>selectCategory('material',c); md.appendChild(d); });
-    const wd = document.getElementById('worksList'); wd.innerHTML = '';
-    workCategories.forEach(c => { const d = document.createElement('div'); d.className='category-item'; d.textContent=c; d.onclick=()=>selectCategory('work',c); wd.appendChild(d); });
-    resetForm();
-}
-
-function resetForm() {
-    currentType=null;currentCategory=null;currentItems=[];currentItem=null;manualOverrides={};
-    document.getElementById('itemSelect').innerHTML='<option value="">Сначала выберите категорию</option>';
-    document.getElementById('infoBlock').style.display='none';
-    document.getElementById('calcBlock').style.display='none';
-    document.getElementById('rowTotal').innerHTML='0 ₽';
-    document.querySelectorAll('.category-item').forEach(e=>e.classList.remove('active'));
-}
-
-function selectCategory(type, cat) {
-    currentType=type;currentCategory=cat;manualOverrides={};
-    document.querySelectorAll('.category-item').forEach(e=>e.classList.remove('active'));
-    const sel=type==='material'?'#materialsList .category-item':'#worksList .category-item';
-    document.querySelectorAll(sel).forEach(e=>{if(e.textContent.trim()===cat)e.classList.add('active')});
-    currentItems=[]; const src=type==='material'?catalog.materials:catalog.works;
-    src.forEach(i=>{if(i.group===cat)currentItems.push({...i,itemType:type})});
-    const s=document.getElementById('itemSelect');
-    s.innerHTML='<option value="">Выберите позицию</option>';
-    const nameCount = {};
-    currentItems.forEach(i => { if (!nameCount[i.name]) nameCount[i.name] = []; nameCount[i.name].push(i); });
-    currentItems.forEach((i, idx) => {
-        const o = document.createElement('option');
-        o.value = i.name; o.dataset.idx = idx;
-        o.textContent = (nameCount[i.name].length > 1 && i.attribute) ? i.name + ' (' + i.attribute + ')' : i.name;
-        o.dataset.unit=i.unit||''; o.dataset.price=i.price||0; o.dataset.size=i.size||'';
-        o.dataset.attribute=i.attribute||''; o.dataset.supplier=i.supplier||''; o.dataset.site=i.site||'';
-        s.appendChild(o);
-    });
-    document.getElementById('infoBlock').style.display='none';
-    document.getElementById('calcBlock').style.display='none';
-    document.getElementById('rowTotal').innerHTML='0 ₽'; currentItem=null;
-}
-
-function fillDetails() {
-    const s=document.getElementById('itemSelect'); const o=s.options[s.selectedIndex];
-    if(!o||!o.value)return;
-    const idx = parseInt(o.dataset.idx);
-    let sel;
-    if (!isNaN(idx) && idx >= 0 && idx < currentItems.length) {
-        sel = currentItems[idx];
-    } else {
-        sel = currentItems.find(i => i.name === o.value && (!o.dataset.attribute || i.attribute === o.dataset.attribute));
-    }
-    if(!sel)return;
-    manualOverrides = {};
-    document.getElementById('infoBlock').style.display='block';
-    renderInfoField('sizeValue', 'sizeContainer', sel.size, 'size');
-    const attrVal = sel.attribute || '';
-    document.getElementById('attrRow').style.display = attrVal ? 'flex' : 'none';
-    if (attrVal) document.getElementById('attrContainer').innerHTML = `<span class="value">${attrVal}</span>`;
-    renderInfoField('unitValue', 'unitContainer', sel.unit, 'unit');
-    const priceStr = sel.price ? sel.price.toLocaleString('ru-RU')+' ₽/'+(sel.unit||'ед.') : '';
-    renderInfoField('priceValue', 'priceContainer', priceStr, 'price');
-    document.getElementById('supplierRow').style.display=sel.supplier?'flex':'none';
-    if(sel.supplier)document.getElementById('supplierValue').innerHTML=sel.supplier;
-    document.getElementById('siteRow').style.display=sel.site?'flex':'none';
-    if(sel.site)document.getElementById('siteValue').innerHTML=sel.site.startsWith('http')?`<a href="${sel.site}" target="_blank" style="color:var(--accent);">открыть</a>`:sel.site;
-    currentItem={type:currentType==='material'?'Материал':'Работа',category:currentCategory,name:sel.name,unit:sel.unit||'',price:parseFloat(sel.price)||0,size:sel.size||'',attribute:sel.attribute||'',supplier:sel.supplier||'',site:sel.site||''};
-    buildCalcInterface();
-}
-
-function renderInfoField(valueId, containerId, tableValue, field) {
-    const container = document.getElementById(containerId);
-    if (tableValue && tableValue !== '0' && tableValue !== '') {
-        container.innerHTML = `<span class="value${field==='size'?' size-hint':''}" id="${valueId}">${tableValue}</span>`;
-    } else {
-        const ph = field==='price'?'0':field==='unit'?'ед.':'-';
-        container.innerHTML = `<input type="text" class="manual-input" id="${valueId}_input" value="${manualOverrides[field]||''}" placeholder="${ph}" oninput="onManualChange('${field}', this.value)">`;
-        manualOverrides[field] = '';
-    }
-}
-
-function onManualChange(field, value) {
-    manualOverrides[field] = value;
-    if (field === 'price') currentItem.price = parseFloat(value) || 0;
-    if (field === 'unit') currentItem.unit = value || '';
-    if (field === 'size') currentItem.size = value;
-    if (field === 'price' || field === 'unit') {
-        const priceVal = field === 'price' ? (parseFloat(value) || 0) : currentItem.price;
-        const unitVal = field === 'unit' ? value : currentItem.unit;
-        const priceEl = document.getElementById('priceValue');
-        if (priceEl) priceEl.innerHTML = priceVal ? priceVal.toLocaleString('ru-RU') + ' ₽/' + (unitVal || 'ед.') : '—';
-    }
-    // Принудительный пересчёт
-    const qtyEl = document.getElementById('calcQty');
-    if (qtyEl) {
-        const q = parseFloat(qtyEl.value) || 0;
-        const price = manualOverrides.price !== undefined ? (parseFloat(manualOverrides.price) || 0) : currentItem.price;
-        const unit = manualOverrides.unit || currentItem.unit || 'ед.';
-        const t = q * price;
-        document.getElementById('rowTotal').innerHTML = t.toFixed(2).replace('.', ',') + ' ₽';
-        const ct = getCalcType(unit);
-        let txt = '';
-        if (ct === 'area') txt = `${q.toFixed(2)} м² x ${price.toFixed(2)} ₽/м² = ${t.toFixed(2)} ₽`;
-        else if (ct === 'length') txt = `${q.toFixed(1)} м x ${price.toFixed(2)} ₽/м = ${t.toFixed(2)} ₽`;
-        else txt = `${q} ${unit} x ${price.toFixed(2)} ₽ = ${t.toFixed(2)} ₽`;
-        document.getElementById('calcResult').innerHTML = txt;
-        lastCalcResult = { total: t, quantity: q, calcText: txt };
-    }
-}
-
-function getCalcType(u) {
-    const un=(u||'').toLowerCase();
-    if(un.includes('м²')||un.includes('м.кв')||un.includes('кв.м'))return'area';
-    if(un.includes('м.п')||un==='м'||un.includes('пог.м'))return'length';
-    return'piece';
-}
-
-function buildCalcInterface() {
-    if(!currentItem)return;
-    const ct=getCalcType(currentItem.unit); const ul=currentItem.unit||'ед.'; let h='';
-    if(ct==='area')h=`<div class="field-group"><label>Площадь (м²)</label><input type="number" id="calcQty" value="1" step="0.01" min="0.01"><div class="calc-hint">Введите нужную площадь</div></div>`;
-    else if(ct==='length')h=`<div class="field-group"><label>Длина (м)</label><input type="number" id="calcQty" value="1" step="0.1" min="0.1"><div class="calc-hint">Введите нужную длину</div></div>`;
-    else h=`<div class="field-group"><label>Количество (${ul})</label><input type="number" id="calcQty" value="1" step="1" min="1"><div class="calc-hint">Введите нужное количество</div></div>`;
-    if(currentItem.size)h+=`<div style="font-size:var(--fs-xs);color:var(--text-secondary);margin-top:6px;">Размер единицы: ${currentItem.size}</div>`;
-    if(currentItem.attribute)h+=`<div style="font-size:var(--fs-xs);color:var(--text-secondary);margin-top:2px;">Характеристики: ${currentItem.attribute}</div>`;
-    document.getElementById('calcFields').innerHTML=h;
-    document.getElementById('calcBlock').style.display='block';
-    document.getElementById('calcQty')?.addEventListener('input', calculateTotal);
-    calculateTotal();
-}
-
-let lastCalcResult = { total: 0, quantity: 0, calcText: '' };
-
-function calculateTotal() {
-    if(!currentItem){lastCalcResult={total:0,quantity:0,calcText:''};document.getElementById('rowTotal').innerHTML='0 ₽';return lastCalcResult;}
-    const q=parseFloat(document.getElementById('calcQty')?.value)||0;
-    const price = manualOverrides.price ? parseFloat(manualOverrides.price)||0 : currentItem.price;
-    const t=q*price; const ct=getCalcType(currentItem.unit); const ul=currentItem.unit||'ед.';
-    let txt='';
-    if(ct==='area')txt=`${q.toFixed(2)} м² x ${price.toFixed(2)} ₽/м² = ${t.toFixed(2)} ₽`;
-    else if(ct==='length')txt=`${q.toFixed(1)} м x ${price.toFixed(2)} ₽/м = ${t.toFixed(2)} ₽`;
-    else txt=`${q} ${ul} x ${price.toFixed(2)} ₽ = ${t.toFixed(2)} ₽`;
-    document.getElementById('rowTotal').innerHTML=t.toFixed(2).replace('.',',')+' ₽';
-    document.getElementById('calcResult').innerHTML=txt;
-    lastCalcResult={total:t,quantity:q,calcText:txt};
-    return lastCalcResult;
-}
-
-function addToEstimate() {
-    if(!currentItem||!currentItem.name){alert('Выберите позицию');return;}
-    const finalPrice = manualOverrides.price ? parseFloat(manualOverrides.price)||0 : currentItem.price;
-    const finalUnit = manualOverrides.unit || currentItem.unit || 'ед.';
-    if (!finalPrice || finalPrice === 0) {
-        alert('Не указана цена. Введите цену вручную в поле «Цена за ед.»');
-        return;
-    }
-    const q = parseFloat(document.getElementById('calcQty')?.value) || 0;
-    if (q <= 0) { alert('Укажите количество'); return; }
-    const t = q * finalPrice;
-    const ct = getCalcType(finalUnit);
-    let s = '';
-    if (ct === 'area') s = `${q.toFixed(2)} м²`;
-    else if (ct === 'length') s = `${q.toFixed(1)} м`;
-    else s = `${q} ${finalUnit}`;
-    estimateItems.push({type:currentItem.type,category:currentItem.category,name:currentItem.name,calcText:s,unit:finalUnit,quantity:q,price:finalPrice,total:t});
-    renderEstimate();
-}
-
-function renderEstimate() {
-    const tb=document.getElementById('estimateBody'); tb.innerHTML='';
-    if(!estimateItems.length){tb.innerHTML='<tr><td colspan="8" class="estimate-empty">Смета пуста</td></tr>';document.getElementById('totalEstimate').innerHTML='0 ₽';return;}
-    const mats=estimateItems.filter(i=>i.type==='Материал'), wrk=estimateItems.filter(i=>i.type==='Работа');
-    let ms=0,ws=0,ri=0;
-    function ar(item){const r=tb.insertRow();r.className=ri%2===0?'even':'odd';ri++;r.insertCell(0).innerHTML=item.type;r.insertCell(1).innerHTML=item.name;r.insertCell(2).innerHTML=item.calcText;r.insertCell(3).innerHTML=item.unit;r.insertCell(4).innerHTML=item.quantity;r.cells[4].className='col-right';r.insertCell(5).innerHTML=item.price.toFixed(2).replace('.',',')+' ₽';r.cells[5].className='col-right';r.insertCell(6).innerHTML=item.total.toFixed(2).replace('.',',')+' ₽';r.cells[6].className='col-right col-bold';const d=r.insertCell(7);d.innerHTML='<button class="del-btn">&times;</button>';d.querySelector('button').onclick=()=>{const idx=estimateItems.indexOf(item);if(idx>=0){estimateItems.splice(idx,1);renderEstimate();}};}
-    function ast(label,sum){const r=tb.insertRow();r.className='subtotal-row';r.insertCell(0).colSpan=6;r.cells[0].innerHTML=label;r.cells[0].style.textAlign='right';r.cells[0].style.fontWeight='700';const v=r.insertCell(1);v.innerHTML=sum.toFixed(2).replace('.',',')+' ₽';v.className='col-right';v.style.fontWeight='700';r.insertCell(2).innerHTML='';}
-    if(mats.length){const sr=tb.insertRow();sr.className='section-row';sr.insertCell(0).colSpan=8;sr.cells[0].innerHTML='МАТЕРИАЛЫ';mats.forEach(i=>{ms+=i.total;ar(i);});ast('Итого материалы:',ms);}
-    if(wrk.length){const sr=tb.insertRow();sr.className='section-row';sr.insertCell(0).colSpan=8;sr.cells[0].innerHTML='РАБОТЫ И УСЛУГИ';wrk.forEach(i=>{ws+=i.total;ar(i);});ast('Итого работы:',ws);}
-    const g=ms+ws; const gr=tb.insertRow();gr.className='grand-row';gr.insertCell(0).colSpan=6;gr.cells[0].innerHTML='ВСЕГО ПО СМЕТЕ:';gr.cells[0].style.textAlign='right';gr.cells[0].style.fontWeight='800';const gv=gr.insertCell(1);gv.innerHTML=g.toFixed(2).replace('.',',')+' ₽';gv.className='col-right';gv.style.fontWeight='800';gr.insertCell(2).innerHTML='';
-    document.getElementById('totalEstimate').innerHTML=g.toFixed(2).replace('.',',')+' ₽';
-    localStorage.setItem('estimate',JSON.stringify(estimateItems));
-}
-
+let materialCategories=[],workCategories=[],currentType=null,currentCategory=null,currentItems=[],currentItem=null,estimateItems=[],manualOverrides={};
+function initConstructor(){materialCategories=[...new Set(catalog.materials.map(i=>i.group).filter(Boolean))].sort();workCategories=[...new Set(catalog.works.map(i=>i.group).filter(Boolean))].sort();renderCategories();loadEstimateFromStorage();}
+function renderCategories(){const md=document.getElementById('materialsList');md.innerHTML='';materialCategories.forEach(c=>{const d=document.createElement('div');d.className='category-item';d.textContent=c;d.onclick=()=>selectCategory('material',c);md.appendChild(d);});const wd=document.getElementById('worksList');wd.innerHTML='';workCategories.forEach(c=>{const d=document.createElement('div');d.className='category-item';d.textContent=c;d.onclick=()=>selectCategory('work',c);wd.appendChild(d);});resetForm();}
+function resetForm(){currentType=null;currentCategory=null;currentItems=[];currentItem=null;manualOverrides={};document.getElementById('itemSelect').innerHTML='<option value="">Сначала выберите категорию</option>';document.getElementById('infoBlock').style.display='none';document.getElementById('calcBlock').style.display='none';document.getElementById('rowTotal').innerHTML='0 ₽';document.querySelectorAll('.category-item').forEach(e=>e.classList.remove('active'));}
+function selectCategory(type,cat){currentType=type;currentCategory=cat;manualOverrides={};document.querySelectorAll('.category-item').forEach(e=>e.classList.remove('active'));const sel=type==='material'?'#materialsList .category-item':'#worksList .category-item';document.querySelectorAll(sel).forEach(e=>{if(e.textContent.trim()===cat)e.classList.add('active')});currentItems=[];const src=type==='material'?catalog.materials:catalog.works;src.forEach(i=>{if(i.group===cat)currentItems.push({...i,itemType:type})});const s=document.getElementById('itemSelect');s.innerHTML='<option value="">Выберите позицию</option>';const nc={};currentItems.forEach(i=>{if(!nc[i.name])nc[i.name]=[];nc[i.name].push(i)});currentItems.forEach((i,idx)=>{const o=document.createElement('option');o.value=i.name;o.dataset.idx=idx;o.textContent=(nc[i.name].length>1&&i.attribute)?i.name+' ('+i.attribute+')':i.name;o.dataset.unit=i.unit||'';o.dataset.price=i.price||0;o.dataset.size=i.size||'';o.dataset.attribute=i.attribute||'';o.dataset.supplier=i.supplier||'';o.dataset.site=i.site||'';s.appendChild(o)});document.getElementById('infoBlock').style.display='none';document.getElementById('calcBlock').style.display='none';document.getElementById('rowTotal').innerHTML='0 ₽';currentItem=null;}
+function fillDetails(){const s=document.getElementById('itemSelect');const o=s.options[s.selectedIndex];if(!o||!o.value)return;const idx=parseInt(o.dataset.idx);let sel;if(!isNaN(idx)&&idx>=0&&idx<currentItems.length)sel=currentItems[idx];else sel=currentItems.find(i=>i.name===o.value&&(!o.dataset.attribute||i.attribute===o.dataset.attribute));if(!sel)return;manualOverrides={};document.getElementById('infoBlock').style.display='block';renderInfoField('sizeValue','sizeContainer',sel.size,'size');const av=sel.attribute||'';document.getElementById('attrRow').style.display=av?'flex':'none';if(av)document.getElementById('attrContainer').innerHTML=`<span class="value">${av}</span>`;renderInfoField('unitValue','unitContainer',sel.unit,'unit');const ps=sel.price?sel.price.toLocaleString('ru-RU')+' ₽/'+(sel.unit||'ед.'):'';renderInfoField('priceValue','priceContainer',ps,'price');document.getElementById('supplierRow').style.display=sel.supplier?'flex':'none';if(sel.supplier)document.getElementById('supplierValue').innerHTML=sel.supplier;document.getElementById('siteRow').style.display=sel.site?'flex':'none';if(sel.site)document.getElementById('siteValue').innerHTML=sel.site.startsWith('http')?`<a href="${sel.site}" target="_blank" style="color:var(--accent);">открыть</a>`:sel.site;currentItem={type:currentType==='material'?'Материал':'Работа',category:currentCategory,name:sel.name+(sel.attribute?' ('+sel.attribute+')':''),unit:sel.unit||'',price:parseFloat(sel.price)||0,size:sel.size||'',attribute:sel.attribute||'',supplier:sel.supplier||'',site:sel.site||''};buildCalcInterface();}
+function renderInfoField(vid,cid,tv,field){const c=document.getElementById(cid);if(tv&&tv!=='0'&&tv!==''){c.innerHTML=`<span class="value${field==='size'?' size-hint':''}" id="${vid}">${tv}</span>`;}else{const ph=field==='price'?'0':field==='unit'?'ед.':'-';c.innerHTML=`<input type="text" class="manual-input" id="${vid}_input" value="${manualOverrides[field]||''}" placeholder="${ph}" oninput="onManualChange('${field}', this.value)">`;manualOverrides[field]='';}}
+function onManualChange(field,value){manualOverrides[field]=value;if(field==='price')currentItem.price=parseFloat(value)||0;if(field==='unit')currentItem.unit=value||'';if(field==='size')currentItem.size=value;if(field==='price'||field==='unit'){const pv=field==='price'?(parseFloat(value)||0):currentItem.price;const uv=field==='unit'?value:currentItem.unit;const pe=document.getElementById('priceValue');if(pe)pe.innerHTML=pv?pv.toLocaleString('ru-RU')+' ₽/'+(uv||'ед.'):'—';}const qe=document.getElementById('calcQty');if(qe){const q=parseFloat(qe.value)||0;const pr=manualOverrides.price!==undefined?(parseFloat(manualOverrides.price)||0):currentItem.price;const un=manualOverrides.unit||currentItem.unit||'ед.';const t=q*pr;document.getElementById('rowTotal').innerHTML=t.toFixed(2).replace('.',',')+' ₽';const ct=getCalcType(un);let txt='';if(ct==='area')txt=`${q.toFixed(2)} м² x ${pr.toFixed(2)} ₽/м² = ${t.toFixed(2)} ₽`;else if(ct==='length')txt=`${q.toFixed(1)} м x ${pr.toFixed(2)} ₽/м = ${t.toFixed(2)} ₽`;else txt=`${q} ${un} x ${pr.toFixed(2)} ₽ = ${t.toFixed(2)} ₽`;document.getElementById('calcResult').innerHTML=txt;lastCalcResult={total:t,quantity:q,calcText:txt};}}
+function getCalcType(u){const un=(u||'').toLowerCase();if(un.includes('м²')||un.includes('м.кв')||un.includes('кв.м'))return'area';if(un.includes('м.п')||un==='м'||un.includes('пог.м'))return'length';return'piece';}
+function buildCalcInterface(){if(!currentItem)return;const ct=getCalcType(currentItem.unit);const ul=currentItem.unit||'ед.';let h='';if(ct==='area')h=`<div class="field-group"><label>Площадь (м²)</label><input type="number" id="calcQty" value="1" step="0.01" min="0.01"><div class="calc-hint">Введите нужную площадь</div></div>`;else if(ct==='length')h=`<div class="field-group"><label>Длина (м)</label><input type="number" id="calcQty" value="1" step="0.1" min="0.1"><div class="calc-hint">Введите нужную длину</div></div>`;else h=`<div class="field-group"><label>Количество (${ul})</label><input type="number" id="calcQty" value="1" step="1" min="1"><div class="calc-hint">Введите нужное количество</div></div>`;if(currentItem.size)h+=`<div style="font-size:var(--fs-xs);color:var(--text-secondary);margin-top:6px;">Размер единицы: ${currentItem.size}</div>`;if(currentItem.attribute)h+=`<div style="font-size:var(--fs-xs);color:var(--text-secondary);margin-top:2px;">Характеристики: ${currentItem.attribute}</div>`;document.getElementById('calcFields').innerHTML=h;document.getElementById('calcBlock').style.display='block';document.getElementById('calcQty')?.addEventListener('input',calculateTotal);calculateTotal();}
+let lastCalcResult={total:0,quantity:0,calcText:''};
+function calculateTotal(){if(!currentItem){lastCalcResult={total:0,quantity:0,calcText:''};document.getElementById('rowTotal').innerHTML='0 ₽';return lastCalcResult;}const q=parseFloat(document.getElementById('calcQty')?.value)||0;const price=manualOverrides.price?parseFloat(manualOverrides.price)||0:currentItem.price;const t=q*price;const ct=getCalcType(currentItem.unit);const ul=currentItem.unit||'ед.';let txt='';if(ct==='area')txt=`${q.toFixed(2)} м² x ${price.toFixed(2)} ₽/м² = ${t.toFixed(2)} ₽`;else if(ct==='length')txt=`${q.toFixed(1)} м x ${price.toFixed(2)} ₽/м = ${t.toFixed(2)} ₽`;else txt=`${q} ${ul} x ${price.toFixed(2)} ₽ = ${t.toFixed(2)} ₽`;document.getElementById('rowTotal').innerHTML=t.toFixed(2).replace('.',',')+' ₽';document.getElementById('calcResult').innerHTML=txt;lastCalcResult={total:t,quantity:q,calcText:txt};return lastCalcResult;}
+function addToEstimate(){if(!currentItem||!currentItem.name){alert('Выберите позицию');return;}const finalPrice=manualOverrides.price?parseFloat(manualOverrides.price)||0:currentItem.price;const finalUnit=manualOverrides.unit||currentItem.unit||'ед.';if(!finalPrice||finalPrice===0){alert('Не указана цена. Введите цену вручную в поле «Цена за ед.»');return;}const q=parseFloat(document.getElementById('calcQty')?.value)||0;if(q<=0){alert('Укажите количество');return;}const t=q*finalPrice;const ct=getCalcType(finalUnit);let s='';if(ct==='area')s=`${q.toFixed(2)} м²`;else if(ct==='length')s=`${q.toFixed(1)} м`;else s=`${q} ${finalUnit}`;estimateItems.push({type:currentItem.type,category:currentItem.category,name:currentItem.name,calcText:s,unit:finalUnit,quantity:q,price:finalPrice,total:t,comment:''});renderEstimate();saveToHistory();}
+function renderEstimate(){const tb=document.getElementById('estimateBody');tb.innerHTML='';if(!estimateItems.length){tb.innerHTML='<tr><td colspan="10" class="estimate-empty">Смета пуста</td></tr>';document.getElementById('totalEstimate').innerHTML='0 ₽';return;}const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');let ms=0,ws=0,ri=0,num=0;function ar(item){num++;const r=tb.insertRow();r.className=ri%2===0?'even':'odd';ri++;r.insertCell(0).innerHTML=num;r.cells[0].className='row-num';r.insertCell(1).innerHTML=item.type;r.insertCell(2).innerHTML=item.name;r.insertCell(3).innerHTML=item.calcText;r.insertCell(4).innerHTML=item.unit;r.insertCell(5).innerHTML=item.quantity;r.cells[5].className='col-right';r.insertCell(6).innerHTML=item.price.toFixed(2).replace('.',',')+' ₽';r.cells[6].className='col-right';r.insertCell(7).innerHTML=item.total.toFixed(2).replace('.',',')+' ₽';r.cells[7].className='col-right col-bold';const cm=r.insertCell(8);cm.className='comment-cell';cm.innerHTML=`<input type="text" value="${(item.comment||'').replace(/"/g,'&quot;')}" placeholder="Комментарий" onchange="updateComment(${estimateItems.indexOf(item)}, this.value)">`;const act=r.insertCell(9);act.className='action-btns';act.innerHTML=`<button class="dup-btn" title="Дублировать">+</button><button class="del-btn" title="Удалить">&times;</button>`;act.querySelector('.dup-btn').onclick=()=>{const it={...item};estimateItems.push(it);renderEstimate();saveToHistory();};act.querySelector('.del-btn').onclick=()=>{const idx=estimateItems.indexOf(item);if(idx>=0){estimateItems.splice(idx,1);renderEstimate();saveToHistory();}};}function ast(label,sum){const r=tb.insertRow();r.className='subtotal-row';r.insertCell(0).colSpan=8;r.cells[0].innerHTML=label;r.cells[0].style.textAlign='right';r.cells[0].style.fontWeight='700';const v=r.insertCell(1);v.innerHTML=sum.toFixed(2).replace('.',',')+' ₽';v.className='col-right';v.style.fontWeight='700';r.insertCell(2).innerHTML='';}if(mats.length){const sr=tb.insertRow();sr.className='section-row';sr.insertCell(0).colSpan=10;sr.cells[0].innerHTML='МАТЕРИАЛЫ';mats.forEach(i=>{ms+=i.total;ar(i);});ast('Итого материалы:',ms);}if(wrk.length){const sr=tb.insertRow();sr.className='section-row';sr.insertCell(0).colSpan=10;sr.cells[0].innerHTML='РАБОТЫ И УСЛУГИ';wrk.forEach(i=>{ws+=i.total;ar(i);});ast('Итого работы:',ws);}let g=ms+ws;const markupAmount=g*markup/100;g+=markupAmount;if(markup>0){const mr=tb.insertRow();mr.className='markup-row-display';mr.insertCell(0).colSpan=8;mr.cells[0].innerHTML=`Наценка (${markup}%):`;mr.cells[0].style.textAlign='right';mr.cells[0].style.fontWeight='700';const mv=mr.insertCell(1);mv.innerHTML=markupAmount.toFixed(2).replace('.',',')+' ₽';mv.className='col-right';mv.style.fontWeight='700';mr.insertCell(2).innerHTML='';}const gr=tb.insertRow();gr.className='grand-row';gr.insertCell(0).colSpan=8;gr.cells[0].innerHTML='ВСЕГО ПО СМЕТЕ:';gr.cells[0].style.textAlign='right';gr.cells[0].style.fontWeight='800';const gv=gr.insertCell(1);gv.innerHTML=g.toFixed(2).replace('.',',')+' ₽';gv.className='col-right';gv.style.fontWeight='800';gr.insertCell(2).innerHTML='';document.getElementById('totalEstimate').innerHTML=g.toFixed(2).replace('.',',')+' ₽';localStorage.setItem('estimate',JSON.stringify(estimateItems));}
+function updateComment(idx,val){if(idx>=0&&idx<estimateItems.length){estimateItems[idx].comment=val;localStorage.setItem('estimate',JSON.stringify(estimateItems));saveToHistory();}}
 function loadEstimateFromStorage(){try{const s=localStorage.getItem('estimate');if(s){estimateItems=JSON.parse(s);renderEstimate();}}catch(e){}}
+
+// ============================================================
+// ИСТОРИЯ
+// ============================================================
+function saveToHistory(){if(!estimateItems.length)return;let history=[];try{history=JSON.parse(localStorage.getItem('estimateHistory')||'[]');}catch(e){}const entry={date:new Date().toLocaleString('ru-RU'),items:JSON.parse(JSON.stringify(estimateItems)),total:estimateItems.reduce((s,i)=>s+i.total,0)};history.unshift(entry);if(history.length>20)history=history.slice(0,20);localStorage.setItem('estimateHistory',JSON.stringify(history));}
+function showHistory(){const ex=document.querySelector('.modal-overlay');if(ex)ex.remove();let history=[];try{history=JSON.parse(localStorage.getItem('estimateHistory')||'[]');}catch(e){}const ov=document.createElement('div');ov.className='modal-overlay';let hhtml='';if(history.length===0){hhtml='<div style="text-align:center;padding:20px;color:var(--text-secondary);">История пуста</div>';}else{history.forEach((h,i)=>{hhtml+=`<div class="history-item" onclick="loadHistoryItem(${i})"><div><strong>Смета от ${h.date}</strong><br><span class="h-total">${h.total.toFixed(2).replace('.',',')} ₽</span> (${h.items.length} поз.)</div><span class="h-del" onclick="event.stopPropagation();deleteHistoryItem(${i})">Удалить</span></div>`;});}ov.innerHTML=`<div class="modal-dialog"><h2>История смет</h2><div class="history-list">${hhtml}</div><div class="modal-actions"><button class="btn btn-outline btn-sm" onclick="clearHistory()">Очистить историю</button><button class="btn btn-primary btn-sm" onclick="closeHelp()">Закрыть</button></div></div>`;ov.addEventListener('click',e=>{if(e.target===ov)closeHelp();});document.body.appendChild(ov);}
+function loadHistoryItem(idx){let history=[];try{history=JSON.parse(localStorage.getItem('estimateHistory')||'[]');}catch(e){}if(idx>=0&&idx<history.length){if(confirm('Загрузить эту смету? Текущая смета будет заменена.')){estimateItems=JSON.parse(JSON.stringify(history[idx].items));renderEstimate();saveToHistory();closeHelp();}}}
+function deleteHistoryItem(idx){let history=[];try{history=JSON.parse(localStorage.getItem('estimateHistory')||'[]');}catch(e){}if(idx>=0&&idx<history.length){history.splice(idx,1);localStorage.setItem('estimateHistory',JSON.stringify(history));showHistory();}}
+function clearHistory(){if(confirm('Очистить всю историю?')){localStorage.setItem('estimateHistory','[]');showHistory();}}
+
+// ============================================================
+// ПЕЧАТЬ
+// ============================================================
+function printEstimate(){window.print();}
 
 // ============================================================
 // ЭКСПОРТ
 // ============================================================
-function copyEstimate(){if(!estimateItems.length){alert('Смета пуста');return;}let t='Тип\tНаименование\tРасчёт\tЕд.\tКол-во\tЦена/ед\tСумма\n';const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');let ms=0,ws=0;if(mats.length){t+='\nМАТЕРИАЛЫ\n';mats.forEach(i=>{ms+=i.total;t+=[i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2)].join('\t')+'\n';});t+=`\t\t\t\t\tИтого материалы:\t${ms.toFixed(2)} ₽\n`;}if(wrk.length){t+='\nРАБОТЫ И УСЛУГИ\n';wrk.forEach(i=>{ws+=i.total;t+=[i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2)].join('\t')+'\n';});t+=`\t\t\t\t\tИтого работы:\t${ws.toFixed(2)} ₽\n`;}t+=`\n\t\t\t\t\tВСЕГО:\t${(ms+ws).toFixed(2)} ₽`;navigator.clipboard.writeText(t).then(()=>alert('Скопировано')).catch(()=>alert('Не удалось'));}
-function clearEstimate(){if(confirm('Очистить смету?')){estimateItems=[];renderEstimate();}}
+function copyEstimate(){if(!estimateItems.length){alert('Смета пуста');return;}let t='№\tТип\tНаименование\tРасчёт\tЕд.\tКол-во\tЦена/ед\tСумма\tКомментарий\n';const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');let ms=0,ws=0,num=0;if(mats.length){t+='\nМАТЕРИАЛЫ\n';mats.forEach(i=>{num++;ms+=i.total;t+=[num,i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2),i.comment||''].join('\t')+'\n';});t+=`\t\t\t\t\t\t\tИтого материалы:\t${ms.toFixed(2)} ₽\n`;}if(wrk.length){t+='\nРАБОТЫ И УСЛУГИ\n';wrk.forEach(i=>{num++;ws+=i.total;t+=[num,i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2),i.comment||''].join('\t')+'\n';});t+=`\t\t\t\t\t\t\tИтого работы:\t${ws.toFixed(2)} ₽\n`;}let g=ms+ws;const ma=g*markup/100;g+=ma;if(markup>0)t+=`\t\t\t\t\t\t\tНаценка (${markup}%):\t${ma.toFixed(2)} ₽\n`;t+=`\n\t\t\t\t\t\t\tВСЕГО:\t${g.toFixed(2)} ₽`;navigator.clipboard.writeText(t).then(()=>alert('Скопировано')).catch(()=>alert('Не удалось'));}
+function clearEstimate(){if(confirm('Очистить смету?')){estimateItems=[];renderEstimate();saveToHistory();}}
 
 function exportToXLSX(){if(!estimateItems.length){alert('Смета пуста');return;}if(typeof ExcelJS==='undefined'){alert('Подождите загрузки...');return;}exportToXLSX_do();}
-async function exportToXLSX_do(){const wb=new ExcelJS.Workbook();const ws=wb.addWorksheet('Смета',{views:[{showGridLines:false}]});ws.columns=[{w:14},{w:34},{w:24},{w:10},{w:12},{w:16},{w:18}];const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');let r=1;const tr=ws.getRow(r);tr.getCell(1).value='Смета от '+new Date().toLocaleString('ru-RU');tr.getCell(1).font={bold:true,size:14,color:{argb:'FF1A5D2A'}};ws.mergeCells(r,1,r,7);tr.height=30;r++;const hdr=ws.getRow(r);['Тип','Наименование','Расчёт','Ед.','Кол-во','Цена/ед','Сумма'].forEach((h,i)=>{const c=hdr.getCell(i+1);c.value=h;c.font={bold:true,color:{argb:'FFFFFFFF'},size:11};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2E7D32'}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=bd();});hdr.height=26;r++;let ms=0,ws2=0;function wsect(title,items,sumObj){const sr=ws.getRow(r);sr.getCell(1).value=title;sr.getCell(1).font={bold:true,size:12,color:{argb:'FF1A5D2A'}};sr.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFC8E6C9'}};ws.mergeCells(r,1,r,7);applyB(sr,1,7);sr.height=24;r++;items.forEach((it,i)=>{sumObj.val+=it.total;const row=ws.getRow(r);const bg=i%2===0?'FFFFFFFF':'FFF5F5F5';const vals=[it.type,it.name,it.calcText,it.unit,it.quantity,it.price.toFixed(2).replace('.',',')+' ₽',it.total.toFixed(2).replace('.',',')+' ₽'];vals.forEach((v,j)=>{const c=row.getCell(j+1);c.value=v;c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={vertical:'middle',wrapText:true,horizontal:j>=4?'right':'left'};c.border=bd();});row.getCell(7).font={bold:true};row.height=22;r++;});const tr2=ws.getRow(r);ws.mergeCells(r,1,r,5);tr2.getCell(6).value='Итого:';tr2.getCell(7).value=sumObj.val.toFixed(2).replace('.',',')+' ₽';[6,7].forEach(j=>{tr2.getCell(j).font={bold:true};tr2.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF9C4'}};tr2.getCell(j).alignment={horizontal:'right',vertical:'middle'};tr2.getCell(j).border=bd();});applyB(tr2,1,5);tr2.height=24;r++;}if(mats.length){const mo={val:0};wsect('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}if(wrk.length){r++;const wo={val:0};wsect('РАБОТЫ И УСЛУГИ',wrk,wo);ws2=wo.val;}r++;const g=ms+ws2;const gr=ws.getRow(r);ws.mergeCells(r,1,r,5);gr.getCell(6).value='ВСЕГО ПО СМЕТЕ:';gr.getCell(7).value=g.toFixed(2).replace('.',',')+' ₽';[6,7].forEach(j=>{gr.getCell(j).font={bold:true,size:13};gr.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFCC02'}};gr.getCell(j).alignment={horizontal:'right',vertical:'middle'};gr.getCell(j).border={top:{style:'medium'},bottom:{style:'medium'},left:{style:'thin'},right:{style:'thin'}};});applyB(gr,1,5);gr.height=28;const buf=await wb.xlsx.writeBuffer();const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`smeta_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xlsx`;a.click();URL.revokeObjectURL(a.href);}
+async function exportToXLSX_do(){const wb=new ExcelJS.Workbook();const ws=wb.addWorksheet('Смета',{views:[{showGridLines:false}]});ws.columns=[{w:6},{w:14},{w:34},{w:22},{w:8},{w:10},{w:14},{w:16},{w:20}];const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;let r=1;const tr=ws.getRow(r);tr.getCell(1).value='Смета от '+new Date().toLocaleString('ru-RU');tr.getCell(1).font={bold:true,size:14,color:{argb:'FF1A5D2A'}};ws.mergeCells(r,1,r,9);tr.height=30;r++;const hdr=ws.getRow(r);['№','Тип','Наименование','Расчёт','Ед.','Кол-во','Цена/ед','Сумма','Комментарий'].forEach((h,i)=>{const c=hdr.getCell(i+1);c.value=h;c.font={bold:true,color:{argb:'FFFFFFFF'},size:10};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2E7D32'}};c.alignment={horizontal:'center',vertical:'middle',wrapText:true};c.border=bd();});hdr.height=24;r++;let ms=0,ws2=0,num=0;function wsect(title,items,sumObj){const sr=ws.getRow(r);sr.getCell(1).value=title;sr.getCell(1).font={bold:true,size:11,color:{argb:'FF1A5D2A'}};sr.getCell(1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFC8E6C9'}};ws.mergeCells(r,1,r,9);applyB(sr,1,9);sr.height=22;r++;items.forEach((it,i)=>{num++;sumObj.val+=it.total;const row=ws.getRow(r);const bg=i%2===0?'FFFFFFFF':'FFF5F5F5';const vals=[num,it.type,it.name,it.calcText,it.unit,it.quantity,it.price.toFixed(2).replace('.',',')+' ₽',it.total.toFixed(2).replace('.',',')+' ₽',it.comment||''];vals.forEach((v,j)=>{const c=row.getCell(j+1);c.value=v;c.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};c.alignment={vertical:'middle',wrapText:true,horizontal:j>=4?'right':'left'};c.border=bd();});row.getCell(8).font={bold:true};row.height=22;r++;});const tr2=ws.getRow(r);ws.mergeCells(r,1,r,7);tr2.getCell(8).value='Итого:';tr2.getCell(9).value=sumObj.val.toFixed(2).replace('.',',')+' ₽';[8,9].forEach(j=>{tr2.getCell(j).font={bold:true};tr2.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF9C4'}};tr2.getCell(j).alignment={horizontal:'right',vertical:'middle'};tr2.getCell(j).border=bd();});applyB(tr2,1,7);tr2.height=22;r++;}if(mats.length){const mo={val:0};wsect('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}if(wrk.length){r++;const wo={val:0};wsect('РАБОТЫ И УСЛУГИ',wrk,wo);ws2=wo.val;}let g=ms+ws2;const ma=g*markup/100;g+=ma;if(markup>0){r++;const mr=ws.getRow(r);ws.mergeCells(r,1,r,7);mr.getCell(8).value=`Наценка (${markup}%):`;mr.getCell(9).value=ma.toFixed(2).replace('.',',')+' ₽';[8,9].forEach(j=>{mr.getCell(j).font={bold:true};mr.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE3F2FD'}};mr.getCell(j).alignment={horizontal:'right',vertical:'middle'};mr.getCell(j).border=bd();});mr.height=22;}r++;const gr=ws.getRow(r);ws.mergeCells(r,1,r,7);gr.getCell(8).value='ВСЕГО:';gr.getCell(9).value=g.toFixed(2).replace('.',',')+' ₽';[8,9].forEach(j=>{gr.getCell(j).font={bold:true,size:12};gr.getCell(j).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFCC02'}};gr.getCell(j).alignment={horizontal:'right',vertical:'middle'};gr.getCell(j).border={top:{style:'medium'},bottom:{style:'medium'},left:{style:'thin'},right:{style:'thin'}};});applyB(gr,1,7);gr.height=26;const buf=await wb.xlsx.writeBuffer();const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`smeta_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xlsx`;a.click();URL.revokeObjectURL(a.href);}
 function bd(){return{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}};}
 function applyB(row,f,t){for(let i=f;i<=t;i++)row.getCell(i).border=bd();}
 
 // ============================================================
 // ЗАПУСК
 // ============================================================
-document.getElementById('itemSelect').addEventListener('change', fillDetails);
+document.getElementById('itemSelect').addEventListener('change',fillDetails);
 loadAllData();
-window.addToEstimate=addToEstimate;window.exportToXLSX=exportToXLSX;window.copyEstimate=copyEstimate;window.clearEstimate=clearEstimate;
+window.addToEstimate=addToEstimate;window.exportToXLSX=exportToXLSX;window.copyEstimate=copyEstimate;window.clearEstimate=clearEstimate;window.printEstimate=printEstimate;window.showHistory=showHistory;window.updateComment=updateComment;
 </script>
 </body>
 </html>
