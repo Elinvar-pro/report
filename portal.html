@@ -256,9 +256,10 @@ function clearHistory(){if(confirm('Очистить всю историю?')){l
 function printEstimate(){
     if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
         const w=window.open('','_blank','width=800,height=600');
-        const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');
+        const mats=estimateItems.filter(i=>i.type==='Материал');
+        const wrk=estimateItems.filter(i=>i.type==='Работа');
         const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;
-        let ms=0,ws=0,num=0;
+        let ms=0,ws2=0,num=0;
         let h=`<html><head><meta charset="UTF-8"><title>Смета</title><style>body{font-family:sans-serif;padding:20px;}h2{color:#1a5d2a;}table{width:100%;border-collapse:collapse;font-size:12px;}th,td{border:1px solid #000;padding:5px 8px;}th{background:#e8e8e8;text-align:left;}.right{text-align:right;}.section td{background:#e8f5e9;font-weight:bold;}.sub td{background:#fff9c4;font-weight:bold;}.grand td{background:#ffcc02;font-weight:bold;font-size:14px;}@media print{body{padding:0;}}</style></head><body><h2>Смета от ${new Date().toLocaleString('ru-RU')}</h2><table><tr><th>№</th><th>Тип</th><th>Наименование</th><th>Расчёт</th><th>Ед.</th><th>Кол-во</th><th>Цена/ед</th><th>Сумма</th></tr>`;
         function ws(title,items,sumObj){h+=`<tr class="section"><td colspan="8">${title}</td></tr>`;items.forEach((it,i)=>{num++;sumObj.val+=it.total;h+=`<tr><td>${num}</td><td>${it.type}</td><td>${it.name}</td><td>${it.calcText}</td><td>${it.unit}</td><td class="right">${it.quantity}</td><td class="right">${it.price.toFixed(2).replace('.',',')} ₽</td><td class="right"><strong>${it.total.toFixed(2).replace('.',',')} ₽</strong></td></tr>`;});h+=`<tr class="sub"><td colspan="7" class="right">Итого:</td><td class="right">${sumObj.val.toFixed(2).replace('.',',')} ₽</td></tr>`;}
         if(mats.length){const mo={val:0};ws('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}
