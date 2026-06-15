@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Конструктор сметы</title>
+    <title>Смета</title>
     <style>
         :root {
             --bg: #f5f7fb; --surface: #ffffff; --surface2: #f8f9fc;
@@ -150,6 +150,8 @@
             .estimate-table th:last-child, .estimate-table td:last-child { display: none !important; }
             .estimate-header-row { display: block !important; border-bottom: none !important; padding: 0 0 10px 0 !important; }
             .estimate-header-row .estimate-grand, .estimate-header-row .markup-row { display: none !important; }
+            .object-row input { border: none !important; padding: 0 !important; background: transparent !important; font-weight: 600 !important; }
+            .object-row label { font-weight: 600 !important; }
             .main-layout { display: block !important; }
             .column { overflow: visible !important; }
             .column-estimate { width: 100% !important; overflow: visible !important; flex: none !important; min-width: 0 !important; }
@@ -269,54 +271,10 @@ function loadHistoryItem(idx){let h=[];try{h=JSON.parse(localStorage.getItem('es
 function deleteHistoryItem(idx){let h=[];try{h=JSON.parse(localStorage.getItem('estimateHistory')||'[]');}catch(e){}if(idx>=0&&idx<h.length){h.splice(idx,1);localStorage.setItem('estimateHistory',JSON.stringify(h));showHistory();}}
 function clearHistory(){if(confirm('Очистить всю историю?')){localStorage.setItem('estimateHistory','[]');showHistory();}}
 
-function printEstimate(){
-    const objName=getObjectName();
-    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
-        const w=window.open('','_blank','width=800,height=600');
-        const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');
-        const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;
-        let ms=0,ws2=0,num=0;
-        let h=`<html><head><meta charset="UTF-8"><title>Смета</title><style>body{font-family:sans-serif;padding:20px;}h2{color:#1a5d2a;}h3{color:#666;font-weight:normal;margin-top:-10px;}table{width:100%;border-collapse:collapse;font-size:12px;}th,td{border:1px solid #000;padding:5px 8px;}th{background:#e8e8e8;text-align:left;}.right{text-align:right;}.section td{background:#e8f5e9;font-weight:bold;}.sub td{background:#fff9c4;font-weight:bold;}.grand td{background:#ffcc02;font-weight:bold;font-size:14px;}@media print{body{padding:0;}}</style></head><body><h2>Смета</h2>${objName?`<h3>Объект: ${objName}</h3>`:''}<table><tr><th>№</th><th>Тип</th><th>Наименование</th><th>Расчёт</th><th>Ед.</th><th>Кол-во</th><th>Цена/ед</th><th>Сумма</th></tr>`;
-        function ws(title,items,sumObj){h+=`<tr class="section"><td colspan="8">${title}</td></tr>`;items.forEach((it,i)=>{num++;sumObj.val+=it.total;h+=`<tr><td>${num}</td><td>${it.type}</td><td>${it.name}</td><td>${it.calcText}</td><td>${it.unit}</td><td class="right">${it.quantity}</td><td class="right">${it.price.toFixed(2).replace('.',',')} ₽</td><td class="right"><strong>${it.total.toFixed(2).replace('.',',')} ₽</strong></td></tr>`;});h+=`<tr class="sub"><td colspan="7" class="right">Итого:</td><td class="right">${sumObj.val.toFixed(2).replace('.',',')} ₽</td></tr>`;}
-        if(mats.length){const mo={val:0};ws('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}
-        if(wrk.length){const wo={val:0};ws('РАБОТЫ И УСЛУГИ',wrk,wo);ws2=wo.val;}
-        let g=ms+ws2;const ma=g*markup/100;g+=ma;
-        if(markup>0)h+=`<tr style="background:#e3f2fd;"><td colspan="7" class="right">Наценка (${markup}%):</td><td class="right">${ma.toFixed(2).replace('.',',')} ₽</td></tr>`;
-        h+=`<tr class="grand"><td colspan="7" class="right">ВСЕГО:</td><td class="right">${g.toFixed(2).replace('.',',')} ₽</td></tr></table></body></html>`;
-        w.document.write(h);w.document.close();
-    }else{window.print();}
-}
-
+function printEstimate(){const objName=getObjectName();if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){const w=window.open('','_blank','width=800,height=600');const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;let ms=0,ws2=0,num=0;let h=`<html><head><meta charset="UTF-8"><title>Смета</title><style>body{font-family:sans-serif;padding:20px;}h2{color:#1a5d2a;font-size:18px;}h3{color:#666;font-weight:normal;margin-top:-8px;font-size:14px;}table{width:100%;border-collapse:collapse;font-size:12px;}th,td{border:1px solid #000;padding:5px 8px;}th{background:#e8e8e8;text-align:left;}.right{text-align:right;}.section td{background:#e8f5e9;font-weight:bold;}.sub td{background:#fff9c4;font-weight:bold;}.grand td{background:#ffcc02;font-weight:bold;font-size:14px;}@media print{body{padding:0;}}</style></head><body><h2>Смета</h2>${objName?`<h3>Объект: ${objName}</h3>`:''}<table><tr><th>№</th><th>Тип</th><th>Наименование</th><th>Расчёт</th><th>Ед.</th><th>Кол-во</th><th>Цена/ед</th><th>Сумма</th></tr>`;function ws(title,items,sumObj){h+=`<tr class="section"><td colspan="8">${title}</td></tr>`;items.forEach((it,i)=>{num++;sumObj.val+=it.total;h+=`<tr><td>${num}</td><td>${it.type}</td><td>${it.name}</td><td>${it.calcText}</td><td>${it.unit}</td><td class="right">${it.quantity}</td><td class="right">${it.price.toFixed(2).replace('.',',')} ₽</td><td class="right"><strong>${it.total.toFixed(2).replace('.',',')} ₽</strong></td></tr>`;});h+=`<tr class="sub"><td colspan="7" class="right">Итого:</td><td class="right">${sumObj.val.toFixed(2).replace('.',',')} ₽</td></tr>`;}if(mats.length){const mo={val:0};ws('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}if(wrk.length){const wo={val:0};ws('РАБОТЫ И УСЛУГИ',wrk,wo);ws2=wo.val;}let g=ms+ws2;const ma=g*markup/100;g+=ma;if(markup>0)h+=`<tr style="background:#e3f2fd;"><td colspan="7" class="right">Наценка (${markup}%):</td><td class="right">${ma.toFixed(2).replace('.',',')} ₽</td></tr>`;h+=`<tr class="grand"><td colspan="7" class="right">ВСЕГО:</td><td class="right">${g.toFixed(2).replace('.',',')} ₽</td></tr></table></body></html>`;w.document.write(h);w.document.close();}else{window.print();}}
 function copyEstimate(){if(!estimateItems.length){alert('Смета пуста');return;}const objName=getObjectName();let t=(objName?`Объект: ${objName}\n\n`:'')+'№\tТип\tНаименование\tРасчёт\tЕд.\tКол-во\tЦена/ед\tСумма\n';const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');let ms=0,ws=0,num=0;if(mats.length){t+='\nМАТЕРИАЛЫ\n';mats.forEach(i=>{num++;ms+=i.total;t+=[num,i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2)].join('\t')+'\n';});t+=`\t\t\t\t\t\tИтого материалы:\t${ms.toFixed(2)} ₽\n`;}if(wrk.length){t+='\nРАБОТЫ И УСЛУГИ\n';wrk.forEach(i=>{num++;ws+=i.total;t+=[num,i.type,i.name,i.calcText,i.unit,i.quantity,i.price.toFixed(2),i.total.toFixed(2)].join('\t')+'\n';});t+=`\t\t\t\t\t\tИтого работы:\t${ws.toFixed(2)} ₽\n`;}let g=ms+ws;const ma=g*markup/100;g+=ma;if(markup>0)t+=`\t\t\t\t\t\tНаценка (${markup}%):\t${ma.toFixed(2)} ₽\n`;t+=`\n\t\t\t\t\t\tВСЕГО:\t${g.toFixed(2)} ₽`;navigator.clipboard.writeText(t).then(()=>alert('Скопировано')).catch(()=>alert('Не удалось'));}
 function clearEstimate(){if(confirm('Очистить смету?')){estimateItems=[];renderEstimate();saveToHistory();}}
-
-function exportToXLSX(){
-    if(!estimateItems.length){alert('Смета пуста');return;}
-    const objName=getObjectName();
-    const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');
-    const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;
-    let ms=0,ws2=0,num=0;
-    const b='border:1px solid #000;',p='padding:5px 8px;';
-    const hdr=`${b}${p}background:#2e7d32;color:#fff;font-weight:bold;text-align:center;`;
-    const sec=`${b}${p}background:#c8e6c9;color:#1a5d2a;font-weight:bold;`;
-    const sub=`${b}${p}background:#fff9c4;font-weight:bold;`;
-    const gnd=`${b}${p}background:#ffcc02;font-weight:bold;`;
-    const mrk=`${b}${p}background:#e3f2fd;font-weight:bold;`;
-    let h=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table cellspacing="0" style="border-collapse:collapse;">`;
-    h+=`<tr><td colspan="8" style="font-size:16px;font-weight:bold;color:#1a5d2a;padding:10px;">Смета от ${new Date().toLocaleString('ru-RU')}</td></tr>`;
-    if(objName)h+=`<tr><td colspan="8" style="font-size:13px;color:#555;padding:4px 10px;">Объект: ${objName}</td></tr>`;
-    h+=`<tr><th style="${hdr}">№</th><th style="${hdr}">Тип</th><th style="${hdr}">Наименование</th><th style="${hdr}">Расчёт</th><th style="${hdr}">Ед.</th><th style="${hdr}">Кол-во</th><th style="${hdr}">Цена/ед</th><th style="${hdr}">Сумма</th></tr>`;
-    function wsect(title,items,sumObj){h+=`<tr><td colspan="8" style="${sec}">${title}</td></tr>`;items.forEach((it,i)=>{num++;sumObj.val+=it.total;const bg=i%2===0?'background:#fff;':'background:#f5f5f5;';h+=`<tr><td style="${b}${p}${bg}text-align:center;">${num}</td><td style="${b}${p}${bg}">${it.type}</td><td style="${b}${p}${bg}">${it.name}</td><td style="${b}${p}${bg}">${it.calcText}</td><td style="${b}${p}${bg}">${it.unit}</td><td style="${b}${p}${bg}text-align:right;">${it.quantity}</td><td style="${b}${p}${bg}text-align:right;">${it.price.toFixed(2).replace('.',',')} ₽</td><td style="${b}${p}${bg}text-align:right;font-weight:bold;">${it.total.toFixed(2).replace('.',',')} ₽</td></tr>`;});h+=`<tr><td colspan="7" style="${sub}text-align:right;">Итого:</td><td style="${sub}text-align:right;">${sumObj.val.toFixed(2).replace('.',',')} ₽</td></tr>`;}
-    if(mats.length){const mo={val:0};wsect('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}
-    if(wrk.length){const wo={val:0};wsect('РАБОТЫ И УСЛУГИ',wrk,wo);ws2=wo.val;}
-    let g=ms+ws2;const ma=g*markup/100;g+=ma;
-    if(markup>0){h+=`<tr><td colspan="7" style="${mrk}text-align:right;">Наценка (${markup}%):</td><td style="${mrk}text-align:right;">${ma.toFixed(2).replace('.',',')} ₽</td></tr>`;}
-    h+=`<tr><td colspan="7" style="${gnd}text-align:right;font-size:14px;">ВСЕГО:</td><td style="${gnd}text-align:right;font-size:14px;">${g.toFixed(2).replace('.',',')} ₽</td></tr>`;
-    h+=`</table></body></html>`;
-    const blob=new Blob([h],{type:'application/vnd.ms-excel;charset=utf-8'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-    a.download=`smeta_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xls`;a.click();URL.revokeObjectURL(a.href);
-}
+function exportToXLSX(){if(!estimateItems.length){alert('Смета пуста');return;}const objName=getObjectName();const mats=estimateItems.filter(i=>i.type==='Материал'),wrk=estimateItems.filter(i=>i.type==='Работа');const markup=parseFloat(document.getElementById('markupPercent')?.value)||0;let ms=0,ws2=0,num=0;const b='border:1px solid #000;',p='padding:5px 8px;';const hdr=`${b}${p}background:#2e7d32;color:#fff;font-weight:bold;text-align:center;`;const sec=`${b}${p}background:#c8e6c9;color:#1a5d2a;font-weight:bold;`;const sub=`${b}${p}background:#fff9c4;font-weight:bold;`;const gnd=`${b}${p}background:#ffcc02;font-weight:bold;`;const mrk=`${b}${p}background:#e3f2fd;font-weight:bold;`;let h=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"></head><body><table cellspacing="0" style="border-collapse:collapse;">`;h+=`<tr><td colspan="8" style="font-size:16px;font-weight:bold;color:#1a5d2a;padding:10px;">Смета от ${new Date().toLocaleString('ru-RU')}</td></tr>`;if(objName)h+=`<tr><td colspan="8" style="font-size:13px;color:#555;padding:4px 10px;">Объект: ${objName}</td></tr>`;h+=`<tr><th style="${hdr}">№</th><th style="${hdr}">Тип</th><th style="${hdr}">Наименование</th><th style="${hdr}">Расчёт</th><th style="${hdr}">Ед.</th><th style="${hdr}">Кол-во</th><th style="${hdr}">Цена/ед</th><th style="${hdr}">Сумма</th></tr>`;function wsect(title,items,sumObj){h+=`<tr><td colspan="8" style="${sec}">${title}</td></tr>`;items.forEach((it,i)=>{num++;sumObj.val+=it.total;const bg=i%2===0?'background:#fff;':'background:#f5f5f5;';h+=`<tr><td style="${b}${p}${bg}text-align:center;">${num}</td><td style="${b}${p}${bg}">${it.type}</td><td style="${b}${p}${bg}">${it.name}</td><td style="${b}${p}${bg}">${it.calcText}</td><td style="${b}${p}${bg}">${it.unit}</td><td style="${b}${p}${bg}text-align:right;">${it.quantity}</td><td style="${b}${p}${bg}text-align:right;">${it.price.toFixed(2).replace('.',',')} ₽</td><td style="${b}${p}${bg}text-align:right;font-weight:bold;">${it.total.toFixed(2).replace('.',',')} ₽</td></tr>`;});h+=`<tr><td colspan="7" style="${sub}text-align:right;">Итого:</td><td style="${sub}text-align:right;">${sumObj.val.toFixed(2).replace('.',',')} ₽</td></tr>`;}if(mats.length){const mo={val:0};wsect('МАТЕРИАЛЫ',mats,mo);ms=mo.val;}if(wrk.length){const wo={val:0};wsect('РАБОТЫ И УСЛУГИ',wrk,wo);ws2=wo.val;}let g=ms+ws2;const ma=g*markup/100;g+=ma;if(markup>0){h+=`<tr><td colspan="7" style="${mrk}text-align:right;">Наценка (${markup}%):</td><td style="${mrk}text-align:right;">${ma.toFixed(2).replace('.',',')} ₽</td></tr>`;}h+=`<tr><td colspan="7" style="${gnd}text-align:right;font-size:14px;">ВСЕГО:</td><td style="${gnd}text-align:right;font-size:14px;">${g.toFixed(2).replace('.',',')} ₽</td></tr></table></body></html>`;const blob=new Blob([h],{type:'application/vnd.ms-excel;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`smeta_${new Date().toISOString().slice(0,19).replace(/:/g,'-')}.xls`;a.click();URL.revokeObjectURL(a.href);}
 
 document.getElementById('itemSelect').addEventListener('change',fillDetails);
 loadAllData();
