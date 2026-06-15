@@ -250,7 +250,7 @@ function setDataStatus(s,t){document.getElementById('dataStatus').innerHTML=`<sp
 function loadAllData(){
     setDataStatus('loading','Загрузка...');
     Promise.all([
-        fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Актуальные+цены+материалов`).then(r=>r.text()),
+        fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Материалы`).then(r=>r.text()),
         fetch(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=Работы`).then(r=>r.text())
     ])
     .then(([t1,t2])=>{
